@@ -53,10 +53,10 @@ export default function HeroSection() {
   return (
     <section className="py-8 lg:py-12 bg-blue-50">
       <div className="w-[90%] max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Simplified Layout - No Complex Grid */}
-        <div className="space-y-6">
-          {/* Main Slider */}
-          <div className="bg-white rounded-xl p-8 lg:p-12 relative overflow-hidden min-h-[400px] lg:min-h-[500px]">
+        {/* Grid Layout: 2/3 for slider, 1/3 for promo blocks */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[500px]">
+          {/* Main Slider - Takes 2/3 on large screens */}
+          <div className="lg:col-span-2 bg-white rounded-xl relative overflow-hidden">
             <div className="relative h-full">
               {slides.map((slide, index) => (
                 <div
@@ -65,15 +65,15 @@ export default function HeroSection() {
                     index === currentSlide ? "opacity-100" : "opacity-0"
                   }`}
                 >
-                  <div className="flex items-center h-full">
+                  <div className="flex items-center h-full p-8 lg:p-12">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center w-full">
-                      <div className="space-y-6">
-                        <div className="text-2xl lg:text-3xl font-serif text-primary">{slide.category}</div>
-                        <h1 className="text-3xl lg:text-5xl font-bold leading-tight text-gray-900">{slide.title}</h1>
-                        <p className="text-lg text-gray-600">{slide.description}</p>
+                      <div className="space-y-4">
+                        <div className="text-xl lg:text-2xl font-serif text-primary">{slide.category}</div>
+                        <h1 className="text-2xl lg:text-4xl font-bold leading-tight text-gray-900">{slide.title}</h1>
+                        <p className="text-base text-gray-600">{slide.description}</p>
                         <Link
                           href="/shop"
-                          className="inline-block bg-primary text-white px-8 py-3 text-sm font-semibold uppercase rounded-lg hover:bg-primary/90 transition-colors"
+                          className="inline-block bg-primary text-white px-6 py-2 text-sm font-semibold uppercase rounded-lg hover:bg-primary/90 transition-colors"
                         >
                           {slide.buttonText}
                         </Link>
@@ -82,8 +82,8 @@ export default function HeroSection() {
                         <Image
                           src={slide.image || "/placeholder.svg"}
                           alt={slide.title}
-                          width={300}
-                          height={300}
+                          width={250}
+                          height={250}
                           className="max-w-full h-auto"
                         />
                       </div>
@@ -111,46 +111,74 @@ export default function HeroSection() {
             {/* Navigation Arrows */}
             <button
               onClick={prevSlide}
-              className="absolute left-4 top-1/2 transform -translate-y-1/2 w-12 h-12 bg-white/80 rounded-full flex items-center justify-center hover:bg-white transition-colors shadow-lg"
+              className="absolute left-4 top-1/2 transform -translate-y-1/2 w-10 h-10 bg-white/80 rounded-full flex items-center justify-center hover:bg-white transition-colors shadow-lg"
             >
-              <ChevronLeft size={24} />
+              <ChevronLeft size={20} />
             </button>
             <button
               onClick={nextSlide}
-              className="absolute right-4 top-1/2 transform -translate-y-1/2 w-12 h-12 bg-white/80 rounded-full flex items-center justify-center hover:bg-white transition-colors shadow-lg"
+              className="absolute right-4 top-1/2 transform -translate-y-1/2 w-10 h-10 bg-white/80 rounded-full flex items-center justify-center hover:bg-white transition-colors shadow-lg"
             >
-              <ChevronRight size={24} />
+              <ChevronRight size={20} />
             </button>
           </div>
 
-          {/* Side Banners - Now in Simple Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="bg-green-100 rounded-xl p-6 lg:p-8 min-h-[200px] flex items-end">
-              <div className="space-y-3">
-                <div className="text-lg font-bold text-green-600 relative">
-                  20% off
-                  <span className="absolute -bottom-1 left-0 w-16 h-0.5 bg-gray-800"></span>
+          {/* Promotional Blocks - Takes 1/3 on large screens, stacked vertically */}
+          <div className="flex flex-col gap-6">
+            {/* Fruits & Vegetables Block */}
+            <div className="bg-green-50 rounded-xl p-6 h-full relative overflow-hidden">
+              <div className="relative z-10 h-full flex flex-col justify-between">
+                <div className="space-y-2">
+                  <div className="text-2xl lg:text-3xl font-bold text-gray-900">20% Off</div>
+                  <div className="w-12 h-0.5 bg-gray-900"></div>
+                  <div className="text-sm text-gray-600 uppercase tracking-wide">SALE</div>
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900">Fruits & Vegetables</h3>
-                <Link href="/shop?category=fruits" className="flex items-center text-gray-800 hover:text-primary">
-                  Shop Collection
-                  <ChevronRight size={20} className="ml-1" />
-                </Link>
+                <div className="space-y-3">
+                  <h3 className="text-xl font-bold text-gray-900">Fruits &<br />Vegetables</h3>
+                  <Link href="/shop?category=fruits" className="flex items-center text-gray-600 hover:text-primary text-sm">
+                    Shop Collection
+                    <ChevronRight size={16} className="ml-1" />
+                  </Link>
+                </div>
               </div>
+                             {/* Background Image - Optional */}
+               <div className="absolute bottom-0 right-0 opacity-20">
+                 <Image
+                   src="/images/ad-image-1.png"
+                   alt="Fruits"
+                   width={120}
+                   height={120}
+                   className="object-contain"
+                 />
+               </div>
             </div>
 
-            <div className="bg-red-100 rounded-xl p-6 lg:p-8 min-h-[200px] flex items-end">
-              <div className="space-y-3">
-                <div className="text-lg font-bold text-red-600 relative">
-                  15% off
-                  <span className="absolute -bottom-1 left-0 w-16 h-0.5 bg-gray-800"></span>
+            {/* Baked Products Block */}
+            <div className="bg-orange-50 rounded-xl p-6 h-full relative overflow-hidden">
+              <div className="relative z-10 h-full flex flex-col justify-between">
+                <div className="space-y-2">
+                  <div className="text-2xl lg:text-3xl font-bold text-gray-900">15% Off</div>
+                  <div className="w-12 h-0.5 bg-gray-900"></div>
+                  <div className="text-sm text-gray-600 uppercase tracking-wide">SALE</div>
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900">Baked Products</h3>
-                <Link href="/shop?category=bakery" className="flex items-center text-gray-800 hover:text-primary">
-                  Shop Collection
-                  <ChevronRight size={20} className="ml-1" />
-                </Link>
+                <div className="space-y-3">
+                  <h3 className="text-xl font-bold text-gray-900">Baked Products</h3>
+                  <Link href="/shop?category=bakery" className="flex items-center text-gray-600 hover:text-primary text-sm">
+                    Shop Collection
+                    <ChevronRight size={16} className="ml-1" />
+                  </Link>
+                </div>
               </div>
+                             {/* Background Image - Optional */}
+               <div className="absolute bottom-0 right-0 opacity-20">
+                 <Image
+                   src="/images/ad-image-2.png"
+                   alt="Bakery"
+                   width={120}
+                   height={120}
+                   className="object-contain"
+                 />
+               </div>
             </div>
           </div>
         </div>
