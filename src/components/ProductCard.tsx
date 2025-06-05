@@ -4,7 +4,8 @@ import { useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { Star, Heart, ShoppingCart, Plus, Minus } from "lucide-react"
-import { useHydratedStore, type Product } from "../lib/store"
+// import { useHydratedStore, type Product } from "../lib/store"
+import type { Product } from "../lib/store"
 
 interface ProductCardProps {
   product: Product
@@ -12,21 +13,24 @@ interface ProductCardProps {
 
 export default function ProductCard({ product }: ProductCardProps) {
   const [quantity, setQuantity] = useState(1)
-  const { addToCart, addToWishlist, removeFromWishlist, isInWishlist } = useHydratedStore()
+  // const { addToCart, addToWishlist, removeFromWishlist, isInWishlist } = useHydratedStore()
 
-  const inWishlist = isInWishlist(product.id)
+  // Temporary: disable store functionality for debugging
+  const inWishlist = false
 
   const handleAddToCart = () => {
-    addToCart(product, quantity)
+    // addToCart(product, quantity)
+    console.log('Add to cart:', product.name, quantity)
     setQuantity(1)
   }
 
   const handleWishlistToggle = () => {
-    if (inWishlist) {
-      removeFromWishlist(product.id)
-    } else {
-      addToWishlist(product)
-    }
+    // if (inWishlist) {
+    //   removeFromWishlist(product.id)
+    // } else {
+    //   addToWishlist(product)
+    // }
+    console.log('Toggle wishlist:', product.name)
   }
 
   const handleQuantityChange = (change: number) => {
