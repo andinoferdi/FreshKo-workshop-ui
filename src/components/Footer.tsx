@@ -144,16 +144,6 @@ export default function Footer() {
               <p className="text-gray-600 mb-3 lg:mb-4">
                 Subscribe to our newsletter to get updates about our grand offers.
               </p>
-              <form className="flex gap-0">
-                <input
-                  className="flex-1 px-4 py-2 bg-gray-100 border-0 rounded-l-lg"
-                  type="email"
-                  placeholder="Email Address"
-                />
-                <button className="bg-dark text-white px-4 py-2 rounded-r-lg" type="submit">
-                  Subscribe
-                </button>
-              </form>
             </div>
           </div>
         </div>
