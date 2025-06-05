@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation"
-import { getProductById, allProducts } from "@/lib/products"
+import { getProductById, products } from "@/lib/products"
 import ProductDetail from "@/components/ProductDetail"
 
 interface ProductPageProps {
@@ -9,7 +9,7 @@ interface ProductPageProps {
 }
 
 export async function generateStaticParams() {
-  return allProducts.map((product) => ({
+  return products.map((product) => ({
     id: product.id.toString(),
   }))
 }

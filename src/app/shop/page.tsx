@@ -7,15 +7,15 @@ import { Filter, Grid, List, ChevronDown } from "lucide-react"
 import Header from "@/components/Header"
 import Footer from "@/components/Footer"
 import ProductCard from "@/components/ProductCard"
-import { products as allProducts, getCategories } from "@/lib/products"
+import { products, getCategories } from "@/lib/products"
 import type { Product } from "@/lib/store"
 
 export default function ShopPage() {
   const searchParams = useSearchParams()
   const categoryParam = searchParams.get("category")
 
-  const [products, setProducts] = useState<Product[]>(allProducts)
-  const [filteredProducts, setFilteredProducts] = useState<Product[]>(allProducts)
+  const [allProducts, setAllProducts] = useState<Product[]>(products)
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>(products)
   const [selectedCategory, setSelectedCategory] = useState(categoryParam || "all")
   const [sortBy, setSortBy] = useState("name")
   const [priceRange, setPriceRange] = useState([0, 100])
