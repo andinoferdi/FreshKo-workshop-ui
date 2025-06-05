@@ -38,20 +38,32 @@ export default function BlogPage() {
   return (
     <>
       <Header />
-      <main className="min-h-screen bg-gray-50 py-8">
-        <div className="w-[90%] max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-4">Blog</h1>
-            <div className="flex items-center gap-2 text-sm text-gray-600">
-              <Link href="/" className="hover:text-primary">
-                Home
-              </Link>
-              <span>/</span>
-              <span className="text-gray-900">Blog</span>
+      <main className="min-h-screen bg-gray-50">
+        {/* Breadcrumb */}
+        <div className="w-[90%] max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex items-center gap-2 text-sm text-gray-600">
+            <Link href="/" className="hover:text-primary">
+              Home
+            </Link>
+            <span>/</span>
+            <span className="text-gray-900">Blog</span>
+          </div>
+        </div>
+
+        {/* Page Header */}
+        <section className="py-8 lg:py-12">
+          <div className="w-[90%] max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-8">
+              <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">Fresh Ideas & Tips</h1>
+              <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+                Discover recipes, nutrition tips, seasonal guides, and everything you need to make the most of fresh,
+                healthy ingredients.
+              </p>
             </div>
           </div>
+        </section>
 
+        <div className="w-[90%] max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
           {/* Search and Filters */}
           <div className="bg-white rounded-2xl shadow-sm p-6 mb-8">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

@@ -107,7 +107,7 @@ export default function HeroSection() {
                   onClick={() => setCurrentSlide(index)}
                   className={`w-3 h-3 rounded-full transition-all duration-300 border-2 ${
                     index === currentSlide
-                      ? "bg-yellow-200 border-yellow-200 scale-125"
+                      ? "bg-green-400 border-green-400 scale-125"
                       : "bg-white border-white hover:scale-110"
                   }`}
                 />

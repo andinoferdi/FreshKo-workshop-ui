@@ -6,7 +6,31 @@
   :root {
     --header-height: 160px;
     --header-height-min: 80px;
+    
+    /* Color variables */
+    --background: 0 0% 100%;
+    --foreground: 224 71.4% 4.1%;
+    --card: 0 0% 100%;
+    --card-foreground: 224 71.4% 4.1%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 224 71.4% 4.1%;
+    --primary: 142 69% 45%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 220 14.3% 95.9%;
+    --secondary-foreground: 220.9 39.3% 11%;
+    --muted: 220 14.3% 95.9%;
+    --muted-foreground: 220 8.9% 46.1%;
+    --accent: 142 69% 45%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 20% 98%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 142 69% 45%;
+    --radius: 0.5rem;
   }
+
+
 
   @media screen and (max-width: 600px) {
     :root {
@@ -40,7 +64,7 @@
 
 @layer components {
   .btn-primary {
-    @apply bg-accent text-white border-transparent hover:bg-yellow-600 focus:ring-2 focus:ring-accent/50 active:bg-accent disabled:bg-gray-300 disabled:text-gray-500;
+    @apply bg-accent text-white border-transparent hover:bg-green-600 focus:ring-2 focus:ring-accent/50 active:bg-accent disabled:bg-gray-300 disabled:text-gray-500;
   }
 
   .btn-outline-primary {

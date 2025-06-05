@@ -1,5 +1,6 @@
 import { create } from "zustand"
 import { persist } from "zustand/middleware"
+import { useEffect, useState } from "react"
 
 export interface Product {
   id: number
@@ -116,3 +117,25 @@ export const useStore = create<StoreState>()(
     },
   ),
 )
+
+// Hydration-safe hook
+export const useHydratedStore = () => {
+  const [isHydrated, setIsHydrated] = useState(false)
+  const store = useStore()
+
+  useEffect(() => {
+    setIsHydrated(true)
+  }, [])
+
+  if (!isHydrated) {
+    return {
+      ...store,
+      cart: [],
+      wishlist: [],
+      getCartTotal: () => 0,
+      getCartItemsCount: () => 0,
+    }
+  }
+
+  return store
+}

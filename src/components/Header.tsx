@@ -5,7 +5,7 @@ import { useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { ShoppingCart, Search, User, Heart, Menu, X } from "lucide-react"
-import { useStore } from "../lib/store"
+import { useHydratedStore, type CartItem } from "../lib/store"
 import { searchProducts } from "../lib/products"
 import { useRouter } from "next/navigation"
 
@@ -23,7 +23,7 @@ export default function Header() {
     removeFromCart,
     setSearchQuery: setStoreSearchQuery,
     setSearchResults,
-  } = useStore()
+  } = useHydratedStore()
   const router = useRouter()
 
   const cartTotal = getCartTotal()
@@ -77,7 +77,7 @@ export default function Header() {
             ) : (
               <div className="space-y-4">
                 <div className="space-y-3">
-                  {cart.map((item) => (
+                  {cart.map((item: CartItem) => (
                     <div key={item.id} className="flex justify-between items-center py-2 border-b">
                       <div className="flex items-center gap-3">
                         <Image
@@ -183,7 +183,7 @@ export default function Header() {
             {/* Logo */}
             <div className="flex-shrink-0">
               <Link href="/" className="block">
-                <Image src="/images/logo.png" alt="FreshKo Logo" width={140} height={45} className="h-auto" />
+                <Image src="/images/logo.png" alt="FreshKo Logo" width={70} height={22} className="h-auto" />
               </Link>
             </div>
 
@@ -362,6 +362,13 @@ export default function Header() {
                             Shop All Products
                           </Link>
                           <Link
+                            href="/services"
+                            className="block py-3 px-4 text-gray-700 hover:bg-gray-50 rounded-lg font-medium"
+                            onClick={() => setIsMenuOpen(false)}
+                          >
+                            Services
+                          </Link>
+                          <Link
                             href="/blog"
                             className="block py-3 px-4 text-gray-700 hover:bg-gray-50 rounded-lg font-medium"
                             onClick={() => setIsMenuOpen(false)}
@@ -397,24 +404,19 @@ export default function Header() {
                     Shop by Departments
                   </Link>
 
-                  <Link 
-                    href="/about" 
-                    className="text-gray-600 hover:text-primary transition-colors duration-200"
-                  >
+                  <Link href="/services" className="text-gray-600 hover:text-primary transition-colors duration-200">
+                    Services
+                  </Link>
+
+                  <Link href="/about" className="text-gray-600 hover:text-primary transition-colors duration-200">
                     About Us
                   </Link>
 
-                  <Link 
-                    href="/blog" 
-                    className="text-gray-600 hover:text-primary transition-colors duration-200"
-                  >
+                  <Link href="/blog" className="text-gray-600 hover:text-primary transition-colors duration-200">
                     Blog
                   </Link>
-                  
-                  <Link 
-                    href="/contact" 
-                    className="text-gray-600 hover:text-primary transition-colors duration-200"
-                  >
+
+                  <Link href="/contact" className="text-gray-600 hover:text-primary transition-colors duration-200">
                     Contact
                   </Link>
                 </div>

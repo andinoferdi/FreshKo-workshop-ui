@@ -45,17 +45,18 @@ export default function OrdersPage() {
   return (
     <>
       <Header />
-      <main className="min-h-screen bg-gray-50 py-8">
+      <main className="min-h-screen bg-gray-50 py-8 lg:py-12">
         <div className="w-[90%] max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-4">My Orders</h1>
+          {/* Page Header */}
+          <div className="mb-8 lg:mb-12">
+            <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">My Orders</h1>
+            <p className="text-lg text-gray-600 mb-6">Track and manage your order history</p>
             <div className="flex items-center gap-2 text-sm text-gray-600">
-              <Link href="/" className="hover:text-primary">
+              <Link href="/" className="hover:text-primary transition-colors">
                 Home
               </Link>
               <span>/</span>
-              <Link href="/account" className="hover:text-primary">
+              <Link href="/account" className="hover:text-primary transition-colors">
                 Account
               </Link>
               <span>/</span>
@@ -64,7 +65,7 @@ export default function OrdersPage() {
           </div>
 
           {/* Search and Filters */}
-          <div className="bg-white rounded-2xl shadow-sm p-6 mb-8">
+          <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
             <div className="flex flex-col md:flex-row justify-between gap-4 mb-4">
               <div className="relative flex-1">
                 <Search size={20} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
@@ -73,13 +74,13 @@ export default function OrdersPage() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search orders..."
-                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition-all"
                 />
               </div>
 
               <button
                 onClick={() => setShowFilters(!showFilters)}
-                className="flex items-center gap-2 px-4 py-3 bg-gray-100 rounded-lg md:hidden"
+                className="flex items-center gap-2 px-4 py-3 bg-gray-100 rounded-lg md:hidden hover:bg-gray-200 transition-colors"
               >
                 <Filter size={20} />
                 Filters
@@ -90,7 +91,7 @@ export default function OrdersPage() {
                   <select
                     value={statusFilter}
                     onChange={(e) => setStatusFilter(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary appearance-none"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary appearance-none transition-all"
                   >
                     <option value="all">All Status</option>
                     <option value="completed">Completed</option>
@@ -108,7 +109,7 @@ export default function OrdersPage() {
                   <select
                     value={dateFilter}
                     onChange={(e) => setDateFilter(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary appearance-none"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary appearance-none transition-all"
                   >
                     <option value="all">All Time</option>
                     <option value="today">Today</option>
@@ -128,12 +129,15 @@ export default function OrdersPage() {
           {filteredOrders.length > 0 ? (
             <div className="space-y-6">
               {filteredOrders.map((order) => (
-                <div key={order.id} className="bg-white rounded-2xl shadow-sm overflow-hidden">
+                <div
+                  key={order.id}
+                  className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow"
+                >
                   {/* Order Header */}
                   <div className="p-6 border-b border-gray-100 flex flex-col md:flex-row justify-between gap-4">
                     <div>
                       <div className="flex items-center gap-3 mb-2">
-                        <h3 className="font-semibold text-lg">Order #{order.id}</h3>
+                        <h3 className="text-xl font-bold text-gray-900">Order #{order.id}</h3>
                         <span
                           className={`px-3 py-1 text-xs font-medium rounded-full ${
                             order.status === "completed"
@@ -148,23 +152,23 @@ export default function OrdersPage() {
                           {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
                         </span>
                       </div>
-                      <div className="text-sm text-gray-500">
+                      <div className="text-sm text-gray-600">
                         <span>Date: {order.date}</span>
                         <span className="mx-2">•</span>
                         <span>{order.items.length} items</span>
                         <span className="mx-2">•</span>
-                        <span>Total: ${order.total.toFixed(2)}</span>
+                        <span className="font-semibold">Total: ${order.total.toFixed(2)}</span>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
                       <Link
                         href={`/account/orders/${order.id}`}
-                        className="flex items-center gap-1 px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 text-sm font-medium"
+                        className="flex items-center gap-1 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 text-sm font-medium transition-colors"
                       >
                         <Eye size={16} />
                         View Details
                       </Link>
-                      <button className="flex items-center gap-1 px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 text-sm font-medium">
+                      <button className="flex items-center gap-1 px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 text-sm font-medium transition-colors">
                         <Download size={16} />
                         Invoice
                       </button>
@@ -181,25 +185,25 @@ export default function OrdersPage() {
                               src={item.image || "/placeholder.svg"}
                               alt={item.name}
                               fill
-                              className="object-cover rounded"
+                              className="object-cover rounded-lg"
                             />
                           </div>
                           <div className="flex-1">
-                            <h4 className="font-medium">{item.name}</h4>
-                            <div className="text-sm text-gray-500">
+                            <h4 className="font-semibold text-gray-900">{item.name}</h4>
+                            <div className="text-sm text-gray-600">
                               <span>Qty: {item.quantity}</span>
                               <span className="mx-2">•</span>
                               <span>${item.price.toFixed(2)} each</span>
                             </div>
                           </div>
                           <div className="text-right">
-                            <span className="font-semibold">${(item.price * item.quantity).toFixed(2)}</span>
+                            <span className="font-bold text-gray-900">${(item.price * item.quantity).toFixed(2)}</span>
                           </div>
                         </div>
                       ))}
 
                       {order.items.length > 3 && (
-                        <div className="text-sm text-gray-500 text-center pt-2 border-t">
+                        <div className="text-sm text-gray-600 text-center pt-2 border-t">
                           + {order.items.length - 3} more items
                         </div>
                       )}
@@ -209,12 +213,12 @@ export default function OrdersPage() {
               ))}
             </div>
           ) : (
-            <div className="bg-white rounded-2xl shadow-sm p-12 text-center">
+            <div className="bg-white rounded-xl shadow-lg p-12 text-center">
               <div className="text-gray-400 mb-4">
                 <Search size={48} className="mx-auto" />
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">No orders found</h3>
-              <p className="text-gray-600 mb-6">Try adjusting your search criteria</p>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">No orders found</h3>
+              <p className="text-lg text-gray-600 mb-6">Try adjusting your search criteria</p>
               <div className="space-x-4">
                 <button
                   onClick={() => {
@@ -222,13 +226,13 @@ export default function OrdersPage() {
                     setStatusFilter("all")
                     setDateFilter("all")
                   }}
-                  className="bg-primary text-white px-6 py-2 rounded-lg hover:bg-primary/80"
+                  className="bg-primary text-white px-6 py-3 rounded-lg hover:bg-primary/90 font-semibold transition-colors"
                 >
                   Clear Filters
                 </button>
                 <Link
                   href="/shop"
-                  className="bg-gray-100 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-200 inline-block"
+                  className="bg-gray-100 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-200 inline-block font-semibold transition-colors"
                 >
                   Continue Shopping
                 </Link>

@@ -4,7 +4,7 @@ import { useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { Star, Heart, ShoppingCart, Plus, Minus } from "lucide-react"
-import { useStore, type Product } from "../lib/store"
+import { useHydratedStore, type Product } from "../lib/store"
 
 interface ProductCardProps {
   product: Product
@@ -12,7 +12,7 @@ interface ProductCardProps {
 
 export default function ProductCard({ product }: ProductCardProps) {
   const [quantity, setQuantity] = useState(1)
-  const { addToCart, addToWishlist, removeFromWishlist, isInWishlist } = useStore()
+  const { addToCart, addToWishlist, removeFromWishlist, isInWishlist } = useHydratedStore()
 
   const inWishlist = isInWishlist(product.id)
 

@@ -4,9 +4,9 @@ import { useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { Heart, Star, Plus, Minus, ShoppingCart, ArrowLeft, Share2 } from "lucide-react"
-import { useStore, type Product } from "@/lib/store"
+import { useHydratedStore, type Product } from "@/lib/store"
 import ProductCard from "./ProductCard"
-import { allProducts } from "@/lib/products"
+import { products } from "@/lib/products"
 
 interface ProductDetailProps {
   product: Product
@@ -15,13 +15,13 @@ interface ProductDetailProps {
 export default function ProductDetail({ product }: ProductDetailProps) {
   const [quantity, setQuantity] = useState(1)
   const [selectedImage, setSelectedImage] = useState(product.image)
-  const { addToCart, addToWishlist, removeFromWishlist, isInWishlist } = useStore()
+  const { addToCart, addToWishlist, removeFromWishlist, isInWishlist } = useHydratedStore()
 
   const isWishlisted = isInWishlist(product.id)
   const discountedPrice = product.discount ? product.price * (1 - product.discount / 100) : product.price
 
   // Get related products from the same category
-  const relatedProducts = allProducts.filter((p) => p.category === product.category && p.id !== product.id).slice(0, 4)
+  const relatedProducts = products.filter((p: Product) => p.category === product.category && p.id !== product.id).slice(0, 4)
 
   const incrementQuantity = () => setQuantity((prev) => prev + 1)
   const decrementQuantity = () => setQuantity((prev) => Math.max(1, prev - 1))

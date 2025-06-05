@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useSearchParams } from "next/navigation"
+import Link from "next/link"
 import { Filter, Grid, List, ChevronDown } from "lucide-react"
 import Header from "@/components/Header"
 import Footer from "@/components/Footer"
@@ -64,25 +65,38 @@ export default function ShopPage() {
   return (
     <>
       <Header />
+      <main className="min-h-screen bg-gray-50">
+        {/* Breadcrumb */}
+        <div className="w-[90%] max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex items-center gap-2 text-sm text-gray-600">
+            <Link href="/" className="hover:text-primary">
+              Home
+            </Link>
+            <span>/</span>
+            <span className="text-gray-900">Shop</span>
+            {selectedCategory !== "all" && (
+              <>
+                <span>/</span>
+                <span className="text-gray-900 capitalize">{selectedCategory}</span>
+              </>
+            )}
+          </div>
+        </div>
 
-      <div className="min-h-screen bg-gray-50 py-8">
-        <div className="w-[90%] max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-4">Shop</h1>
-            <div className="flex items-center gap-2 text-sm text-gray-600">
-              <span>Home</span>
-              <span>/</span>
-              <span className="text-gray-900">Shop</span>
-              {selectedCategory !== "all" && (
-                <>
-                  <span>/</span>
-                  <span className="text-gray-900 capitalize">{selectedCategory}</span>
-                </>
-              )}
+        {/* Page Header */}
+        <section className="py-8 lg:py-12">
+          <div className="w-[90%] max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-8">
+              <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">Shop Fresh Groceries</h1>
+              <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+                Discover our wide selection of fresh produce, quality meats, dairy products, and pantry essentials.
+                Everything you need for healthy, delicious meals.
+              </p>
             </div>
           </div>
+        </section>
 
+        <div className="w-[90%] max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
           <div className="flex flex-col lg:flex-row gap-8">
             {/* Filters Sidebar */}
             <div className="lg:w-64 flex-shrink-0">
@@ -288,8 +302,7 @@ export default function ShopPage() {
             </div>
           </div>
         </div>
-      </div>
-
+      </main>
       <Footer />
     </>
   )

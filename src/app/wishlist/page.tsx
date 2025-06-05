@@ -17,15 +17,15 @@ export default function WishlistPage() {
     return (
       <>
         <Header />
-        <main className="min-h-screen bg-gray-50 py-12">
+        <main className="min-h-screen bg-gray-50 py-8 lg:py-12">
           <div className="w-[90%] max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center py-16">
               <Heart size={80} className="mx-auto text-gray-300 mb-6" />
-              <h1 className="text-3xl font-bold text-gray-900 mb-4">Your Wishlist is Empty</h1>
-              <p className="text-gray-600 mb-8">Save items you love to your wishlist for easy access later.</p>
+              <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">Your Wishlist is Empty</h1>
+              <p className="text-lg text-gray-600 mb-8">Save items you love to your wishlist for easy access later.</p>
               <Link
                 href="/shop"
-                className="inline-flex items-center gap-2 bg-primary text-white px-8 py-3 rounded-lg font-semibold hover:bg-primary/80"
+                className="inline-flex items-center gap-2 bg-primary text-white px-8 py-3 rounded-lg font-semibold hover:bg-primary/90 transition-colors"
               >
                 <ArrowLeft size={20} />
                 Continue Shopping
@@ -41,13 +41,14 @@ export default function WishlistPage() {
   return (
     <>
       <Header />
-      <main className="min-h-screen bg-gray-50 py-8">
+      <main className="min-h-screen bg-gray-50 py-8 lg:py-12">
         <div className="w-[90%] max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-4">My Wishlist</h1>
+          {/* Page Header */}
+          <div className="mb-8 lg:mb-12">
+            <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">My Wishlist</h1>
+            <p className="text-lg text-gray-600 mb-6">Your saved items for future purchases</p>
             <div className="flex items-center gap-2 text-sm text-gray-600">
-              <Link href="/" className="hover:text-primary">
+              <Link href="/" className="hover:text-primary transition-colors">
                 Home
               </Link>
               <span>/</span>
@@ -56,9 +57,12 @@ export default function WishlistPage() {
           </div>
 
           {/* Wishlist Items */}
-          <div className="bg-white rounded-2xl shadow-sm p-6">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-semibold">Saved Items ({wishlist.length})</h2>
+          <div className="bg-white rounded-xl shadow-lg p-6">
+            <div className="flex justify-between items-center mb-8">
+              <h2 className="text-xl font-bold text-gray-900">Saved Items ({wishlist.length})</h2>
+              <Link href="/shop" className="text-primary hover:text-primary/80 font-medium transition-colors">
+                Continue Shopping
+              </Link>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -66,7 +70,10 @@ export default function WishlistPage() {
                 const discountedPrice = product.discount ? product.price * (1 - product.discount / 100) : product.price
 
                 return (
-                  <div key={product.id} className="bg-gray-50 rounded-xl p-4 relative">
+                  <div
+                    key={product.id}
+                    className="bg-gray-50 rounded-xl p-4 relative hover:shadow-lg transition-shadow"
+                  >
                     {/* Remove Button */}
                     <button
                       onClick={() => removeFromWishlist(product.id)}
@@ -109,13 +116,13 @@ export default function WishlistPage() {
                       </div>
 
                       {/* Unit */}
-                      {product.unit && <p className="text-sm text-gray-500">{product.unit}</p>}
+                      {product.unit && <p className="text-sm text-gray-600">{product.unit}</p>}
 
                       {/* Add to Cart Button */}
                       <button
                         onClick={() => handleAddToCart(product)}
                         disabled={!product.inStock}
-                        className={`w-full py-2 px-4 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 ${
+                        className={`w-full py-3 px-4 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 ${
                           product.inStock
                             ? "bg-primary text-white hover:bg-primary/90"
                             : "bg-gray-300 text-gray-500 cursor-not-allowed"
@@ -128,17 +135,6 @@ export default function WishlistPage() {
                   </div>
                 )
               })}
-            </div>
-
-            {/* Continue Shopping */}
-            <div className="mt-8 text-center">
-              <Link
-                href="/shop"
-                className="inline-flex items-center gap-2 text-primary hover:text-primary/80 font-medium"
-              >
-                <ArrowLeft size={20} />
-                Continue Shopping
-              </Link>
             </div>
           </div>
         </div>
