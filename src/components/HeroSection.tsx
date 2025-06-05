@@ -34,8 +34,12 @@ const slides = [
 
 export default function HeroSection() {
   const [currentSlide, setCurrentSlide] = useState(0)
+  const [isLoaded, setIsLoaded] = useState(false)
 
   useEffect(() => {
+    // Ensure component is mounted
+    setIsLoaded(true)
+    
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % slides.length)
     }, 5000)
@@ -50,19 +54,34 @@ export default function HeroSection() {
     setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length)
   }
 
+  if (!isLoaded) {
+    return (
+      <section className="py-2 lg:py-3 relative bg-blue-50 min-h-[400px] lg:min-h-[630px]">
+        <div className="w-[90%] max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-center h-[400px] lg:h-[630px]">
+            <div className="text-center">
+              <div className="animate-pulse text-gray-500">Loading...</div>
+            </div>
+          </div>
+        </div>
+      </section>
+    )
+  }
+
   return (
     <section
-      className="py-2 lg:py-3"
+      className="py-2 lg:py-3 relative bg-blue-50"
       style={{
         backgroundImage: "url('/images/background-pattern.jpg')",
         backgroundRepeat: "no-repeat",
         backgroundSize: "cover",
+        backgroundPosition: "center",
       }}
     >
       <div className="w-[90%] max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="banner-blocks">
           {/* Main Slider */}
-          <div className="banner-ad bg-blue-50 block-1 relative overflow-hidden">
+          <div className="banner-ad bg-blue-50 block-1 relative overflow-hidden min-h-[400px] lg:min-h-[630px]">
             <div className="relative h-full min-h-[630px]">
               {slides.map((slide, index) => (
                 <div
@@ -131,8 +150,11 @@ export default function HeroSection() {
 
           {/* Side Banners */}
           <div
-            className="banner-ad bg-green-100 block-2 p-4 lg:p-5 flex items-end"
-            style={{ background: "url('/images/ad-image-1.png') no-repeat right bottom, #dcfce7" }}
+            className="banner-ad bg-green-100 block-2 p-4 lg:p-5 flex items-end relative min-h-[200px] lg:min-h-[300px]"
+            style={{ 
+              background: "linear-gradient(rgba(220, 252, 231, 0.9), rgba(220, 252, 231, 0.9)), url('/images/ad-image-1.png') no-repeat right bottom",
+              backgroundSize: "contain"
+            }}
           >
             <div className="space-y-3">
               <div className="text-lg font-bold text-green-600 relative">
@@ -148,8 +170,11 @@ export default function HeroSection() {
           </div>
 
           <div
-            className="banner-ad bg-red-100 block-3 p-5 flex items-end"
-            style={{ background: "url('/images/ad-image-2.png') no-repeat right bottom, #fecaca" }}
+            className="banner-ad bg-red-100 block-3 p-5 flex items-end relative min-h-[200px] lg:min-h-[300px]"
+            style={{ 
+              background: "linear-gradient(rgba(254, 202, 202, 0.9), rgba(254, 202, 202, 0.9)), url('/images/ad-image-2.png') no-repeat right bottom",
+              backgroundSize: "contain"
+            }}
           >
             <div className="space-y-3">
               <div className="text-lg font-bold text-red-600 relative">
