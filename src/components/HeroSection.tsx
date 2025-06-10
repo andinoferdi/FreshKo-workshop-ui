@@ -82,63 +82,76 @@
                     <div className="h-full flex items-center">
                       <div className="w-full grid grid-cols-1 md:grid-cols-5 gap-6 md:gap-8 p-6 sm:p-8 md:p-10 lg:p-12">
                         {/* Text Content - 3 columns */}
-                        <div className="md:col-span-3 flex flex-col justify-center space-y-4 sm:space-y-5 md:space-y-6 pb-16 sm:pb-20">
-                          {/* Category Badge */}
-                          <div className="inline-flex">
+                        <div className="md:col-span-3 flex flex-col h-full pt-8 sm:pt-12 pb-16 sm:pb-20">
+                          {/* Category Badge - Fixed Position */}
+                          <div className="mb-4 sm:mb-6">
                             <span className="text-sm sm:text-base font-medium text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full">
                               {slide.category}
                             </span>
                           </div>
 
-                          {/* Dynamic Title Handling */}
-                          <h1 className="font-bold text-gray-900 leading-tight tracking-tight">
-                            {slide.title === "Heinz Tomato Ketchup" ? (
-                              <>
-                                <span className="block text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl">
-                                  Heinz Tomato
-                                </span>
-                                <span className="block text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl">
-                                  Ketchup
-                                </span>
-                              </>
-                            ) : slide.title.includes("&") ? (
-                              <>
-                                {slide.title.split("&").map((part, idx) => (
-                                  <span
-                                    key={idx}
-                                    className="block text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl"
-                                  >
-                                    {part.trim()}
-                                    {idx === 0 && " &"}
+                          {/* Title Container - Flexible but Consistent */}
+                          <div className="mb-6 sm:mb-8 min-h-[8rem] sm:min-h-[10rem] md:min-h-[12rem] lg:min-h-[14rem] flex items-start">
+                            <h1 className="font-bold text-gray-900 leading-[1.1] tracking-tight">
+                              {slide.title === "Heinz Tomato Ketchup" ? (
+                                <>
+                                  <span className="block text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl mb-2">
+                                    Heinz Tomato
                                   </span>
-                                ))}
-                              </>
-                            ) : (
-                              <span className="block text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl">
-                                {slide.title}
-                              </span>
-                            )}
-                          </h1>
+                                  <span className="block text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl">
+                                    Ketchup
+                                  </span>
+                                </>
+                              ) : slide.title === "Fresh Smoothie & Summer Juice" ? (
+                                <>
+                                  <span className="block text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl mb-2">
+                                    Fresh Smoothie &
+                                  </span>
+                                  <span className="block text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl">
+                                    Summer Juice
+                                  </span>
+                                </>
+                              ) : slide.title.includes("&") ? (
+                                <>
+                                  {slide.title.split("&").map((part, idx) => (
+                                    <span
+                                      key={idx}
+                                      className={`block text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl ${idx === 0 ? 'mb-2' : ''}`}
+                                    >
+                                      {part.trim()}
+                                      {idx === 0 && " &"}
+                                    </span>
+                                  ))}
+                                </>
+                              ) : (
+                                <span className="block text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl">
+                                  {slide.title}
+                                </span>
+                              )}
+                            </h1>
+                          </div>
 
-                          {/* Description */}
-                          <p className="text-sm sm:text-base md:text-lg text-gray-600 leading-relaxed max-w-md lg:max-w-lg">
-                            {slide.description}
-                          </p>
+                          {/* Description - Flexible Height */}
+                          <div className="mb-8 sm:mb-10 flex-1 min-h-[4rem] flex items-start">
+                            <p className="text-sm sm:text-base md:text-lg text-gray-600 leading-relaxed max-w-md lg:max-w-lg">
+                              {slide.description}
+                            </p>
+                          </div>
 
-                          {/* CTA Button */}
-                          <div className="pt-2 sm:pt-4">
+                          {/* CTA Button - Always at Bottom */}
+                          <div className="mt-auto">
                             <Link
                               href="/shop"
-                              className="inline-flex items-center justify-center bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm sm:text-base px-6 sm:px-8 md:px-10 py-3 sm:py-4 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl uppercase tracking-wide relative z-5"
+                              className="inline-flex items-center justify-center bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm sm:text-base px-6 sm:px-8 md:px-10 py-3 sm:py-4 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl uppercase tracking-wide relative z-5 min-w-[160px] sm:min-w-[180px]"
                             >
                               {slide.buttonText}
                             </Link>
                           </div>
                         </div>
 
-                        {/* Product Image - 2 columns */}
+                        {/* Product Image - 2 columns - Fixed Position */}
                         <div className="md:col-span-2 flex items-center justify-center p-4 md:p-6">
-                          <div className="relative w-full max-w-[200px] sm:max-w-[250px] md:max-w-[300px] lg:max-w-[350px]">
+                          <div className="relative w-full h-full max-w-[280px] sm:max-w-[320px] md:max-w-[350px] lg:max-w-[380px] flex items-center justify-center">
                             <Image
                               src={
                                 slide.image ||
@@ -147,7 +160,7 @@
                               alt={slide.title}
                               width={350}
                               height={350}
-                              className="w-full h-auto object-contain drop-shadow-lg"
+                              className="w-full h-auto object-contain drop-shadow-lg max-h-[300px] sm:max-h-[350px] md:max-h-[400px]"
                               priority={index === 0}
                             />
                           </div>
