@@ -4,7 +4,7 @@ import type React from "react"
 
 import { useState } from "react"
 import Link from "next/link"
-import { User, Edit3, Save, X, ShoppingBag, Heart, CreditCard } from "lucide-react"
+import { User, Edit3, Save, X } from "lucide-react"
 import Header from "@/components/Header"
 import Footer from "@/components/Footer"
 
@@ -73,34 +73,10 @@ export default function ProfilePage() {
                 </div>
 
                 <nav className="space-y-2">
-                  <Link
-                    href="/account/profile"
-                    className="flex items-center gap-3 px-4 py-3 bg-primary/10 text-primary rounded-lg font-semibold"
-                  >
+                  <div className="flex items-center gap-3 px-4 py-3 bg-primary/10 text-primary rounded-lg font-semibold">
                     <User size={20} />
                     Profile Settings
-                  </Link>
-                  <Link
-                    href="/account/orders"
-                    className="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-lg font-medium transition-colors"
-                  >
-                    <ShoppingBag size={20} />
-                    Order History
-                  </Link>
-                  <Link
-                    href="/wishlist"
-                    className="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-lg font-medium transition-colors"
-                  >
-                    <Heart size={20} />
-                    Wishlist
-                  </Link>
-                  <Link
-                    href="/account/payment"
-                    className="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-lg font-medium transition-colors"
-                  >
-                    <CreditCard size={20} />
-                    Payment Methods
-                  </Link>
+                  </div>
                 </nav>
               </div>
             </div>

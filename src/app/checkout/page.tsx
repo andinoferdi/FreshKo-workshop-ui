@@ -169,7 +169,6 @@ export default function CheckoutPage() {
                         name="email"
                         value={formData.email}
                         onChange={handleInputChange}
-                        required
                         className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition-all"
                         placeholder="your@email.com"
                       />
@@ -181,7 +180,6 @@ export default function CheckoutPage() {
                         name="firstName"
                         value={formData.firstName}
                         onChange={handleInputChange}
-                        required
                         className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition-all"
                       />
                     </div>
@@ -192,7 +190,6 @@ export default function CheckoutPage() {
                         name="lastName"
                         value={formData.lastName}
                         onChange={handleInputChange}
-                        required
                         className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition-all"
                       />
                     </div>
@@ -210,7 +207,6 @@ export default function CheckoutPage() {
                         name="address"
                         value={formData.address}
                         onChange={handleInputChange}
-                        required
                         className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition-all"
                         placeholder="123 Main Street"
                       />
@@ -223,7 +219,6 @@ export default function CheckoutPage() {
                           name="city"
                           value={formData.city}
                           onChange={handleInputChange}
-                          required
                           className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition-all"
                         />
                       </div>
@@ -234,7 +229,6 @@ export default function CheckoutPage() {
                           name="state"
                           value={formData.state}
                           onChange={handleInputChange}
-                          required
                           className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition-all"
                         />
                       </div>
@@ -245,7 +239,6 @@ export default function CheckoutPage() {
                           name="zipCode"
                           value={formData.zipCode}
                           onChange={handleInputChange}
-                          required
                           className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition-all"
                         />
                       </div>
@@ -257,7 +250,6 @@ export default function CheckoutPage() {
                         name="phone"
                         value={formData.phone}
                         onChange={handleInputChange}
-                        required
                         className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition-all"
                         placeholder="(555) 123-4567"
                       />
@@ -291,7 +283,6 @@ export default function CheckoutPage() {
                             name="cardNumber"
                             value={formData.cardNumber}
                             onChange={handleInputChange}
-                            required
                             className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition-all"
                             placeholder="1234 5678 9012 3456"
                           />
@@ -304,7 +295,6 @@ export default function CheckoutPage() {
                               name="expiryDate"
                               value={formData.expiryDate}
                               onChange={handleInputChange}
-                              required
                               className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition-all"
                               placeholder="MM/YY"
                             />
@@ -316,7 +306,6 @@ export default function CheckoutPage() {
                               name="cvv"
                               value={formData.cvv}
                               onChange={handleInputChange}
-                              required
                               className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition-all"
                               placeholder="123"
                             />
@@ -329,7 +318,6 @@ export default function CheckoutPage() {
                             name="nameOnCard"
                             value={formData.nameOnCard}
                             onChange={handleInputChange}
-                            required
                             className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition-all"
                             placeholder="John Doe"
                           />
