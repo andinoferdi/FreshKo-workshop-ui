@@ -1,8 +1,17 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Image from "next/image"
-import { BarChart3, Users, ShoppingBag, DollarSign, TrendingUp, TrendingDown, Package, Clock } from "lucide-react"
+import { useState } from "react";
+import Image from "next/image";
+import {
+  BarChart3,
+  Users,
+  ShoppingBag,
+  DollarSign,
+  TrendingUp,
+  TrendingDown,
+  Package,
+  Clock,
+} from "lucide-react";
 import {
   LineChart,
   Line,
@@ -19,10 +28,10 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
-} from "recharts"
-import DashboardLayout from "@/components/dashboard/DashboardLayout"
-import { orders } from "@/lib/orders"
-import { products } from "@/lib/products"
+} from "recharts";
+import DashboardLayout from "@/components/dashboard/DashboardLayout";
+import { orders } from "@/lib/orders";
+import { products } from "@/lib/products";
 
 // Sample data for charts
 const salesData = [
@@ -33,7 +42,7 @@ const salesData = [
   { name: "Fri", sales: 1890, orders: 35, revenue: 4800 },
   { name: "Sat", sales: 2390, orders: 42, revenue: 3800 },
   { name: "Sun", sales: 3490, orders: 38, revenue: 4300 },
-]
+];
 
 const categoryData = [
   { name: "Vegetables", value: 35, color: "#10B981" },
@@ -41,7 +50,7 @@ const categoryData = [
   { name: "Dairy", value: 20, color: "#047857" },
   { name: "Meat", value: 12, color: "#065F46" },
   { name: "Others", value: 8, color: "#064E3B" },
-]
+];
 
 const monthlyData = [
   { month: "Jan", revenue: 12000, customers: 145, orders: 89 },
@@ -50,38 +59,42 @@ const monthlyData = [
   { month: "Apr", revenue: 22000, customers: 201, orders: 148 },
   { month: "May", revenue: 25000, customers: 223, orders: 167 },
   { month: "Jun", revenue: 28000, customers: 245, orders: 189 },
-]
+];
 
 // Helper function to get status style
 const getStatusStyle = (status: string) => {
   switch (status) {
     case "completed":
-      return "bg-green-100 text-green-800"
+      return "bg-green-100 text-green-700";
     case "processing":
-      return "bg-green-50 text-green-700"
+      return "bg-yellow-100 text-yellow-700";
     case "shipped":
-      return "bg-green-200 text-green-800"
+      return "bg-blue-100 text-blue-700";
     case "cancelled":
-      return "bg-gray-100 text-gray-600"
+      return "bg-red-100 text-red-700";
     default:
-      return "bg-gray-100 text-gray-600"
+      return "bg-gray-100 text-gray-600";
   }
-}
+};
 
 export default function DashboardPage() {
-  const [timeRange, setTimeRange] = useState("week")
+  const [timeRange, setTimeRange] = useState("week");
 
   // Calculate statistics
-  const totalSales = orders.reduce((sum, order) => sum + order.total, 0)
-  const totalOrders = orders.length
-  const totalProducts = products.length
-  const totalCustomers = 120 // Example value
+  const totalSales = orders.reduce((sum, order) => sum + order.total, 0);
+  const totalOrders = orders.length;
+  const totalProducts = products.length;
+  const totalCustomers = 120; // Example value
 
   // Recent orders
-  const recentOrders = [...orders].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0, 5)
+  const recentOrders = [...orders]
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    .slice(0, 5);
 
   // Popular products
-  const popularProducts = [...products].sort((a, b) => b.rating - a.rating).slice(0, 5)
+  const popularProducts = [...products]
+    .sort((a, b) => b.rating - a.rating)
+    .slice(0, 5);
 
   return (
     <DashboardLayout>
@@ -89,7 +102,9 @@ export default function DashboardPage() {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
           <div>
             <h1 className="text-3xl font-bold gradient-text mb-2">Dashboard</h1>
-            <p className="text-gray-600">Welcome back! Here's what's happening with your store today.</p>
+            <p className="text-gray-600">
+              Welcome back! Here's what's happening with your store today.
+            </p>
           </div>
 
           <div className="mt-4 md:mt-0">
@@ -111,12 +126,18 @@ export default function DashboardPage() {
           <div className="modern-card p-6 hover:scale-105 transition-all duration-300 group">
             <div className="flex justify-between items-start">
               <div>
-                <p className="text-sm text-gray-500 mb-2 font-medium">Total Sales</p>
-                <h3 className="text-2xl font-bold text-gray-900">${totalSales.toFixed(2)}</h3>
+                <p className="text-sm text-gray-500 mb-2 font-medium">
+                  Total Sales
+                </p>
+                <h3 className="text-2xl font-bold text-gray-900">
+                  ${totalSales.toFixed(2)}
+                </h3>
                 <div className="flex items-center mt-3 text-sm">
                   <TrendingUp className="text-green-500 mr-1" size={16} />
                   <span className="text-green-500 font-semibold">+12.5%</span>
-                  <span className="text-gray-500 ml-1">from last {timeRange}</span>
+                  <span className="text-gray-500 ml-1">
+                    from last {timeRange}
+                  </span>
                 </div>
               </div>
               <div className="p-3 bg-gradient-to-br from-green-100 to-green-200 rounded-xl group-hover:scale-110 transition-all duration-300">
@@ -128,12 +149,18 @@ export default function DashboardPage() {
           <div className="modern-card p-6 hover:scale-105 transition-all duration-300 group">
             <div className="flex justify-between items-start">
               <div>
-                <p className="text-sm text-gray-500 mb-2 font-medium">Total Orders</p>
-                <h3 className="text-2xl font-bold text-gray-900">{totalOrders}</h3>
+                <p className="text-sm text-gray-500 mb-2 font-medium">
+                  Total Orders
+                </p>
+                <h3 className="text-2xl font-bold text-gray-900">
+                  {totalOrders}
+                </h3>
                 <div className="flex items-center mt-3 text-sm">
                   <TrendingUp className="text-green-500 mr-1" size={16} />
                   <span className="text-green-500 font-semibold">+8.2%</span>
-                  <span className="text-gray-500 ml-1">from last {timeRange}</span>
+                  <span className="text-gray-500 ml-1">
+                    from last {timeRange}
+                  </span>
                 </div>
               </div>
               <div className="p-3 bg-gradient-to-br from-green-200 to-green-300 rounded-xl group-hover:scale-110 transition-all duration-300">
@@ -145,12 +172,18 @@ export default function DashboardPage() {
           <div className="modern-card p-6 hover:scale-105 transition-all duration-300 group">
             <div className="flex justify-between items-start">
               <div>
-                <p className="text-sm text-gray-500 mb-2 font-medium">Total Products</p>
-                <h3 className="text-2xl font-bold text-gray-900">{totalProducts}</h3>
+                <p className="text-sm text-gray-500 mb-2 font-medium">
+                  Total Products
+                </p>
+                <h3 className="text-2xl font-bold text-gray-900">
+                  {totalProducts}
+                </h3>
                 <div className="flex items-center mt-3 text-sm">
                   <TrendingUp className="text-green-500 mr-1" size={16} />
                   <span className="text-green-500 font-semibold">+5.3%</span>
-                  <span className="text-gray-500 ml-1">from last {timeRange}</span>
+                  <span className="text-gray-500 ml-1">
+                    from last {timeRange}
+                  </span>
                 </div>
               </div>
               <div className="p-3 bg-gradient-to-br from-green-50 to-green-100 rounded-xl group-hover:scale-110 transition-all duration-300">
@@ -162,12 +195,18 @@ export default function DashboardPage() {
           <div className="modern-card p-6 hover:scale-105 transition-all duration-300 group">
             <div className="flex justify-between items-start">
               <div>
-                <p className="text-sm text-gray-500 mb-2 font-medium">Total Customers</p>
-                <h3 className="text-2xl font-bold text-gray-900">{totalCustomers}</h3>
+                <p className="text-sm text-gray-500 mb-2 font-medium">
+                  Total Customers
+                </p>
+                <h3 className="text-2xl font-bold text-gray-900">
+                  {totalCustomers}
+                </h3>
                 <div className="flex items-center mt-3 text-sm">
                   <TrendingDown className="text-gray-500 mr-1" size={16} />
                   <span className="text-gray-500 font-semibold">-2.4%</span>
-                  <span className="text-gray-500 ml-1">from last {timeRange}</span>
+                  <span className="text-gray-500 ml-1">
+                    from last {timeRange}
+                  </span>
                 </div>
               </div>
               <div className="p-3 bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl group-hover:scale-110 transition-all duration-300">
@@ -182,7 +221,9 @@ export default function DashboardPage() {
           {/* Sales Overview - Line Chart */}
           <div className="xl:col-span-2 modern-card p-6 hover:shadow-2xl transition-all duration-300">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-lg font-bold text-gray-900">Sales Overview</h2>
+              <h2 className="text-lg font-bold text-gray-900">
+                Sales Overview
+              </h2>
               <select className="text-sm modern-input py-2 px-3 font-semibold">
                 <option>Last 7 Days</option>
                 <option>Last 30 Days</option>
@@ -224,7 +265,9 @@ export default function DashboardPage() {
           {/* Category Distribution - Pie Chart */}
           <div className="modern-card p-6 hover:shadow-2xl transition-all duration-300">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-lg font-bold text-gray-900">Category Sales</h2>
+              <h2 className="text-lg font-bold text-gray-900">
+                Category Sales
+              </h2>
             </div>
             <ResponsiveContainer width="100%" height={300}>
               <PieChart>
@@ -261,7 +304,9 @@ export default function DashboardPage() {
           {/* Monthly Revenue Trend */}
           <div className="modern-card p-6 hover:shadow-2xl transition-all duration-300">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-lg font-bold text-gray-900">Monthly Revenue</h2>
+              <h2 className="text-lg font-bold text-gray-900">
+                Monthly Revenue
+              </h2>
             </div>
             <ResponsiveContainer width="100%" height={250}>
               <LineChart data={monthlyData}>
@@ -292,7 +337,9 @@ export default function DashboardPage() {
           {/* Orders vs Customers */}
           <div className="modern-card p-6 hover:shadow-2xl transition-all duration-300">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-lg font-bold text-gray-900">Orders vs Customers</h2>
+              <h2 className="text-lg font-bold text-gray-900">
+                Orders vs Customers
+              </h2>
             </div>
             <ResponsiveContainer width="100%" height={250}>
               <BarChart data={monthlyData}>
@@ -309,8 +356,18 @@ export default function DashboardPage() {
                   }}
                 />
                 <Legend />
-                <Bar dataKey="orders" fill="#10B981" name="Orders" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="customers" fill="#059669" name="Customers" radius={[4, 4, 0, 0]} />
+                <Bar
+                  dataKey="orders"
+                  fill="#10B981"
+                  name="Orders"
+                  radius={[4, 4, 0, 0]}
+                />
+                <Bar
+                  dataKey="customers"
+                  fill="#059669"
+                  name="Customers"
+                  radius={[4, 4, 0, 0]}
+                />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -346,17 +403,26 @@ export default function DashboardPage() {
                       key={order.id}
                       className="border-b border-gray-50 last:border-0 hover:bg-gray-50/50 transition-colors duration-300"
                     >
-                      <td className="py-3 text-sm font-semibold">#{order.id}</td>
-                      <td className="py-3 text-sm font-medium">{order.customer || "John Doe"}</td>
+                      <td className="py-3 text-sm font-semibold">
+                        #{order.id}
+                      </td>
+                      <td className="py-3 text-sm font-medium">
+                        {order.customer || "John Doe"}
+                      </td>
                       <td className="py-3 text-sm">{order.date}</td>
                       <td className="py-3">
                         <span
-                          className={`px-3 py-1 text-xs font-semibold rounded-full ${getStatusStyle(order.status)}`}
+                          className={`px-3 py-1 text-xs font-semibold rounded-full ${getStatusStyle(
+                            order.status
+                          )}`}
                         >
-                          {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                          {order.status.charAt(0).toUpperCase() +
+                            order.status.slice(1)}
                         </span>
                       </td>
-                      <td className="py-3 text-sm text-right font-bold text-primary">${order.total.toFixed(2)}</td>
+                      <td className="py-3 text-sm text-right font-bold text-primary">
+                        ${order.total.toFixed(2)}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -367,7 +433,9 @@ export default function DashboardPage() {
           {/* Popular Products */}
           <div className="modern-card p-6 hover:shadow-2xl transition-all duration-300">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-lg font-bold text-gray-900">Popular Products</h2>
+              <h2 className="text-lg font-bold text-gray-900">
+                Popular Products
+              </h2>
               <a
                 href="/dashboard/products"
                 className="text-primary text-sm hover:underline hover:text-green-700 transition-colors duration-300 font-semibold"
@@ -398,7 +466,11 @@ export default function DashboardPage() {
                         {[...Array(5)].map((_, i) => (
                           <svg
                             key={i}
-                            className={`w-3 h-3 ${i < Math.floor(product.rating) ? "text-green-500" : "text-gray-300"}`}
+                            className={`w-3 h-3 ${
+                              i < Math.floor(product.rating)
+                                ? "text-green-500"
+                                : "text-gray-300"
+                            }`}
                             fill="currentColor"
                             viewBox="0 0 20 20"
                           >
@@ -406,13 +478,19 @@ export default function DashboardPage() {
                           </svg>
                         ))}
                       </div>
-                      <span className="text-xs text-gray-500 font-medium">({product.rating})</span>
+                      <span className="text-xs text-gray-500 font-medium">
+                        ({product.rating})
+                      </span>
                     </div>
                   </div>
                   <div className="text-right">
-                    <span className="font-bold text-primary">${product.price.toFixed(2)}</span>
+                    <span className="font-bold text-primary">
+                      ${product.price.toFixed(2)}
+                    </span>
                     {product.discount && (
-                      <span className="text-xs text-green-600 block font-semibold">-{product.discount}%</span>
+                      <span className="text-xs text-green-600 block font-semibold">
+                        -{product.discount}%
+                      </span>
                     )}
                   </div>
                 </div>
@@ -441,7 +519,11 @@ export default function DashboardPage() {
               </div>
               <div>
                 <p className="font-semibold text-sm">
-                  New order <span className="font-bold text-primary">#{orders[0].id}</span> was placed
+                  New order{" "}
+                  <span className="font-bold text-primary">
+                    #{orders[0].id}
+                  </span>{" "}
+                  was placed
                 </p>
                 <p className="text-xs text-gray-500 mt-1 flex items-center">
                   <Clock size={12} className="inline mr-1" />
@@ -458,7 +540,11 @@ export default function DashboardPage() {
               </div>
               <div>
                 <p className="font-semibold text-sm">
-                  Product <span className="font-bold text-primary">{products[0].name}</span> is low in stock
+                  Product{" "}
+                  <span className="font-bold text-primary">
+                    {products[0].name}
+                  </span>{" "}
+                  is low in stock
                 </p>
                 <p className="text-xs text-gray-500 mt-1 flex items-center">
                   <Clock size={12} className="inline mr-1" />2 hours ago
@@ -473,7 +559,9 @@ export default function DashboardPage() {
                 </div>
               </div>
               <div>
-                <p className="font-semibold text-sm">Monthly sales report is available</p>
+                <p className="font-semibold text-sm">
+                  Monthly sales report is available
+                </p>
                 <p className="text-xs text-gray-500 mt-1 flex items-center">
                   <Clock size={12} className="inline mr-1" />5 hours ago
                 </p>
@@ -488,7 +576,9 @@ export default function DashboardPage() {
               </div>
               <div>
                 <p className="font-semibold text-sm">
-                  New customer <span className="font-bold text-primary">Jane Smith</span> registered
+                  New customer{" "}
+                  <span className="font-bold text-primary">Jane Smith</span>{" "}
+                  registered
                 </p>
                 <p className="text-xs text-gray-500 mt-1 flex items-center">
                   <Clock size={12} className="inline mr-1" />1 day ago
@@ -499,5 +589,5 @@ export default function DashboardPage() {
         </div>
       </div>
     </DashboardLayout>
-  )
+  );
 }
