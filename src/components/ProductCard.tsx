@@ -49,7 +49,7 @@ export default function ProductCard({ product }: ProductCardProps) {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden group hover:shadow-md transition-shadow duration-300">
+    <div className="bg-white rounded-xl border border-gray-100 overflow-hidden group hover:shadow-lg hover:scale-105 transition-all duration-300">
       {/* Product Image */}
       <div className="relative aspect-square overflow-hidden bg-gray-50">
         <Link href={`/product/${product.id}`}>
@@ -66,7 +66,7 @@ export default function ProductCard({ product }: ProductCardProps) {
 
         {/* Discount Badge */}
         {product.discount && (
-          <div className="absolute top-2 left-2 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded">
+          <div className="absolute top-2 left-2 bg-primary text-white text-xs font-bold px-2 py-1 rounded-full">
             -{product.discount}%
           </div>
         )}
@@ -76,8 +76,8 @@ export default function ProductCard({ product }: ProductCardProps) {
           onClick={toggleWishlistHandler}
           className={`absolute top-2 right-2 p-2 rounded-full transition-colors ${
             inWishlist
-              ? "bg-green-500 text-white"
-              : "bg-white text-gray-600 hover:bg-green-50 hover:text-green-500"
+              ? "bg-primary text-white"
+              : "bg-white text-gray-600 hover:bg-primary/10 hover:text-primary"
           }`}
         >
           <Heart
@@ -102,7 +102,7 @@ export default function ProductCard({ product }: ProductCardProps) {
               key={i}
               className={
                 i < Math.floor(product.rating)
-                  ? "fill-green-400 text-green-400"
+                  ? "fill-primary text-primary"
                   : "text-gray-300"
               }
               size={14}
@@ -130,19 +130,19 @@ export default function ProductCard({ product }: ProductCardProps) {
 
         {/* Cart Controls */}
         {quantity > 0 ? (
-          <div className="flex items-center border border-gray-200 rounded">
+          <div className="flex items-center border border-gray-200 rounded-lg overflow-hidden">
             <button
               onClick={() => handleQuantityChange(-1)}
-              className="p-1 hover:bg-gray-100 transition-colors"
+              className="p-2 hover:bg-primary/10 hover:text-primary transition-all duration-300"
             >
               <Minus className="w-4 h-4" />
             </button>
-            <span className="px-3 py-1 min-w-[2rem] text-center">
+            <span className="px-3 py-2 min-w-[2rem] text-center font-medium">
               {quantity}
             </span>
             <button
               onClick={() => handleQuantityChange(1)}
-              className="p-1 hover:bg-gray-100 transition-colors"
+              className="p-2 hover:bg-primary/10 hover:text-primary transition-all duration-300"
             >
               <Plus className="w-4 h-4" />
             </button>
@@ -150,9 +150,9 @@ export default function ProductCard({ product }: ProductCardProps) {
         ) : (
           <button
             onClick={handleAddToCart}
-            className={`flex-1 px-3 py-2 rounded text-sm font-medium transition-colors flex items-center justify-center gap-1 ${
+            className={`w-full px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300 flex items-center justify-center gap-1 ${
               product.inStock
-                ? "bg-primary text-white hover:bg-green-700"
+                ? "bg-primary text-white hover:bg-primary/90 hover:scale-105"
                 : "bg-gray-300 text-gray-500 cursor-not-allowed"
             }`}
             disabled={!product.inStock}

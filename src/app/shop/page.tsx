@@ -397,16 +397,7 @@ export default function ShopPage() {
                   }`}
                 >
                   {filteredProducts.map((product) => (
-                    <div
-                      key={product.id}
-                      className={
-                        viewMode === "list"
-                          ? "bg-white rounded-xl shadow-sm overflow-hidden"
-                          : ""
-                      }
-                    >
-                      <ProductCard product={product} />
-                    </div>
+                    <ProductCard key={product.id} product={product} />
                   ))}
                 </div>
               )}

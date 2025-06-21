@@ -1,17 +1,60 @@
 "use client";
 
-import { useState } from "react";
-import Image from "next/image";
+import { useState, useEffect, Suspense } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { Calendar, Folder, Search, ChevronDown } from "lucide-react";
+import { Search, ChevronDown } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import BlogCard from "@/components/BlogCard";
 import { blogPosts } from "@/lib/blog";
 
-export default function BlogPage() {
+function BlogContent() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
   const [searchQuery, setSearchQuery] = useState("");
   const [category, setCategory] = useState("all");
   const [sortBy, setSortBy] = useState("latest");
+
+  // Initialize state from URL parameters
+  useEffect(() => {
+    const categoryParam = searchParams.get("category");
+    const tagParam = searchParams.get("tag");
+    const searchParam = searchParams.get("search");
+
+    if (categoryParam) {
+      setCategory(categoryParam);
+    }
+    if (tagParam) {
+      setSearchQuery(tagParam);
+    }
+    if (searchParam) {
+      setSearchQuery(searchParam);
+    }
+  }, [searchParams]);
+
+  // Update URL when filters change
+  const updateURL = (
+    newCategory: string,
+    newSearch: string,
+    newSort: string
+  ) => {
+    const params = new URLSearchParams();
+
+    if (newCategory !== "all") {
+      params.set("category", newCategory);
+    }
+    if (newSearch) {
+      params.set("search", newSearch);
+    }
+    if (newSort !== "latest") {
+      params.set("sort", newSort);
+    }
+
+    const newURL = params.toString() ? `/blog?${params.toString()}` : "/blog";
+    router.push(newURL, { scroll: false });
+  };
 
   // Filter and sort blog posts
   const filteredPosts = blogPosts
@@ -72,7 +115,11 @@ export default function BlogPage() {
                 <input
                   type="text"
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={(e) => {
+                    const newSearch = e.target.value;
+                    setSearchQuery(newSearch);
+                    updateURL(category, newSearch, sortBy);
+                  }}
                   placeholder="Search articles..."
                   className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg bg-white
                            focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary
@@ -83,7 +130,11 @@ export default function BlogPage() {
               <div className="relative">
                 <select
                   value={category}
-                  onChange={(e) => setCategory(e.target.value)}
+                  onChange={(e) => {
+                    const newCategory = e.target.value;
+                    setCategory(newCategory);
+                    updateURL(newCategory, searchQuery, sortBy);
+                  }}
                   className="w-full px-4 py-3 border border-gray-200 rounded-lg bg-white
                            focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary
                            appearance-none transition-all duration-300"
@@ -103,7 +154,11 @@ export default function BlogPage() {
               <div className="relative">
                 <select
                   value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value)}
+                  onChange={(e) => {
+                    const newSort = e.target.value;
+                    setSortBy(newSort);
+                    updateURL(category, searchQuery, newSort);
+                  }}
                   className="w-full px-4 py-3 border border-gray-200 rounded-lg bg-white
                            focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary
                            appearance-none transition-all duration-300"
@@ -122,76 +177,13 @@ export default function BlogPage() {
 
           {/* Blog Posts */}
           {filteredPosts.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {filteredPosts.map((post) => (
-                <article
-                  key={post.id}
-                  className="bg-gray-50 border border-gray-100 rounded-2xl overflow-hidden
-                           hover:shadow-lg hover:scale-105 transition-all duration-300 group"
-                >
-                  <div className="overflow-hidden">
-                    <Link href={`/blog/${post.id}`}>
-                      <Image
-                        src={post.image || "/placeholder.svg"}
-                        alt={post.title}
-                        width={400}
-                        height={250}
-                        className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-500"
-                      />
-                    </Link>
-                  </div>
-
-                  <div className="p-6">
-                    <div className="flex items-center gap-3 text-sm text-gray-500 mb-3">
-                      <div className="flex items-center gap-1">
-                        <Calendar size={14} />
-                        {post.date}
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Folder size={14} />
-                        <span className="capitalize">{post.category}</span>
-                      </div>
-                    </div>
-
-                    <h3 className="text-xl font-semibold mb-3 line-clamp-2">
-                      <Link
-                        href={`/blog/${post.id}`}
-                        className="text-gray-900 hover:text-primary transition-colors duration-300"
-                      >
-                        {post.title}
-                      </Link>
-                    </h3>
-
-                    <p className="text-gray-600 leading-relaxed mb-4 line-clamp-3">
-                      {post.excerpt}
-                    </p>
-
-                    <Link
-                      href={`/blog/${post.id}`}
-                      className="inline-flex items-center text-primary font-medium hover:text-primary/80 
-                               transition-colors duration-300 group/link"
-                    >
-                      Read More
-                      <svg
-                        className="w-4 h-4 ml-1 group-hover/link:translate-x-1 transition-transform duration-300"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M9 5l7 7-7 7"
-                        />
-                      </svg>
-                    </Link>
-                  </div>
-                </article>
+                <BlogCard key={post.id} post={post} />
               ))}
             </div>
           ) : (
-            <div className="bg-white rounded-2xl shadow-sm p-12 text-center border border-gray-100">
+            <div className="bg-white rounded-xl shadow-sm p-12 text-center border border-gray-100">
               <div className="text-gray-400 mb-4">
                 <Search size={48} className="mx-auto" />
               </div>
@@ -205,9 +197,11 @@ export default function BlogPage() {
                 onClick={() => {
                   setSearchQuery("");
                   setCategory("all");
+                  setSortBy("latest");
+                  router.push("/blog");
                 }}
-                className="bg-primary text-white px-6 py-3 rounded-lg font-medium
-                         hover:bg-primary/90 hover:scale-105 transition-all duration-300 shadow-lg"
+                className="bg-primary text-white px-6 py-3 rounded-lg font-semibold
+                         hover:bg-primary/90 transition-colors duration-300"
               >
                 Clear Filters
               </button>
@@ -217,5 +211,22 @@ export default function BlogPage() {
       </main>
       <Footer />
     </>
+  );
+}
+
+export default function BlogPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-white flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading blog posts...</p>
+          </div>
+        </div>
+      }
+    >
+      <BlogContent />
+    </Suspense>
   );
 }

@@ -31,10 +31,17 @@ export default function BlogDetailPage() {
   return (
     <>
       <Header />
-      <main className="min-h-screen bg-white py-8">
+      <main className="min-h-screen bg-white py-8 lg:py-12">
         <div className="container mx-auto px-4">
-          {/* Breadcrumb */}
-          <div className="mb-8">
+          {/* Page Header */}
+          <div className="mb-8 lg:mb-12">
+            <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+              {post.title}
+            </h1>
+            <p className="text-lg text-gray-600 mb-6">
+              {post.excerpt ||
+                "Read our latest blog post about fresh produce and healthy living."}
+            </p>
             <div className="flex items-center gap-2 text-sm text-gray-600">
               <Link href="/" className="hover:text-primary transition-colors">
                 Home
@@ -47,7 +54,7 @@ export default function BlogDetailPage() {
                 Blog
               </Link>
               <span>/</span>
-              <span className="text-gray-900 line-clamp-1">{post.title}</span>
+              <span className="text-gray-900">{post.category}</span>
             </div>
           </div>
 
@@ -56,14 +63,14 @@ export default function BlogDetailPage() {
             <div className="lg:col-span-2">
               <article className="bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-100">
                 {/* Featured Image */}
-                <div className="relative h-[300px] md:h-[400px] overflow-hidden">
+                <div className="relative aspect-[16/9] overflow-hidden">
                   <Image
                     src={post.image || "/placeholder.svg"}
                     alt={post.title}
                     fill
-                    className="object-cover hover:scale-105 transition-transform duration-500"
+                    className="object-cover object-center hover:scale-105 transition-transform duration-500"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent"></div>
                 </div>
 
                 {/* Content */}
@@ -83,11 +90,6 @@ export default function BlogDetailPage() {
                       {post.author}
                     </div>
                   </div>
-
-                  {/* Title */}
-                  <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-6 leading-tight">
-                    {post.title}
-                  </h1>
 
                   {/* Content */}
                   <div className="prose max-w-none text-gray-700 mb-8">

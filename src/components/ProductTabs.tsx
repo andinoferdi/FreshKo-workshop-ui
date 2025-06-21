@@ -69,7 +69,8 @@ export default function ProductTabs() {
                   : "bg-white text-gray-700 border-gray-200 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-900"
               }`}
               data-aos="zoom-in"
-              data-aos-delay={300 + index * 50}
+              data-aos-delay={250 + index * 75}
+              data-aos-duration="500"
             >
               {tab.label}
             </button>
@@ -78,20 +79,40 @@ export default function ProductTabs() {
 
         {/* Products Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {getFilteredProducts().map((product, index) => (
-            <div
-              key={product.id}
-              data-aos="fade-up"
-              data-aos-delay={index * 100}
-            >
-              <ProductCard product={product} />
-            </div>
-          ))}
+          {getFilteredProducts().map((product, index) => {
+            // Create staggered animations with different directions
+            const animationTypes = [
+              "fade-up",
+              "fade-left",
+              "fade-right",
+              "zoom-in",
+            ];
+            const animationType = animationTypes[index % 4];
+            const delay = 400 + index * 150;
+
+            return (
+              <div
+                key={product.id}
+                data-aos={animationType}
+                data-aos-delay={delay}
+                data-aos-duration="600"
+                data-aos-easing="ease-out-cubic"
+              >
+                <ProductCard product={product} />
+              </div>
+            );
+          })}
         </div>
 
         {getFilteredProducts().length === 0 && (
-          <div className="text-center py-12" data-aos="fade-up">
-            <p className="text-gray-500">No products found in this category.</p>
+          <div
+            className="text-center py-12"
+            data-aos="fade-up"
+            data-aos-delay="500"
+          >
+            <p className="text-gray-500 text-lg">
+              No products found in this category.
+            </p>
           </div>
         )}
       </div>

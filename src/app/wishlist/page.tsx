@@ -1,17 +1,13 @@
 "use client";
-import Image from "next/image";
 import Link from "next/link";
-import { Heart, ShoppingCart, X, ArrowLeft } from "lucide-react";
+import { Heart, ShoppingCart, ArrowLeft } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import ProductCard from "@/components/ProductCard";
 import { useStore } from "@/lib/store";
 
 export default function WishlistPage() {
-  const { wishlist, removeFromWishlist, addToCart } = useStore();
-
-  const handleAddToCart = (product: any) => {
-    addToCart(product, 1);
-  };
+  const { wishlist, addToCart } = useStore();
 
   if (wishlist.length === 0) {
     return (
@@ -87,83 +83,9 @@ export default function WishlistPage() {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {wishlist.map((product) => {
-                const discountedPrice = product.discount
-                  ? product.price * (1 - product.discount / 100)
-                  : product.price;
-
-                return (
-                  <div
-                    key={product.id}
-                    className="bg-white rounded-xl p-4 relative hover:shadow-lg hover:scale-105 transition-all duration-300 group border border-gray-100"
-                  >
-                    {/* Remove Button */}
-                    <button
-                      onClick={() => removeFromWishlist(product.id)}
-                      className="absolute top-2 right-2 p-2 bg-white rounded-full shadow-sm hover:bg-gray-100 hover:text-gray-700 hover:scale-110 transition-all duration-300 opacity-0 group-hover:opacity-100"
-                    >
-                      <X size={16} />
-                    </button>
-
-                    {/* Product Image */}
-                    <div className="relative aspect-square mb-4 bg-gray-50 rounded-lg overflow-hidden">
-                      <Link href={`/product/${product.id}`}>
-                        <Image
-                          src={product.image || "/placeholder.svg"}
-                          alt={product.name}
-                          fill
-                          className="object-cover hover:scale-110 transition-transform duration-500"
-                        />
-                      </Link>
-                      {product.discount && (
-                        <div className="absolute top-2 left-2 bg-primary text-white text-xs font-bold px-2 py-1 rounded-full">
-                          -{product.discount}%
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Product Info */}
-                    <div className="space-y-3">
-                      <Link href={`/product/${product.id}`}>
-                        <h3 className="font-semibold text-gray-900 hover:text-primary transition-colors duration-300 line-clamp-2">
-                          {product.name}
-                        </h3>
-                      </Link>
-
-                      {/* Price */}
-                      <div className="flex items-center gap-2">
-                        <span className="text-lg font-bold text-primary">
-                          ${discountedPrice.toFixed(2)}
-                        </span>
-                        {product.discount && (
-                          <span className="text-sm text-gray-500 line-through">
-                            ${product.price.toFixed(2)}
-                          </span>
-                        )}
-                      </div>
-
-                      {/* Unit */}
-                      {product.unit && (
-                        <p className="text-sm text-gray-600">{product.unit}</p>
-                      )}
-
-                      {/* Add to Cart Button */}
-                      <button
-                        onClick={() => handleAddToCart(product)}
-                        disabled={!product.inStock}
-                        className={`w-full py-3 px-4 rounded-lg font-semibold transition-all duration-300 flex items-center justify-center gap-2 ${
-                          product.inStock
-                            ? "bg-primary text-white hover:bg-primary/90 hover:scale-105 hover:shadow-md"
-                            : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                        }`}
-                      >
-                        <ShoppingCart size={16} />
-                        {product.inStock ? "Add to Cart" : "Out of Stock"}
-                      </button>
-                    </div>
-                  </div>
-                );
-              })}
+              {wishlist.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
             </div>
 
             {/* Additional Actions */}
@@ -178,7 +100,7 @@ export default function WishlistPage() {
                 </Link>
                 <button
                   onClick={() =>
-                    wishlist.forEach((product) => handleAddToCart(product))
+                    wishlist.forEach((product) => addToCart(product, 1))
                   }
                   disabled={
                     wishlist.length === 0 || wishlist.every((p) => !p.inStock)
