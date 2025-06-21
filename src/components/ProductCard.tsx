@@ -1,148 +1,124 @@
-"use client";
+"use client"
 
-import { useState } from "react";
-import Image from "next/image";
-import Link from "next/link";
-import { Star, Heart, ShoppingCart, Plus, Minus } from "lucide-react";
-import { useHydratedStore, type Product } from "../lib/store";
+import { useState } from "react"
+import Image from "next/image"
+import Link from "next/link"
+import { Star, Heart, ShoppingCart, Plus, Minus } from "lucide-react"
+import { useHydratedStore, type Product } from "../lib/store"
 
 interface ProductCardProps {
-  product: Product;
+  product: Product
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
-  const {
-    cart,
-    addToCart,
-    updateQuantity,
-    wishlist,
-    addToWishlist,
-    removeFromWishlist,
-    isInWishlist,
-  } = useHydratedStore();
-  const [imageLoading, setImageLoading] = useState(true);
+  const { cart, addToCart, updateQuantity, wishlist, addToWishlist, removeFromWishlist, isInWishlist } =
+    useHydratedStore()
+  const [imageLoading, setImageLoading] = useState(true)
 
-  const cartItem = cart.find((item) => item.id === product.id);
-  const quantity = cartItem?.quantity || 0;
-  const inWishlist = isInWishlist(product.id);
+  const cartItem = cart.find((item) => item.id === product.id)
+  const quantity = cartItem?.quantity || 0
+  const inWishlist = isInWishlist(product.id)
 
   // Calculate discounted price
-  const discountedPrice = product.discount
-    ? product.price * (1 - product.discount / 100)
-    : product.price;
+  const discountedPrice = product.discount ? product.price * (1 - product.discount / 100) : product.price
 
   const handleAddToCart = () => {
-    addToCart(product);
-  };
+    addToCart(product)
+  }
 
   const handleQuantityChange = (delta: number) => {
-    const newQuantity = quantity + delta;
-    updateQuantity(product.id, newQuantity);
-  };
+    const newQuantity = quantity + delta
+    updateQuantity(product.id, newQuantity)
+  }
 
   const toggleWishlistHandler = () => {
     if (inWishlist) {
-      removeFromWishlist(product.id);
+      removeFromWishlist(product.id)
     } else {
-      addToWishlist(product);
+      addToWishlist(product)
     }
-  };
+  }
 
   return (
-    <div className="bg-white rounded-xl border border-gray-100 overflow-hidden group hover:shadow-lg hover:scale-105 transition-all duration-300">
+    <div className="modern-card overflow-hidden group hover:shadow-2xl hover:scale-105 transition-all duration-500">
       {/* Product Image */}
-      <div className="relative aspect-square overflow-hidden bg-gray-50">
+      <div className="relative aspect-square overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100">
         <Link href={`/product/${product.id}`}>
           <Image
-            src={product.image}
+            src={product.image || "/placeholder.svg"}
             alt={product.name}
             fill
-            className={`object-cover transition-all duration-500 group-hover:scale-110 ${
+            className={`object-cover transition-all duration-700 group-hover:scale-110 ${
               imageLoading ? "blur-sm" : "blur-0"
             }`}
             onLoad={() => setImageLoading(false)}
           />
         </Link>
 
-        {/* Discount Badge */}
+        {/* Modern Discount Badge */}
         {product.discount && (
-          <div className="absolute top-2 left-2 bg-primary text-white text-xs font-bold px-2 py-1 rounded-full">
+          <div className="absolute top-3 left-3 bg-gradient-primary text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg animate-pulse">
             -{product.discount}%
           </div>
         )}
 
-        {/* Wishlist Button */}
+        {/* Modern Wishlist Button */}
         <button
           onClick={toggleWishlistHandler}
-          className={`absolute top-2 right-2 p-2 rounded-full transition-colors ${
+          className={`absolute top-3 right-3 p-2.5 rounded-full transition-all duration-300 shadow-lg ${
             inWishlist
-              ? "bg-primary text-white"
-              : "bg-white text-gray-600 hover:bg-primary/10 hover:text-primary"
+              ? "bg-gradient-primary text-white scale-110"
+              : "glass-effect text-gray-600 hover:bg-primary/10 hover:text-primary hover:scale-110"
           }`}
         >
-          <Heart
-            className="w-4 h-4"
-            fill={inWishlist ? "currentColor" : "none"}
-          />
+          <Heart className="w-4 h-4" fill={inWishlist ? "currentColor" : "none"} />
         </button>
       </div>
 
       {/* Product Info */}
-      <div className="p-4">
+      <div className="p-6">
         <Link href={`/product/${product.id}`}>
-          <h3 className="font-semibold text-gray-900 mb-2 hover:text-primary transition-colors line-clamp-2">
+          <h3 className="font-bold text-gray-900 mb-3 hover:text-primary transition-colors line-clamp-2 text-lg">
             {product.name}
           </h3>
         </Link>
 
-        {/* Rating */}
-        <div className="flex items-center mb-2">
+        {/* Modern Rating */}
+        <div className="flex items-center mb-3">
           {[...Array(5)].map((_, i) => (
             <Star
               key={i}
-              className={
-                i < Math.floor(product.rating)
-                  ? "fill-primary text-primary"
-                  : "text-gray-300"
-              }
-              size={14}
+              className={i < Math.floor(product.rating) ? "fill-primary text-primary" : "text-gray-300"}
+              size={16}
             />
           ))}
-          <span className="text-sm text-gray-500 ml-1">({product.rating})</span>
+          <span className="text-sm text-gray-500 ml-2 font-medium">({product.rating})</span>
         </div>
 
-        {/* Price */}
-        <div className="flex items-center gap-2 mb-3">
-          <span className="text-lg font-bold text-primary">
-            ${discountedPrice.toFixed(2)}
-          </span>
+        {/* Modern Price */}
+        <div className="flex items-center gap-3 mb-4">
+          <span className="text-xl font-bold gradient-text">${discountedPrice.toFixed(2)}</span>
           {product.discount && (
-            <span className="text-sm text-gray-500 line-through">
-              ${product.price.toFixed(2)}
-            </span>
+            <span className="text-sm text-gray-500 line-through font-medium">${product.price.toFixed(2)}</span>
           )}
         </div>
 
         {/* Unit */}
-        {product.unit && (
-          <p className="text-sm text-gray-500 mb-3">{product.unit}</p>
-        )}
+        {product.unit && <p className="text-sm text-gray-500 mb-4 font-medium">{product.unit}</p>}
 
-        {/* Cart Controls */}
+        {/* Modern Cart Controls */}
         {quantity > 0 ? (
-          <div className="flex items-center border border-gray-200 rounded-lg overflow-hidden">
+          <div className="flex items-center modern-input p-0 overflow-hidden">
             <button
               onClick={() => handleQuantityChange(-1)}
-              className="p-2 hover:bg-primary/10 hover:text-primary transition-all duration-300"
+              className="p-3 hover:bg-primary/10 hover:text-primary transition-all duration-300"
             >
               <Minus className="w-4 h-4" />
             </button>
-            <span className="px-3 py-2 min-w-[2rem] text-center font-medium">
-              {quantity}
-            </span>
+            <span className="px-4 py-3 min-w-[3rem] text-center font-bold">{quantity}</span>
             <button
               onClick={() => handleQuantityChange(1)}
-              className="p-2 hover:bg-primary/10 hover:text-primary transition-all duration-300"
+              className="p-3 hover:bg-primary/10 hover:text-primary transition-all duration-300"
             >
               <Plus className="w-4 h-4" />
             </button>
@@ -150,10 +126,8 @@ export default function ProductCard({ product }: ProductCardProps) {
         ) : (
           <button
             onClick={handleAddToCart}
-            className={`w-full px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300 flex items-center justify-center gap-1 ${
-              product.inStock
-                ? "bg-primary text-white hover:bg-primary/90 hover:scale-105"
-                : "bg-gray-300 text-gray-500 cursor-not-allowed"
+            className={`w-full px-4 py-3 rounded-xl text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2 ${
+              product.inStock ? "btn-primary shadow-lg hover:shadow-xl" : "bg-gray-300 text-gray-500 cursor-not-allowed"
             }`}
             disabled={!product.inStock}
           >
@@ -163,5 +137,5 @@ export default function ProductCard({ product }: ProductCardProps) {
         )}
       </div>
     </div>
-  );
+  )
 }

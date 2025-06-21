@@ -1,4 +1,4 @@
-import { ShoppingCart, Shield, Award, MapPin, Gift } from "lucide-react";
+import { ShoppingCart, Shield, Award, MapPin, Gift } from "lucide-react"
 
 const features = [
   {
@@ -14,8 +14,7 @@ const features = [
   {
     icon: Award,
     title: "Quality Guarantee",
-    description:
-      "We source only the freshest, highest-quality products for you.",
+    description: "We source only the freshest, highest-quality products for you.",
   },
   {
     icon: MapPin,
@@ -25,22 +24,26 @@ const features = [
   {
     icon: Gift,
     title: "Daily Offers",
-    description:
-      "Check back daily for new offers and discounts on your favorite items.",
+    description: "Check back daily for new offers and discounts on your favorite items.",
   },
-];
+]
 
 export default function Features() {
   return (
-    <section className="py-12 lg:py-20 bg-white">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12" data-aos="fade-up">
-          <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-2">
-            Why Choose FreshKo?
+    <section className="py-16 lg:py-24 bg-gradient-to-br from-white to-green-50/30 relative overflow-hidden">
+      {/* Background Elements */}
+      <div className="absolute inset-0 opacity-5">
+        <div className="absolute top-10 right-10 w-64 h-64 bg-gradient-primary rounded-full blur-3xl"></div>
+        <div className="absolute bottom-10 left-10 w-48 h-48 bg-gradient-primary rounded-full blur-2xl"></div>
+      </div>
+
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="text-center mb-16" data-aos="fade-up">
+          <h2 className="heading-lg text-gray-900 mb-4">
+            Why Choose <span className="gradient-text">FreshKo</span>?
           </h2>
-          <p className="text-gray-600 max-w-2xl mx-auto">
-            We are committed to providing you with the best products and
-            services. Here's what makes us different.
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto font-medium">
+            We are committed to providing you with the best products and services. Here's what makes us different.
           </p>
         </div>
 
@@ -48,23 +51,21 @@ export default function Features() {
           {features.map((feature, index) => (
             <div
               key={index}
-              className="group text-center p-6 bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1"
+              className="group text-center p-8 modern-card hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2"
               data-aos="fade-up"
               data-aos-delay={200 + index * 100}
             >
-              <div className="inline-block p-4 bg-green-100 text-primary rounded-full mb-4 group-hover:bg-primary group-hover:text-white transition-colors duration-300">
-                <feature.icon size={32} />
+              <div className="inline-block p-6 bg-gradient-to-br from-green-100 to-green-200 text-primary rounded-2xl mb-6 group-hover:bg-gradient-primary group-hover:text-white transition-all duration-500 group-hover:scale-110 transform shadow-lg">
+                <feature.icon size={36} />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-primary transition-colors duration-300">
                 {feature.title}
               </h3>
-              <p className="text-sm text-gray-600 leading-relaxed">
-                {feature.description}
-              </p>
+              <p className="text-gray-600 leading-relaxed font-medium">{feature.description}</p>
             </div>
           ))}
         </div>
       </div>
     </section>
-  );
+  )
 }

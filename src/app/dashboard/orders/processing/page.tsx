@@ -2,58 +2,30 @@
 
 import { useState } from "react"
 import Image from "next/image"
-import { Search, Filter, Eye, Edit, MoreHorizontal, Download } from "lucide-react"
+import { Search, Filter, Eye, MoreHorizontal, Truck, CheckCircle } from "lucide-react"
 import DashboardLayout from "@/components/dashboard/DashboardLayout"
 import { orders } from "@/lib/orders"
 
-export default function DashboardOrdersPage() {
+export default function ProcessingOrdersPage() {
   const [searchQuery, setSearchQuery] = useState("")
-  const [statusFilter, setStatusFilter] = useState("all")
-  const [dateFilter, setDateFilter] = useState("all")
   const [showFilters, setShowFilters] = useState(false)
 
-  // Filter orders
-  const filteredOrders = orders.filter((order) => {
+  // Filter only processing orders
+  const processingOrders = orders.filter((order) => order.status === "processing")
+
+  const filteredOrders = processingOrders.filter((order) => {
     const matchesSearch =
       order.id.toString().includes(searchQuery) ||
       order.customer?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       order.items.some((item) => item.name.toLowerCase().includes(searchQuery.toLowerCase()))
-    const matchesStatus = statusFilter === "all" || order.status === statusFilter
-    const matchesDate = dateFilter === "all" || filterByDate(order.date, dateFilter)
-    return matchesSearch && matchesStatus && matchesDate
+    return matchesSearch
   })
 
-  function filterByDate(dateString: string, filter: string) {
-    const orderDate = new Date(dateString)
-    const today = new Date()
-    const lastWeek = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000)
-    const lastMonth = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000)
-
-    switch (filter) {
-      case "today":
-        return orderDate.toDateString() === today.toDateString()
-      case "week":
-        return orderDate >= lastWeek
-      case "month":
-        return orderDate >= lastMonth
-      default:
-        return true
-    }
-  }
-
-  function getStatusStyle(status: string) {
-    switch (status) {
-      case "completed":
-        return "bg-gradient-to-r from-green-100 to-green-200 text-green-800"
-      case "processing":
-        return "bg-gradient-to-r from-green-50 to-green-100 text-green-700"
-      case "shipped":
-        return "bg-gradient-to-r from-green-200 to-green-300 text-green-900"
-      case "cancelled":
-        return "bg-gradient-to-r from-gray-100 to-gray-200 text-gray-600"
-      default:
-        return "bg-gradient-to-r from-gray-100 to-gray-200 text-gray-600"
-    }
+  const handleStatusChange = (orderId: number, newStatus: string) => {
+    // Here you would typically make an API call to update the order status
+    console.log(`Updating order ${orderId} to ${newStatus}`)
+    // For demo purposes, we'll just show an alert
+    alert(`Order #${orderId} status updated to ${newStatus}`)
   }
 
   return (
@@ -61,13 +33,14 @@ export default function DashboardOrdersPage() {
       <div className="container mx-auto px-4 py-6">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
           <div>
-            <h1 className="text-3xl font-bold gradient-text mb-2">Orders</h1>
-            <p className="text-gray-600 font-medium">Manage customer orders and track deliveries</p>
+            <h1 className="text-3xl font-bold gradient-text mb-2">Processing Orders</h1>
+            <p className="text-gray-600 font-medium">Manage orders that are currently being processed</p>
           </div>
-          <button className="mt-4 md:mt-0 btn-primary flex items-center gap-2 hover:scale-105 transition-all duration-300">
-            <Download size={20} />
-            Export Orders
-          </button>
+          <div className="mt-4 md:mt-0 flex items-center gap-2">
+            <span className="px-4 py-2 bg-gradient-to-r from-yellow-100 to-yellow-200 text-yellow-800 rounded-lg font-bold text-sm">
+              {filteredOrders.length} Processing
+            </span>
+          </div>
         </div>
 
         {/* Search and Filters */}
@@ -79,7 +52,7 @@ export default function DashboardOrdersPage() {
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search orders..."
+                placeholder="Search processing orders..."
                 className="modern-input w-full pl-12 pr-4 py-3 font-medium"
               />
             </div>
@@ -91,31 +64,6 @@ export default function DashboardOrdersPage() {
               <Filter size={20} />
               Filters
             </button>
-
-            <div className={`flex flex-col md:flex-row gap-4 ${showFilters ? "block" : "hidden md:flex"}`}>
-              <select
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-                className="modern-input px-4 py-3 font-semibold"
-              >
-                <option value="all">All Status</option>
-                <option value="completed">Completed</option>
-                <option value="processing">Processing</option>
-                <option value="shipped">Shipped</option>
-                <option value="cancelled">Cancelled</option>
-              </select>
-
-              <select
-                value={dateFilter}
-                onChange={(e) => setDateFilter(e.target.value)}
-                className="modern-input px-4 py-3 font-semibold"
-              >
-                <option value="all">All Time</option>
-                <option value="today">Today</option>
-                <option value="week">Last 7 Days</option>
-                <option value="month">Last 30 Days</option>
-              </select>
-            </div>
           </div>
         </div>
 
@@ -134,9 +82,6 @@ export default function DashboardOrdersPage() {
                   <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Date</th>
                   <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
                     Items
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
-                    Status
                   </th>
                   <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
                     Total
@@ -180,20 +125,26 @@ export default function DashboardOrdersPage() {
                       <div className="text-xs text-gray-500 mt-1 font-medium">{order.items.length} items</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-3 py-1 text-xs font-bold rounded-full ${getStatusStyle(order.status)}`}>
-                        {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-bold text-primary">${order.total.toFixed(2)}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <div className="flex items-center gap-2">
-                        <button className="text-gray-600 hover:text-primary p-2 hover:bg-gray-100 rounded-lg transition-all duration-300 hover:scale-110">
-                          <Eye size={16} />
+                        <button
+                          onClick={() => handleStatusChange(order.id, "shipped")}
+                          className="flex items-center gap-1 px-3 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-300 hover:scale-105 font-semibold text-xs"
+                        >
+                          <Truck size={14} />
+                          Ship
+                        </button>
+                        <button
+                          onClick={() => handleStatusChange(order.id, "completed")}
+                          className="flex items-center gap-1 px-3 py-2 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 transition-all duration-300 hover:scale-105 font-semibold text-xs"
+                        >
+                          <CheckCircle size={14} />
+                          Complete
                         </button>
                         <button className="text-gray-600 hover:text-primary p-2 hover:bg-gray-100 rounded-lg transition-all duration-300 hover:scale-110">
-                          <Edit size={16} />
+                          <Eye size={16} />
                         </button>
                         <button className="text-gray-600 hover:text-primary p-2 hover:bg-gray-100 rounded-lg transition-all duration-300 hover:scale-110">
                           <MoreHorizontal size={16} />
@@ -211,8 +162,8 @@ export default function DashboardOrdersPage() {
               <div className="text-gray-400 mb-4">
                 <Search size={48} className="mx-auto" />
               </div>
-              <h3 className="text-lg font-bold text-gray-900 mb-2">No orders found</h3>
-              <p className="text-gray-500 font-medium">Try adjusting your search criteria</p>
+              <h3 className="text-lg font-bold text-gray-900 mb-2">No processing orders found</h3>
+              <p className="text-gray-500 font-medium">All orders have been processed or try adjusting your search</p>
             </div>
           )}
         </div>

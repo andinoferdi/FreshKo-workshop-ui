@@ -1,60 +1,57 @@
-import Image from "next/image";
-import Link from "next/link";
-import { Facebook, Twitter, Youtube, Instagram } from "lucide-react";
+import Image from "next/image"
+import Link from "next/link"
+import { Facebook, Twitter, Youtube, Instagram } from "lucide-react"
 
 export default function Footer() {
   return (
     <>
-      <footer className="py-8 lg:py-12 bg-gray-50">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6 lg:gap-8">
+      <footer className="py-12 lg:py-16 bg-gradient-to-br from-gray-50 to-white relative overflow-hidden">
+        {/* Background Elements */}
+        <div className="absolute inset-0 opacity-5">
+          <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-primary rounded-full blur-3xl"></div>
+        </div>
+
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-8 lg:gap-12">
             {/* Logo and Social */}
             <div className="lg:col-span-2">
-              <Image
-                src="/images/logo.png"
-                alt="logo"
-                width={120}
-                height={40}
-                className="mb-6 lg:mb-8"
-              />
-              <div className="flex gap-2">
+              <Image src="/images/logo.png" alt="logo" width={140} height={46} className="mb-8 lg:mb-10" />
+              <div className="flex gap-3">
                 <Link
                   href="#"
-                  className="p-2 border border-gray-300 rounded hover:bg-primary hover:text-white hover:border-primary transition-all duration-300"
+                  className="p-3 glass-effect rounded-xl hover:bg-gradient-primary hover:text-white hover:scale-110 transition-all duration-300 shadow-lg"
                 >
-                  <Facebook size={16} />
+                  <Facebook size={18} />
                 </Link>
                 <Link
                   href="#"
-                  className="p-2 border border-gray-300 rounded hover:bg-primary hover:text-white hover:border-primary transition-all duration-300"
+                  className="p-3 glass-effect rounded-xl hover:bg-gradient-primary hover:text-white hover:scale-110 transition-all duration-300 shadow-lg"
                 >
-                  <Twitter size={16} />
+                  <Twitter size={18} />
                 </Link>
                 <Link
                   href="#"
-                  className="p-2 border border-gray-300 rounded hover:bg-primary hover:text-white hover:border-primary transition-all duration-300"
+                  className="p-3 glass-effect rounded-xl hover:bg-gradient-primary hover:text-white hover:scale-110 transition-all duration-300 shadow-lg"
                 >
-                  <Youtube size={16} />
+                  <Youtube size={18} />
                 </Link>
                 <Link
                   href="#"
-                  className="p-2 border border-gray-300 rounded hover:bg-primary hover:text-white hover:border-primary transition-all duration-300"
+                  className="p-3 glass-effect rounded-xl hover:bg-gradient-primary hover:text-white hover:scale-110 transition-all duration-300 shadow-lg"
                 >
-                  <Instagram size={16} />
+                  <Instagram size={18} />
                 </Link>
               </div>
             </div>
 
             {/* About */}
             <div>
-              <h5 className="font-semibold text-lg mb-4 text-gray-900">
-                About
-              </h5>
-              <ul className="space-y-1.5 lg:space-y-2">
+              <h5 className="font-bold text-xl mb-6 gradient-text">About</h5>
+              <ul className="space-y-3">
                 <li>
                   <Link
                     href="/about"
-                    className="text-gray-600 hover:text-primary transition-colors"
+                    className="text-gray-600 hover:text-primary transition-colors font-medium hover:translate-x-1 transform duration-200 block"
                   >
                     About us
                   </Link>
@@ -62,7 +59,7 @@ export default function Footer() {
                 <li>
                   <Link
                     href="#"
-                    className="text-gray-600 hover:text-primary transition-colors"
+                    className="text-gray-600 hover:text-primary transition-colors font-medium hover:translate-x-1 transform duration-200 block"
                   >
                     Conditions
                   </Link>
@@ -70,7 +67,7 @@ export default function Footer() {
                 <li>
                   <Link
                     href="/blog"
-                    className="text-gray-600 hover:text-primary transition-colors"
+                    className="text-gray-600 hover:text-primary transition-colors font-medium hover:translate-x-1 transform duration-200 block"
                   >
                     Our Journals
                   </Link>
@@ -78,7 +75,7 @@ export default function Footer() {
                 <li>
                   <Link
                     href="#"
-                    className="text-gray-600 hover:text-primary transition-colors"
+                    className="text-gray-600 hover:text-primary transition-colors font-medium hover:translate-x-1 transform duration-200 block"
                   >
                     Careers
                   </Link>
@@ -86,7 +83,7 @@ export default function Footer() {
                 <li>
                   <Link
                     href="#"
-                    className="text-gray-600 hover:text-primary transition-colors"
+                    className="text-gray-600 hover:text-primary transition-colors font-medium hover:translate-x-1 transform duration-200 block"
                   >
                     Affiliate Programme
                   </Link>
@@ -94,7 +91,7 @@ export default function Footer() {
                 <li>
                   <Link
                     href="#"
-                    className="text-gray-600 hover:text-primary transition-colors"
+                    className="text-gray-600 hover:text-primary transition-colors font-medium hover:translate-x-1 transform duration-200 block"
                   >
                     Press
                   </Link>
@@ -104,14 +101,12 @@ export default function Footer() {
 
             {/* Customer Service */}
             <div>
-              <h5 className="font-semibold text-lg mb-4 text-gray-900">
-                Customer Service
-              </h5>
-              <ul className="space-y-1.5 lg:space-y-2">
+              <h5 className="font-bold text-xl mb-6 gradient-text">Customer Service</h5>
+              <ul className="space-y-3">
                 <li>
                   <Link
                     href="#"
-                    className="text-gray-600 hover:text-primary transition-colors"
+                    className="text-gray-600 hover:text-primary transition-colors font-medium hover:translate-x-1 transform duration-200 block"
                   >
                     FAQ
                   </Link>
@@ -119,7 +114,7 @@ export default function Footer() {
                 <li>
                   <Link
                     href="/contact"
-                    className="text-gray-600 hover:text-primary transition-colors"
+                    className="text-gray-600 hover:text-primary transition-colors font-medium hover:translate-x-1 transform duration-200 block"
                   >
                     Contact
                   </Link>
@@ -127,7 +122,7 @@ export default function Footer() {
                 <li>
                   <Link
                     href="#"
-                    className="text-gray-600 hover:text-primary transition-colors"
+                    className="text-gray-600 hover:text-primary transition-colors font-medium hover:translate-x-1 transform duration-200 block"
                   >
                     Privacy Policy
                   </Link>
@@ -135,7 +130,7 @@ export default function Footer() {
                 <li>
                   <Link
                     href="#"
-                    className="text-gray-600 hover:text-primary transition-colors"
+                    className="text-gray-600 hover:text-primary transition-colors font-medium hover:translate-x-1 transform duration-200 block"
                   >
                     Returns & Refunds
                   </Link>
@@ -143,7 +138,7 @@ export default function Footer() {
                 <li>
                   <Link
                     href="#"
-                    className="text-gray-600 hover:text-primary transition-colors"
+                    className="text-gray-600 hover:text-primary transition-colors font-medium hover:translate-x-1 transform duration-200 block"
                   >
                     Cookie Guidelines
                   </Link>
@@ -151,7 +146,7 @@ export default function Footer() {
                 <li>
                   <Link
                     href="#"
-                    className="text-gray-600 hover:text-primary transition-colors"
+                    className="text-gray-600 hover:text-primary transition-colors font-medium hover:translate-x-1 transform duration-200 block"
                   >
                     Delivery Information
                   </Link>
@@ -161,12 +156,12 @@ export default function Footer() {
 
             {/* Shop */}
             <div>
-              <h5 className="font-semibold text-lg mb-4 text-gray-900">Shop</h5>
-              <ul className="space-y-1.5 lg:space-y-2">
+              <h5 className="font-bold text-xl mb-6 gradient-text">Shop</h5>
+              <ul className="space-y-3">
                 <li>
                   <Link
                     href="/shop"
-                    className="text-gray-600 hover:text-primary transition-colors"
+                    className="text-gray-600 hover:text-primary transition-colors font-medium hover:translate-x-1 transform duration-200 block"
                   >
                     All Products
                   </Link>
@@ -174,7 +169,7 @@ export default function Footer() {
                 <li>
                   <Link
                     href="/shop?category=fruits"
-                    className="text-gray-600 hover:text-primary transition-colors"
+                    className="text-gray-600 hover:text-primary transition-colors font-medium hover:translate-x-1 transform duration-200 block"
                   >
                     Fresh Fruits
                   </Link>
@@ -182,7 +177,7 @@ export default function Footer() {
                 <li>
                   <Link
                     href="/shop?category=vegetables"
-                    className="text-gray-600 hover:text-primary transition-colors"
+                    className="text-gray-600 hover:text-primary transition-colors font-medium hover:translate-x-1 transform duration-200 block"
                   >
                     Vegetables
                   </Link>
@@ -190,7 +185,7 @@ export default function Footer() {
                 <li>
                   <Link
                     href="/shop?category=dairy"
-                    className="text-gray-600 hover:text-primary transition-colors"
+                    className="text-gray-600 hover:text-primary transition-colors font-medium hover:translate-x-1 transform duration-200 block"
                   >
                     Dairy Products
                   </Link>
@@ -198,7 +193,7 @@ export default function Footer() {
                 <li>
                   <Link
                     href="/wishlist"
-                    className="text-gray-600 hover:text-primary transition-colors"
+                    className="text-gray-600 hover:text-primary transition-colors font-medium hover:translate-x-1 transform duration-200 block"
                   >
                     Wishlist
                   </Link>
@@ -206,7 +201,7 @@ export default function Footer() {
                 <li>
                   <Link
                     href="/services"
-                    className="text-gray-600 hover:text-primary transition-colors"
+                    className="text-gray-600 hover:text-primary transition-colors font-medium hover:translate-x-1 transform duration-200 block"
                   >
                     Services
                   </Link>
@@ -216,18 +211,11 @@ export default function Footer() {
 
             {/* Newsletter */}
             <div>
-              <h5 className="font-semibold text-lg mb-4 text-gray-900">
-                Subscribe Us
-              </h5>
-              <p className="text-gray-600 mb-3 lg:mb-4">
-                Subscribe to our newsletter to get updates about our grand
-                offers.
+              <h5 className="font-bold text-xl mb-6 gradient-text">Subscribe Us</h5>
+              <p className="text-gray-600 mb-6 font-medium leading-relaxed">
+                Subscribe to our newsletter to get updates about our grand offers.
               </p>
-              <Link
-                href="/contact"
-                className="inline-block bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium
-                         hover:bg-primary/90 transition-colors"
-              >
+              <Link href="/contact" className="btn-primary inline-block text-sm shadow-lg hover:shadow-xl">
                 Subscribe Now
               </Link>
             </div>
@@ -236,23 +224,17 @@ export default function Footer() {
       </footer>
 
       {/* Footer Bottom */}
-      <div className="bg-gray-100 py-3 lg:py-4">
+      <div className="bg-gradient-to-r from-gray-100 to-gray-50 py-6">
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row justify-between items-center text-sm text-gray-600">
-            <p>© 2023 FreshKo. All rights reserved.</p>
-            <p>
+            <p className="font-medium">© 2023 FreshKo. All rights reserved.</p>
+            <p className="font-medium">
               Free HTML Template by{" "}
-              <Link
-                href="https://templatesjungle.com/"
-                className="hover:text-primary transition-colors"
-              >
+              <Link href="https://templatesjungle.com/" className="hover:text-primary transition-colors font-semibold">
                 TemplatesJungle
               </Link>{" "}
               Distributed by{" "}
-              <Link
-                href="https://themewagon.com"
-                className="hover:text-primary transition-colors"
-              >
+              <Link href="https://themewagon.com" className="hover:text-primary transition-colors font-semibold">
                 ThemeWagon
               </Link>
             </p>
@@ -260,5 +242,5 @@ export default function Footer() {
         </div>
       </div>
     </>
-  );
+  )
 }

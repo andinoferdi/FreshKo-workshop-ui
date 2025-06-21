@@ -2,58 +2,27 @@
 
 import { useState } from "react"
 import Image from "next/image"
-import { Search, Filter, Eye, Edit, MoreHorizontal, Download } from "lucide-react"
+import { Search, Eye, MoreHorizontal, Star, RotateCcw } from "lucide-react"
 import DashboardLayout from "@/components/dashboard/DashboardLayout"
 import { orders } from "@/lib/orders"
 
-export default function DashboardOrdersPage() {
+export default function CompletedOrdersPage() {
   const [searchQuery, setSearchQuery] = useState("")
-  const [statusFilter, setStatusFilter] = useState("all")
-  const [dateFilter, setDateFilter] = useState("all")
-  const [showFilters, setShowFilters] = useState(false)
 
-  // Filter orders
-  const filteredOrders = orders.filter((order) => {
+  // Filter only completed orders
+  const completedOrders = orders.filter((order) => order.status === "completed")
+
+  const filteredOrders = completedOrders.filter((order) => {
     const matchesSearch =
       order.id.toString().includes(searchQuery) ||
       order.customer?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       order.items.some((item) => item.name.toLowerCase().includes(searchQuery.toLowerCase()))
-    const matchesStatus = statusFilter === "all" || order.status === statusFilter
-    const matchesDate = dateFilter === "all" || filterByDate(order.date, dateFilter)
-    return matchesSearch && matchesStatus && matchesDate
+    return matchesSearch
   })
 
-  function filterByDate(dateString: string, filter: string) {
-    const orderDate = new Date(dateString)
-    const today = new Date()
-    const lastWeek = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000)
-    const lastMonth = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000)
-
-    switch (filter) {
-      case "today":
-        return orderDate.toDateString() === today.toDateString()
-      case "week":
-        return orderDate >= lastWeek
-      case "month":
-        return orderDate >= lastMonth
-      default:
-        return true
-    }
-  }
-
-  function getStatusStyle(status: string) {
-    switch (status) {
-      case "completed":
-        return "bg-gradient-to-r from-green-100 to-green-200 text-green-800"
-      case "processing":
-        return "bg-gradient-to-r from-green-50 to-green-100 text-green-700"
-      case "shipped":
-        return "bg-gradient-to-r from-green-200 to-green-300 text-green-900"
-      case "cancelled":
-        return "bg-gradient-to-r from-gray-100 to-gray-200 text-gray-600"
-      default:
-        return "bg-gradient-to-r from-gray-100 to-gray-200 text-gray-600"
-    }
+  const handleStatusChange = (orderId: number, newStatus: string) => {
+    console.log(`Updating order ${orderId} to ${newStatus}`)
+    alert(`Order #${orderId} status updated to ${newStatus}`)
   }
 
   return (
@@ -61,13 +30,14 @@ export default function DashboardOrdersPage() {
       <div className="container mx-auto px-4 py-6">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
           <div>
-            <h1 className="text-3xl font-bold gradient-text mb-2">Orders</h1>
-            <p className="text-gray-600 font-medium">Manage customer orders and track deliveries</p>
+            <h1 className="text-3xl font-bold gradient-text mb-2">Completed Orders</h1>
+            <p className="text-gray-600 font-medium">Successfully delivered orders and customer feedback</p>
           </div>
-          <button className="mt-4 md:mt-0 btn-primary flex items-center gap-2 hover:scale-105 transition-all duration-300">
-            <Download size={20} />
-            Export Orders
-          </button>
+          <div className="mt-4 md:mt-0 flex items-center gap-2">
+            <span className="px-4 py-2 bg-gradient-to-r from-green-100 to-green-200 text-green-800 rounded-lg font-bold text-sm">
+              {filteredOrders.length} Completed
+            </span>
+          </div>
         </div>
 
         {/* Search and Filters */}
@@ -79,42 +49,9 @@ export default function DashboardOrdersPage() {
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search orders..."
+                placeholder="Search completed orders..."
                 className="modern-input w-full pl-12 pr-4 py-3 font-medium"
               />
-            </div>
-
-            <button
-              onClick={() => setShowFilters(!showFilters)}
-              className="flex items-center gap-2 px-6 py-3 glass-effect rounded-xl md:hidden hover:bg-white/20 transition-all duration-300 font-semibold"
-            >
-              <Filter size={20} />
-              Filters
-            </button>
-
-            <div className={`flex flex-col md:flex-row gap-4 ${showFilters ? "block" : "hidden md:flex"}`}>
-              <select
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-                className="modern-input px-4 py-3 font-semibold"
-              >
-                <option value="all">All Status</option>
-                <option value="completed">Completed</option>
-                <option value="processing">Processing</option>
-                <option value="shipped">Shipped</option>
-                <option value="cancelled">Cancelled</option>
-              </select>
-
-              <select
-                value={dateFilter}
-                onChange={(e) => setDateFilter(e.target.value)}
-                className="modern-input px-4 py-3 font-semibold"
-              >
-                <option value="all">All Time</option>
-                <option value="today">Today</option>
-                <option value="week">Last 7 Days</option>
-                <option value="month">Last 30 Days</option>
-              </select>
             </div>
           </div>
         </div>
@@ -136,7 +73,7 @@ export default function DashboardOrdersPage() {
                     Items
                   </th>
                   <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
-                    Status
+                    Rating
                   </th>
                   <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
                     Total
@@ -180,20 +117,33 @@ export default function DashboardOrdersPage() {
                       <div className="text-xs text-gray-500 mt-1 font-medium">{order.items.length} items</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-3 py-1 text-xs font-bold rounded-full ${getStatusStyle(order.status)}`}>
-                        {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
-                      </span>
+                      <div className="flex items-center">
+                        <div className="flex">
+                          {[...Array(5)].map((_, i) => (
+                            <Star
+                              key={i}
+                              size={16}
+                              className={`${i < 4 ? "text-yellow-400 fill-current" : "text-gray-300"}`}
+                            />
+                          ))}
+                        </div>
+                        <span className="ml-1 text-xs text-gray-500 font-semibold">(4.0)</span>
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-bold text-primary">${order.total.toFixed(2)}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <div className="flex items-center gap-2">
-                        <button className="text-gray-600 hover:text-primary p-2 hover:bg-gray-100 rounded-lg transition-all duration-300 hover:scale-110">
-                          <Eye size={16} />
+                        <button
+                          onClick={() => handleStatusChange(order.id, "processing")}
+                          className="flex items-center gap-1 px-3 py-2 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg hover:from-orange-600 hover:to-orange-700 transition-all duration-300 hover:scale-105 font-semibold text-xs"
+                        >
+                          <RotateCcw size={14} />
+                          Reorder
                         </button>
                         <button className="text-gray-600 hover:text-primary p-2 hover:bg-gray-100 rounded-lg transition-all duration-300 hover:scale-110">
-                          <Edit size={16} />
+                          <Eye size={16} />
                         </button>
                         <button className="text-gray-600 hover:text-primary p-2 hover:bg-gray-100 rounded-lg transition-all duration-300 hover:scale-110">
                           <MoreHorizontal size={16} />
@@ -211,31 +161,13 @@ export default function DashboardOrdersPage() {
               <div className="text-gray-400 mb-4">
                 <Search size={48} className="mx-auto" />
               </div>
-              <h3 className="text-lg font-bold text-gray-900 mb-2">No orders found</h3>
-              <p className="text-gray-500 font-medium">Try adjusting your search criteria</p>
+              <h3 className="text-lg font-bold text-gray-900 mb-2">No completed orders found</h3>
+              <p className="text-gray-500 font-medium">
+                No orders have been completed yet or try adjusting your search
+              </p>
             </div>
           )}
         </div>
-
-        {/* Pagination */}
-        {filteredOrders.length > 0 && (
-          <div className="flex items-center justify-between mt-6">
-            <div className="text-sm text-gray-700 font-medium">
-              Showing <span className="font-bold">1</span> to{" "}
-              <span className="font-bold">{Math.min(10, filteredOrders.length)}</span> of{" "}
-              <span className="font-bold">{filteredOrders.length}</span> results
-            </div>
-            <div className="flex gap-2">
-              <button className="px-4 py-2 text-sm glass-effect rounded-lg hover:bg-white/20 transition-all duration-300 font-semibold">
-                Previous
-              </button>
-              <button className="px-4 py-2 text-sm bg-gradient-primary text-white rounded-lg font-semibold">1</button>
-              <button className="px-4 py-2 text-sm glass-effect rounded-lg hover:bg-white/20 transition-all duration-300 font-semibold">
-                Next
-              </button>
-            </div>
-          </div>
-        )}
       </div>
     </DashboardLayout>
   )

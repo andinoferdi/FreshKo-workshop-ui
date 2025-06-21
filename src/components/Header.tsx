@@ -1,25 +1,25 @@
-"use client";
+"use client"
 
-import type React from "react";
-import { useState, useEffect } from "react";
-import { usePathname } from "next/navigation";
-import Image from "next/image";
-import Link from "next/link";
-import { ShoppingCart, Search, User, Heart, Menu, X } from "lucide-react";
-import { useHydratedStore, type CartItem } from "../lib/store";
-import { searchProducts } from "../lib/products";
-import { useRouter } from "next/navigation";
-import { useVisibilityFix } from "@/hooks/useVisibilityFix";
+import type React from "react"
+import { useState, useEffect } from "react"
+import { usePathname } from "next/navigation"
+import Image from "next/image"
+import Link from "next/link"
+import { ShoppingCart, Search, User, Heart, Menu, X } from "lucide-react"
+import { useHydratedStore, type CartItem } from "../lib/store"
+import { searchProducts } from "../lib/products"
+import { useRouter } from "next/navigation"
+import { useVisibilityFix } from "@/hooks/useVisibilityFix"
 
 export default function Header() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isCartOpen, setIsCartOpen] = useState(false);
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [isScrolled, setIsScrolled] = useState(false);
-  const { isLoaded } = useVisibilityFix(20); // Faster loading for header
-  const pathname = usePathname();
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isCartOpen, setIsCartOpen] = useState(false)
+  const [isSearchOpen, setIsSearchOpen] = useState(false)
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
+  const [searchQuery, setSearchQuery] = useState("")
+  const [isScrolled, setIsScrolled] = useState(false)
+  const { isLoaded } = useVisibilityFix(20) // Faster loading for header
+  const pathname = usePathname()
 
   const {
     cart,
@@ -30,48 +30,48 @@ export default function Header() {
     removeFromCart,
     setSearchQuery: setStoreSearchQuery,
     setSearchResults,
-  } = useHydratedStore();
-  const router = useRouter();
+  } = useHydratedStore()
+  const router = useRouter()
 
-  const cartTotal = getCartTotal();
-  const cartItemsCount = getCartItemsCount();
-  const wishlistCount = getWishlistCount();
+  const cartTotal = getCartTotal()
+  const cartItemsCount = getCartItemsCount()
+  const wishlistCount = getWishlistCount()
 
   // Handle scroll effect
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+      setIsScrolled(window.scrollY > 20)
+    }
+    window.addEventListener("scroll", handleScroll)
+    return () => window.removeEventListener("scroll", handleScroll)
+  }, [])
 
   // Close menus on navigation
   useEffect(() => {
-    setIsMenuOpen(false);
-    setIsCartOpen(false);
-    setIsSearchOpen(false);
-    setIsUserMenuOpen(false);
-  }, [pathname]);
+    setIsMenuOpen(false)
+    setIsCartOpen(false)
+    setIsSearchOpen(false)
+    setIsUserMenuOpen(false)
+  }, [pathname])
 
   const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault()
     if (searchQuery.trim()) {
-      const results = searchProducts(searchQuery);
-      setStoreSearchQuery(searchQuery);
-      setSearchResults(results);
-      router.push("/search");
-      setIsSearchOpen(false);
+      const results = searchProducts(searchQuery)
+      setStoreSearchQuery(searchQuery)
+      setSearchResults(results)
+      router.push("/search")
+      setIsSearchOpen(false)
     }
-  };
+  }
 
   const handleQuickSearch = (query: string) => {
-    setSearchQuery(query);
-    const results = searchProducts(query);
-    setStoreSearchQuery(query);
-    setSearchResults(results);
-    router.push("/search");
-  };
+    setSearchQuery(query)
+    const results = searchProducts(query)
+    setStoreSearchQuery(query)
+    setSearchResults(results)
+    router.push("/search")
+  }
 
   return (
     <>
@@ -135,9 +135,7 @@ export default function Header() {
                             <h6 className="font-medium text-sm text-gray-900 hover:text-primary transition-colors duration-200">
                               {item.name}
                             </h6>
-                            <small className="text-gray-500">
-                              Qty: {item.quantity}
-                            </small>
+                            <small className="text-gray-500">Qty: {item.quantity}</small>
                           </div>
                         </div>
                         <div className="text-right">
@@ -157,9 +155,7 @@ export default function Header() {
 
                   <div className="flex justify-between items-center pt-4 border-t border-gray-200 font-semibold text-lg">
                     <span>Total</span>
-                    <strong className="text-primary">
-                      ${cartTotal.toFixed(2)}
-                    </strong>
+                    <strong className="text-primary">${cartTotal.toFixed(2)}</strong>
                   </div>
 
                   <div className="space-y-3 pt-4">
@@ -226,20 +222,16 @@ export default function Header() {
               </form>
 
               <div className="space-y-2">
-                <h5 className="text-sm font-medium text-gray-700 mb-3">
-                  Quick Search
-                </h5>
-                {["Fruits", "Vegetables", "Dairy", "Meat", "Beverages"].map(
-                  (category) => (
-                    <button
-                      key={category}
-                      onClick={() => handleQuickSearch(category)}
-                      className="block w-full text-left px-3 py-2 text-gray-600 hover:bg-gray-50 hover:text-primary rounded-lg transition-all duration-200 hover:translate-x-1"
-                    >
-                      {category}
-                    </button>
-                  )
-                )}
+                <h5 className="text-sm font-medium text-gray-700 mb-3">Quick Search</h5>
+                {["Fruits", "Vegetables", "Dairy", "Meat", "Beverages"].map((category) => (
+                  <button
+                    key={category}
+                    onClick={() => handleQuickSearch(category)}
+                    className="block w-full text-left px-3 py-2 text-gray-600 hover:bg-gray-50 hover:text-primary rounded-lg transition-all duration-200 hover:translate-x-1"
+                  >
+                    {category}
+                  </button>
+                ))}
               </div>
             </div>
           </div>
@@ -247,23 +239,21 @@ export default function Header() {
       )}
 
       <header
-        className={`bg-white shadow-sm sticky top-0 z-40 transition-all duration-300 ${
-          isScrolled ? "shadow-lg backdrop-blur-md bg-white/95" : ""
-        } ${
-          isLoaded ? "translate-y-0 opacity-100" : "translate-y-0 opacity-90"
-        }`}
+        className={`bg-white/80 backdrop-blur-md border-b border-white/20 sticky top-0 z-40 transition-all duration-500 ${
+          isScrolled ? "shadow-lg bg-white/90" : ""
+        } ${isLoaded ? "translate-y-0 opacity-100" : "translate-y-0 opacity-90"}`}
       >
         <div className="container mx-auto px-4">
           {/* Top Bar */}
-          <div className="flex items-center justify-between py-3 lg:py-4 border-b border-gray-100">
+          <div className="flex items-center justify-between py-4 lg:py-5">
             {/* Logo */}
             <div className="flex-shrink-0">
               <Link href="/" className="block group">
                 <Image
                   src="/images/logo.png"
                   alt="FreshKo Logo"
-                  width={70}
-                  height={22}
+                  width={80}
+                  height={26}
                   className="h-auto group-hover:scale-105 transition-transform duration-300"
                 />
               </Link>
@@ -273,12 +263,12 @@ export default function Header() {
             <div className="hidden lg:flex flex-1 max-w-2xl mx-8">
               <form
                 onSubmit={handleSearch}
-                className="flex w-full bg-gray-50 rounded-xl overflow-hidden border border-gray-200 hover:border-primary/50 transition-colors duration-300 group"
+                className="flex w-full modern-input p-0 overflow-hidden hover:shadow-lg transition-all duration-300 group"
               >
                 <div className="flex-1">
                   <input
                     type="text"
-                    className="w-full border-0 bg-transparent px-4 py-3 text-sm focus:outline-none placeholder-gray-400"
+                    className="w-full border-0 bg-transparent px-6 py-4 text-sm focus:outline-none placeholder-gray-400 font-medium"
                     placeholder="Search for fresh groceries and more..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
@@ -286,7 +276,7 @@ export default function Header() {
                 </div>
                 <button
                   type="submit"
-                  className="px-6 py-3 bg-primary text-white hover:bg-primary/90 transition-all duration-300 hover:scale-105 transform"
+                  className="px-8 py-4 bg-gradient-primary text-white hover:shadow-lg transition-all duration-300 hover:scale-105 transform font-medium"
                 >
                   <Search size={20} />
                 </button>
@@ -297,10 +287,10 @@ export default function Header() {
             <div className="flex items-center gap-3 lg:gap-4">
               {/* Support Info - Desktop */}
               <div className="hidden xl:block text-right group">
-                <span className="text-xs text-gray-500 block group-hover:text-primary transition-colors duration-200">
+                <span className="text-xs text-gray-500 block group-hover:text-primary transition-colors duration-200 font-medium">
                   Need Help?
                 </span>
-                <span className="text-sm font-semibold text-gray-800 group-hover:text-primary transition-colors duration-200">
+                <span className="text-sm font-bold text-gray-800 group-hover:text-primary transition-colors duration-200">
                   +1-800-FRESHKO
                 </span>
               </div>
@@ -311,56 +301,46 @@ export default function Header() {
                 <div className="relative">
                   <button
                     onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                    className="p-2.5 bg-gray-50 rounded-full hover:bg-gray-100 transition-all duration-300 hover:scale-110 transform group"
+                    className="p-3 glass-effect rounded-xl hover:bg-white/20 transition-all duration-300 hover:scale-110 transform group"
                     title="My Account"
                   >
-                    <User
-                      size={20}
-                      className="text-gray-600 group-hover:text-primary transition-colors duration-200"
-                    />
+                    <User size={20} className="text-gray-600 group-hover:text-primary transition-colors duration-200" />
                   </button>
 
                   {/* User Dropdown */}
                   {isUserMenuOpen && (
                     <>
                       {/* Mobile Overlay */}
-                      <div
-                        className="sm:hidden fixed inset-0 z-40"
-                        onClick={() => setIsUserMenuOpen(false)}
-                      />
+                      <div className="sm:hidden fixed inset-0 z-40" onClick={() => setIsUserMenuOpen(false)} />
 
                       <div
-                        className="absolute top-full mt-2 bg-white shadow-xl rounded-xl border border-gray-100 z-50 transform transition-all duration-300 scale-100 opacity-100 
-                                      w-64 right-0 
-                                      max-sm:fixed max-sm:top-16 max-sm:right-4 max-sm:left-4 max-sm:w-auto max-sm:mx-auto"
+                        className="absolute top-full mt-3 modern-card z-50 transform transition-all duration-300 scale-100 opacity-100 
+                                w-64 right-0 
+                                max-sm:fixed max-sm:top-16 max-sm:right-4 max-sm:left-4 max-sm:w-auto max-sm:mx-auto"
                       >
                         <div className="py-2">
-                          <div className="px-4 py-4 border-b border-gray-100 bg-gradient-to-r from-primary/5 to-primary/10">
-                            <p className="text-sm font-semibold text-gray-800">
-                              Welcome back!
-                            </p>
-                            <p className="text-xs text-gray-500">
-                              john.doe@email.com
-                            </p>
+                          <div className="px-6 py-4 border-b border-gray-100/50 bg-gradient-to-r from-primary/5 to-primary/10 rounded-t-xl">
+                            <p className="text-sm font-semibold text-gray-800">Welcome back!</p>
+                            <p className="text-xs text-gray-500 font-medium">john.doe@email.com</p>
                           </div>
                           <Link
                             href="/account/orders"
-                            className="block px-4 py-3 text-gray-700 hover:bg-gray-50 hover:text-primary transition-all duration-200 hover:translate-x-1"
+                            className="block px-6 py-3 text-gray-700 hover:bg-gray-50/50 hover:text-primary transition-all duration-200 hover:translate-x-1 font-medium"
                             onClick={() => setIsUserMenuOpen(false)}
                           >
                             Order History
                           </Link>
                           <Link
                             href="/dashboard"
-                            className="block px-4 py-3 text-gray-700 hover:bg-gray-50 hover:text-primary transition-all duration-200 hover:translate-x-1"
+                            className="block px-6 py-3 text-gray-700 hover:bg-gray-50/50 hover:text-primary transition-all duration-200 hover:translate-x-1 font-medium"
                             onClick={() => setIsUserMenuOpen(false)}
                           >
                             Dashboard
                           </Link>
-                          <div className="border-t border-gray-100 my-1"></div>
+                          <div className="border-t border-gray-100/50 my-1"></div>
                           <Link
                             href="/account/profile"
-                            className="block px-4 py-3 text-gray-700 hover:bg-gray-50 hover:text-primary transition-all duration-200 hover:translate-x-1"
+                            className="block px-6 py-3 text-gray-700 hover:bg-gray-50/50 hover:text-primary transition-all duration-200 hover:translate-x-1 font-medium"
                             onClick={() => setIsUserMenuOpen(false)}
                           >
                             Account Settings
@@ -373,15 +353,12 @@ export default function Header() {
 
                 <Link
                   href="/wishlist"
-                  className="relative p-2.5 bg-gray-50 rounded-full hover:bg-gray-100 transition-all duration-300 hover:scale-110 transform group"
+                  className="relative p-3 glass-effect rounded-xl hover:bg-white/20 transition-all duration-300 hover:scale-110 transform group"
                   title="Wishlist"
                 >
-                  <Heart
-                    size={20}
-                    className="text-gray-600 group-hover:text-primary transition-colors duration-200"
-                  />
+                  <Heart size={20} className="text-gray-600 group-hover:text-primary transition-colors duration-200" />
                   {wishlistCount > 0 && (
-                    <span className="absolute -top-1 -right-1 bg-primary text-white text-xs rounded-full w-4 h-4 flex items-center justify-center font-medium">
+                    <span className="absolute -top-1 -right-1 bg-gradient-primary text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold animate-pulse">
                       {wishlistCount}
                     </span>
                   )}
@@ -389,19 +366,16 @@ export default function Header() {
 
                 {/* Mobile Search */}
                 <button
-                  className="lg:hidden p-2.5 bg-gray-50 rounded-full hover:bg-gray-100 transition-all duration-300 hover:scale-110 transform group"
+                  className="lg:hidden p-3 glass-effect rounded-xl hover:bg-white/20 transition-all duration-300 hover:scale-110 transform group"
                   onClick={() => setIsSearchOpen(true)}
                   title="Search"
                 >
-                  <Search
-                    size={20}
-                    className="text-gray-600 group-hover:text-primary transition-colors duration-200"
-                  />
+                  <Search size={20} className="text-gray-600 group-hover:text-primary transition-colors duration-200" />
                 </button>
 
                 {/* Cart Button */}
                 <button
-                  className="relative p-2.5 bg-gray-50 rounded-full hover:bg-gray-100 transition-all duration-300 hover:scale-110 transform group"
+                  className="relative p-3 glass-effect rounded-xl hover:bg-white/20 transition-all duration-300 hover:scale-110 transform group"
                   onClick={() => setIsCartOpen(true)}
                   title="Shopping Cart"
                 >
@@ -410,7 +384,7 @@ export default function Header() {
                     className="text-gray-600 group-hover:text-primary transition-colors duration-200 group-hover:animate-bounce"
                   />
                   {cartItemsCount > 0 && (
-                    <span className="absolute -top-1 -right-1 bg-primary text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-medium animate-pulse">
+                    <span className="absolute -top-1 -right-1 bg-gradient-primary text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold animate-pulse">
                       {cartItemsCount}
                     </span>
                   )}
@@ -418,23 +392,17 @@ export default function Header() {
 
                 {/* Mobile Menu Toggle */}
                 <button
-                  className="lg:hidden p-2.5 bg-gray-50 rounded-full hover:bg-gray-100 transition-all duration-300 hover:scale-110 transform group"
+                  className="lg:hidden p-3 glass-effect rounded-xl hover:bg-white/20 transition-all duration-300 hover:scale-110 transform group"
                   onClick={() => setIsMenuOpen(!isMenuOpen)}
                   title="Menu"
                 >
-                  <Menu
-                    size={20}
-                    className="text-gray-600 group-hover:text-primary transition-colors duration-200"
-                  />
+                  <Menu size={20} className="text-gray-600 group-hover:text-primary transition-colors duration-200" />
                 </button>
               </div>
 
               {/* Desktop Cart Info */}
-              <div
-                className="hidden lg:block text-right group cursor-pointer"
-                onClick={() => setIsCartOpen(true)}
-              >
-                <span className="block text-xs text-gray-500 group-hover:text-primary transition-colors duration-200">
+              <div className="hidden lg:block text-right group cursor-pointer" onClick={() => setIsCartOpen(true)}>
+                <span className="block text-xs text-gray-500 group-hover:text-primary transition-colors duration-200 font-medium">
                   Cart ({cartItemsCount} items)
                 </span>
                 <span className="block text-sm font-bold text-gray-800 group-hover:text-primary transition-colors duration-200">
@@ -445,44 +413,50 @@ export default function Header() {
           </div>
 
           {/* Navigation Menu - Desktop */}
-          <nav className="hidden lg:block py-4">
+          <nav className="hidden lg:block py-4 border-t border-gray-100/50">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-8">
                 <Link
                   href="/"
-                  className="text-gray-700 hover:text-primary font-medium transition-colors duration-300 hover:scale-105 transform"
+                  className="text-gray-700 hover:text-primary font-semibold transition-all duration-300 hover:scale-105 transform relative group"
                 >
                   Home
+                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-primary transition-all duration-300 group-hover:w-full"></span>
                 </Link>
                 <Link
                   href="/shop"
-                  className="text-gray-700 hover:text-primary font-medium transition-colors duration-300 hover:scale-105 transform"
+                  className="text-gray-700 hover:text-primary font-semibold transition-all duration-300 hover:scale-105 transform relative group"
                 >
                   Shop by Departments
+                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-primary transition-all duration-300 group-hover:w-full"></span>
                 </Link>
                 <Link
                   href="/services"
-                  className="text-gray-700 hover:text-primary font-medium transition-colors duration-300 hover:scale-105 transform"
+                  className="text-gray-700 hover:text-primary font-semibold transition-all duration-300 hover:scale-105 transform relative group"
                 >
                   Services
+                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-primary transition-all duration-300 group-hover:w-full"></span>
                 </Link>
                 <Link
                   href="/about"
-                  className="text-gray-700 hover:text-primary font-medium transition-colors duration-300 hover:scale-105 transform"
+                  className="text-gray-700 hover:text-primary font-semibold transition-all duration-300 hover:scale-105 transform relative group"
                 >
                   About Us
+                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-primary transition-all duration-300 group-hover:w-full"></span>
                 </Link>
                 <Link
                   href="/blog"
-                  className="text-gray-700 hover:text-primary font-medium transition-colors duration-300 hover:scale-105 transform"
+                  className="text-gray-700 hover:text-primary font-semibold transition-all duration-300 hover:scale-105 transform relative group"
                 >
                   Blog
+                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-primary transition-all duration-300 group-hover:w-full"></span>
                 </Link>
                 <Link
                   href="/contact"
-                  className="text-gray-700 hover:text-primary font-medium transition-colors duration-300 hover:scale-105 transform"
+                  className="text-gray-700 hover:text-primary font-semibold transition-all duration-300 hover:scale-105 transform relative group"
                 >
                   Contact
+                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-primary transition-all duration-300 group-hover:w-full"></span>
                 </Link>
               </div>
             </div>
@@ -500,13 +474,7 @@ export default function Header() {
           <div className="fixed left-0 top-0 h-full w-80 bg-white shadow-2xl transform transition-transform duration-300 ease-out overflow-y-auto">
             <div className="p-6">
               <div className="flex justify-between items-center mb-8">
-                <Image
-                  src="/images/logo.png"
-                  alt="FreshKo Logo"
-                  width={70}
-                  height={22}
-                  className="h-auto"
-                />
+                <Image src="/images/logo.png" alt="FreshKo Logo" width={70} height={22} className="h-auto" />
                 <button
                   onClick={() => setIsMenuOpen(false)}
                   className="text-gray-500 hover:text-gray-700 p-2 hover:bg-gray-100 rounded-full transition-colors duration-200"
@@ -563,9 +531,7 @@ export default function Header() {
               <div className="mt-8 pt-6 border-t border-gray-200">
                 <div className="text-center">
                   <p className="text-sm text-gray-600 mb-2">Need Help?</p>
-                  <p className="text-lg font-semibold text-primary">
-                    +1-800-FRESHKO
-                  </p>
+                  <p className="text-lg font-semibold text-primary">+1-800-FRESHKO</p>
                 </div>
               </div>
             </div>
@@ -573,5 +539,5 @@ export default function Header() {
         </div>
       )}
     </>
-  );
+  )
 }
