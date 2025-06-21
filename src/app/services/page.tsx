@@ -113,51 +113,45 @@ export default function ServicesPage() {
   return (
     <>
       <Header />
-      <main className="min-h-screen bg-gray-50">
-        {/* Breadcrumb */}
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center gap-2 text-sm text-gray-600">
-            <Link href="/" className="hover:text-primary transition-colors">
-              Home
-            </Link>
-            <span>/</span>
-            <span className="text-gray-900">Services</span>
-          </div>
-        </div>
-
-        {/* Hero Section */}
-        <section className="py-12 lg:py-20 bg-white">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center max-w-4xl mx-auto">
-              <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
-                Our <span className="text-primary">Services</span>
-              </h1>
-              <p className="text-xl lg:text-2xl text-gray-600 mb-8 leading-relaxed">
-                From farm to table, we provide comprehensive grocery solutions
-                designed to make fresh, healthy eating convenient and accessible
-                for everyone.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link
-                  href="/shop"
-                  className="bg-primary text-white px-8 py-4 rounded-lg font-semibold hover:bg-green-700 transition-colors transform hover:scale-105"
-                >
-                  Start Shopping
-                </Link>
-                <Link
-                  href="/contact"
-                  className="border-2 border-primary text-primary px-8 py-4 rounded-lg font-semibold hover:bg-primary hover:text-white transition-all transform hover:scale-105"
-                >
-                  Contact Us
-                </Link>
-              </div>
+      <main className="min-h-screen bg-white py-8 lg:py-12">
+        <div className="container mx-auto px-4">
+          {/* Page Header */}
+          <div className="mb-8 lg:mb-12">
+            <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+              Our <span className="text-primary">Services</span>
+            </h1>
+            <p className="text-lg text-gray-600 mb-6">
+              From farm to table, we provide comprehensive grocery solutions
+              designed to make fresh, healthy eating convenient and accessible
+              for everyone.
+            </p>
+            <div className="flex items-center gap-2 text-sm text-gray-600">
+              <Link href="/" className="hover:text-primary transition-colors">
+                Home
+              </Link>
+              <span>/</span>
+              <span className="text-gray-900">Services</span>
             </div>
           </div>
-        </section>
 
-        {/* Main Services */}
-        <section className="py-12 lg:py-20">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          {/* CTA Buttons */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
+            <Link
+              href="/shop"
+              className="bg-primary text-white px-8 py-4 rounded-lg font-semibold hover:bg-primary/90 transition-all duration-300 hover:scale-105 hover:shadow-lg text-center"
+            >
+              Start Shopping
+            </Link>
+            <Link
+              href="/contact"
+              className="border-2 border-primary text-primary px-8 py-4 rounded-lg font-semibold hover:bg-primary hover:text-white transition-all duration-300 hover:scale-105 text-center"
+            >
+              Contact Us
+            </Link>
+          </div>
+
+          {/* Main Services */}
+          <section className="mb-16">
             <div className="text-center mb-12">
               <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
                 What We Offer
@@ -173,10 +167,10 @@ export default function ServicesPage() {
               {services.map((service, index) => (
                 <div
                   key={index}
-                  className="bg-white rounded-xl shadow-sm border border-gray-100 p-8 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1"
+                  className="bg-gray-50 rounded-xl border border-gray-100 p-8 hover:shadow-lg hover:scale-105 transition-all duration-300"
                 >
                   <div className="flex items-center mb-6">
-                    <div className="bg-green-50 p-3 rounded-lg mr-4">
+                    <div className="bg-primary/10 p-3 rounded-lg mr-4 border border-primary/20">
                       <service.icon className="w-8 h-8 text-primary" />
                     </div>
                     <h3 className="text-xl font-bold text-gray-900">
@@ -200,136 +194,137 @@ export default function ServicesPage() {
                 </div>
               ))}
             </div>
-          </div>
-        </section>
+          </section>
 
-        {/* Additional Services */}
-        <section className="py-12 lg:py-20 bg-white">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-                Specialized Offerings
-              </h2>
-              <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-                Explore our specialized services tailored to meet your unique
-                dietary needs and lifestyle preferences.
-              </p>
-            </div>
+          {/* Additional Services */}
+          <section className="py-12 lg:py-20 bg-white">
+            <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="text-center mb-12">
+                <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+                  Specialized Offerings
+                </h2>
+                <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+                  Explore our specialized services tailored to meet your unique
+                  dietary needs and lifestyle preferences.
+                </p>
+              </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {additionalServices.map((service, index) => (
-                <div
-                  key={index}
-                  className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1"
-                >
-                  <div className="aspect-video relative">
-                    <Image
-                      src={service.image || "/placeholder.svg"}
-                      alt={service.title}
-                      fill
-                      className="object-cover"
-                    />
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                {additionalServices.map((service, index) => (
+                  <div
+                    key={index}
+                    className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1"
+                  >
+                    <div className="aspect-video relative">
+                      <Image
+                        src={service.image || "/placeholder.svg"}
+                        alt={service.title}
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                    <div className="p-6">
+                      <h3 className="text-xl font-bold text-gray-900 mb-3">
+                        {service.title}
+                      </h3>
+                      <p className="text-gray-600 leading-relaxed">
+                        {service.description}
+                      </p>
+                    </div>
                   </div>
-                  <div className="p-6">
-                    <h3 className="text-xl font-bold text-gray-900 mb-3">
-                      {service.title}
-                    </h3>
-                    <p className="text-gray-600 leading-relaxed">
-                      {service.description}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* How It Works */}
-        <section className="py-12 lg:py-20">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-                How It Works
-              </h2>
-              <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-                Getting fresh groceries delivered has never been easier. Follow
-                these simple steps to start enjoying farm-fresh produce.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-              {[
-                {
-                  step: "01",
-                  title: "Browse & Select",
-                  description:
-                    "Browse our extensive catalog of fresh produce, dairy, meats, and pantry essentials. Add items to your cart with just a click.",
-                },
-                {
-                  step: "02",
-                  title: "Choose Delivery",
-                  description:
-                    "Select your preferred delivery time slot. We offer same-day delivery and flexible scheduling to fit your lifestyle.",
-                },
-                {
-                  step: "03",
-                  title: "Personal Shopping",
-                  description:
-                    "Our expert shoppers carefully select each item, ensuring you receive the freshest and highest quality products available.",
-                },
-                {
-                  step: "04",
-                  title: "Fresh Delivery",
-                  description:
-                    "Receive your groceries at your doorstep in temperature-controlled packaging, maintaining optimal freshness from store to door.",
-                },
-              ].map((step, index) => (
-                <div key={index} className="text-center group">
-                  <div className="bg-primary text-white w-16 h-16 rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
-                    {step.step}
-                  </div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-3">
-                    {step.title}
-                  </h3>
-                  <p className="text-gray-600 leading-relaxed">
-                    {step.description}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Contact CTA */}
-        <section className="py-12 lg:py-20 bg-primary text-white">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center max-w-4xl mx-auto">
-              <Phone className="w-16 h-16 mx-auto mb-6 opacity-80" />
-              <h2 className="text-3xl lg:text-4xl font-bold mb-6">
-                Need Help Choosing the Right Service?
-              </h2>
-              <p className="text-xl mb-8 opacity-90 leading-relaxed">
-                Our customer service team is here to help you find the perfect
-                service package for your needs. Get personalized recommendations
-                and answers to all your questions.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link
-                  href="/contact"
-                  className="bg-white text-primary px-8 py-4 rounded-lg font-semibold hover:bg-gray-100 transition-all transform hover:scale-105"
-                >
-                  Contact Support
-                </Link>
-                <a
-                  href="tel:+1-800-FRESHKO"
-                  className="border-2 border-white text-white px-8 py-4 rounded-lg font-semibold hover:bg-white hover:text-primary transition-all transform hover:scale-105"
-                >
-                  Call +1-800-FRESHKO
-                </a>
+                ))}
               </div>
             </div>
-          </div>
-        </section>
+          </section>
+
+          {/* How It Works */}
+          <section className="py-12 lg:py-20">
+            <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="text-center mb-12">
+                <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+                  How It Works
+                </h2>
+                <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+                  Getting fresh groceries delivered has never been easier.
+                  Follow these simple steps to start enjoying farm-fresh
+                  produce.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                {[
+                  {
+                    step: "01",
+                    title: "Browse & Select",
+                    description:
+                      "Browse our extensive catalog of fresh produce, dairy, meats, and pantry essentials. Add items to your cart with just a click.",
+                  },
+                  {
+                    step: "02",
+                    title: "Choose Delivery",
+                    description:
+                      "Select your preferred delivery time slot. We offer same-day delivery and flexible scheduling to fit your lifestyle.",
+                  },
+                  {
+                    step: "03",
+                    title: "Personal Shopping",
+                    description:
+                      "Our expert shoppers carefully select each item, ensuring you receive the freshest and highest quality products available.",
+                  },
+                  {
+                    step: "04",
+                    title: "Fresh Delivery",
+                    description:
+                      "Receive your groceries at your doorstep in temperature-controlled packaging, maintaining optimal freshness from store to door.",
+                  },
+                ].map((step, index) => (
+                  <div key={index} className="text-center group">
+                    <div className="bg-primary text-white w-16 h-16 rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+                      {step.step}
+                    </div>
+                    <h3 className="text-xl font-bold text-gray-900 mb-3">
+                      {step.title}
+                    </h3>
+                    <p className="text-gray-600 leading-relaxed">
+                      {step.description}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          {/* Contact CTA */}
+          <section className="py-12 lg:py-20 bg-primary text-white">
+            <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="text-center max-w-4xl mx-auto">
+                <Phone className="w-16 h-16 mx-auto mb-6 opacity-80" />
+                <h2 className="text-3xl lg:text-4xl font-bold mb-6">
+                  Need Help Choosing the Right Service?
+                </h2>
+                <p className="text-xl mb-8 opacity-90 leading-relaxed">
+                  Our customer service team is here to help you find the perfect
+                  service package for your needs. Get personalized
+                  recommendations and answers to all your questions.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                  <Link
+                    href="/contact"
+                    className="bg-white text-primary px-8 py-4 rounded-lg font-semibold hover:bg-gray-100 transition-all transform hover:scale-105"
+                  >
+                    Contact Support
+                  </Link>
+                  <a
+                    href="tel:+1-800-FRESHKO"
+                    className="border-2 border-white text-white px-8 py-4 rounded-lg font-semibold hover:bg-white hover:text-primary transition-all transform hover:scale-105"
+                  >
+                    Call +1-800-FRESHKO
+                  </a>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
       </main>
       <Footer />
     </>

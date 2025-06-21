@@ -122,52 +122,44 @@ export default function ShopPage() {
   return (
     <>
       <Header />
-      <main className="min-h-screen bg-gray-50">
-        {/* Breadcrumb */}
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center gap-2 text-sm text-gray-600">
-            <Link href="/" className="hover:text-primary transition-colors">
-              Home
-            </Link>
-            <span>/</span>
-            <span className="text-gray-900">Shop</span>
-            {selectedCategory !== "all" && (
-              <>
-                <span>/</span>
-                <span className="text-gray-900 capitalize">
-                  {selectedCategory}
-                </span>
-              </>
-            )}
-          </div>
-        </div>
-
-        {/* Page Header */}
-        <section className="py-8 lg:py-12 bg-white">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center">
-              <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-                Shop Fresh Groceries
-              </h1>
-              <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                Discover our wide selection of fresh produce, quality meats,
-                dairy products, and pantry essentials. Everything you need for
-                healthy, delicious meals.
-              </p>
+      <main className="min-h-screen bg-white py-8 lg:py-12">
+        <div className="container mx-auto px-4">
+          {/* Page Header */}
+          <div className="mb-8 lg:mb-12">
+            <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+              Shop Fresh Groceries
+            </h1>
+            <p className="text-lg text-gray-600 mb-6">
+              Discover our wide selection of fresh produce, quality meats, dairy
+              products, and pantry essentials. Everything you need for healthy,
+              delicious meals.
+            </p>
+            <div className="flex items-center gap-2 text-sm text-gray-600">
+              <Link href="/" className="hover:text-primary transition-colors">
+                Home
+              </Link>
+              <span>/</span>
+              <span className="text-gray-900">Shop</span>
+              {selectedCategory !== "all" && (
+                <>
+                  <span>/</span>
+                  <span className="text-gray-900 capitalize">
+                    {selectedCategory}
+                  </span>
+                </>
+              )}
             </div>
           </div>
-        </section>
 
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex flex-col lg:flex-row gap-8">
             {/* Filters Sidebar */}
             <div className="lg:w-64 flex-shrink-0">
-              <div className="bg-white rounded-xl shadow-sm p-6 sticky top-4">
+              <div className="bg-gray-50 rounded-xl border border-gray-100 p-6 sticky top-4">
                 <div className="flex items-center justify-between mb-6 lg:hidden">
                   <h2 className="text-lg font-semibold">Filters</h2>
                   <button
                     onClick={() => setShowFilters(!showFilters)}
-                    className="p-2 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                    className="p-2 bg-white rounded-lg hover:bg-gray-100 transition-colors border border-gray-200"
                   >
                     <Filter size={20} />
                   </button>
@@ -184,7 +176,7 @@ export default function ShopPage() {
                       Categories
                     </h3>
                     <div className="space-y-2">
-                      <label className="flex items-center gap-3 cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors">
+                      <label className="flex items-center gap-3 cursor-pointer hover:bg-white p-2 rounded-lg transition-colors">
                         <input
                           type="radio"
                           name="category"
@@ -198,7 +190,7 @@ export default function ShopPage() {
                       {categories.map((category: string) => (
                         <label
                           key={category}
-                          className="flex items-center gap-3 cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors"
+                          className="flex items-center gap-3 cursor-pointer hover:bg-white p-2 rounded-lg transition-colors"
                         >
                           <input
                             type="radio"

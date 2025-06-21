@@ -41,37 +41,28 @@ export default function BlogPage() {
   return (
     <>
       <Header />
-      <main className="min-h-screen bg-white">
-        {/* Breadcrumb */}
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center gap-2 text-sm text-gray-600">
-            <Link href="/" className="hover:text-primary transition-colors">
-              Home
-            </Link>
-            <span>/</span>
-            <span className="text-gray-900">Blog</span>
-          </div>
-        </div>
-
-        {/* Page Header */}
-        <section className="py-8 lg:py-12 bg-gray-50">
-          <div className="container mx-auto px-4">
-            <div className="text-center mb-8">
-              <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-                Fresh Ideas & Tips
-              </h1>
-              <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                Discover recipes, nutrition tips, seasonal guides, and
-                everything you need to make the most of fresh, healthy
-                ingredients.
-              </p>
+      <main className="min-h-screen bg-white py-8 lg:py-12">
+        <div className="container mx-auto px-4">
+          {/* Page Header */}
+          <div className="mb-8 lg:mb-12">
+            <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+              Fresh Ideas & Tips
+            </h1>
+            <p className="text-lg text-gray-600 mb-6">
+              Discover recipes, nutrition tips, seasonal guides, and everything
+              you need to make the most of fresh, healthy ingredients.
+            </p>
+            <div className="flex items-center gap-2 text-sm text-gray-600">
+              <Link href="/" className="hover:text-primary transition-colors">
+                Home
+              </Link>
+              <span>/</span>
+              <span className="text-gray-900">Blog</span>
             </div>
           </div>
-        </section>
 
-        <div className="container mx-auto px-4 pb-16">
           {/* Search and Filters */}
-          <div className="bg-white rounded-2xl shadow-sm p-6 mb-8 border border-gray-100 -mt-8 relative z-10">
+          <div className="bg-gray-50 rounded-2xl border border-gray-100 p-6 mb-8">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="relative">
                 <Search
@@ -83,7 +74,7 @@ export default function BlogPage() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search articles..."
-                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg 
+                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg bg-white
                            focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary
                            transition-all duration-300"
                 />
@@ -93,7 +84,7 @@ export default function BlogPage() {
                 <select
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-lg 
+                  className="w-full px-4 py-3 border border-gray-200 rounded-lg bg-white
                            focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary
                            appearance-none transition-all duration-300"
                 >
@@ -113,7 +104,7 @@ export default function BlogPage() {
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-lg 
+                  className="w-full px-4 py-3 border border-gray-200 rounded-lg bg-white
                            focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary
                            appearance-none transition-all duration-300"
                 >
@@ -135,7 +126,7 @@ export default function BlogPage() {
               {filteredPosts.map((post) => (
                 <article
                   key={post.id}
-                  className="bg-white border border-gray-100 shadow-sm rounded-2xl overflow-hidden
+                  className="bg-gray-50 border border-gray-100 rounded-2xl overflow-hidden
                            hover:shadow-lg hover:scale-105 transition-all duration-300 group"
                 >
                   <div className="overflow-hidden">

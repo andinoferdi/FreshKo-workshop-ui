@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, type ReactNode } from "react";
+import { usePathname } from "next/navigation";
 
 interface Props {
   children: ReactNode;
@@ -13,6 +14,7 @@ interface Props {
 export default function AOSProvider({ children }: Props) {
   const [isClient, setIsClient] = useState(false);
   const [isAOSLoaded, setIsAOSLoaded] = useState(false);
+  const pathname = usePathname();
 
   useEffect(() => {
     // Ensure we're on the client side
@@ -52,11 +54,12 @@ export default function AOSProvider({ children }: Props) {
             AOS.init({
               duration: 1000,
               easing: "ease-in-out",
-              once: true,
+              once: false,
               mirror: false,
-              offset: 100,
+              offset: 50,
               disable: false,
               startEvent: "DOMContentLoaded",
+              anchorPlacement: "top-bottom",
             });
 
             // Refresh AOS after initialization
@@ -86,6 +89,22 @@ export default function AOSProvider({ children }: Props) {
       }
     };
   }, []);
+
+  // Handle route changes
+  useEffect(() => {
+    if (isAOSLoaded && typeof window !== "undefined") {
+      import("aos")
+        .then((AOS) => {
+          // Small delay to ensure DOM is updated after navigation
+          setTimeout(() => {
+            AOS.default.refreshHard();
+          }, 100);
+        })
+        .catch((error) => {
+          console.warn("Failed to refresh AOS on route change:", error);
+        });
+    }
+  }, [pathname, isAOSLoaded]);
 
   // Prevent hydration mismatch by ensuring consistent rendering
   if (!isClient) {

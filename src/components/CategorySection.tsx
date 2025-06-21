@@ -8,57 +8,39 @@ import { ArrowRight, Sparkles } from "lucide-react";
 const categories = [
   {
     id: 1,
-    name: "Fresh Fruits",
+    name: "Fruits",
     image: "/images/thumb-avocado.png",
     count: "25+ items",
-    color: "from-primary/20 to-primary/30",
-    bgColor: "bg-primary/5",
-    emoji: "🍎",
   },
   {
     id: 2,
     name: "Vegetables",
     image: "/images/thumb-tomatoes.png",
     count: "30+ items",
-    color: "from-primary/30 to-primary/40",
-    bgColor: "bg-primary/10",
-    emoji: "🥬",
   },
   {
     id: 3,
-    name: "Dairy Products",
+    name: "Dairy",
     image: "/images/thumb-milk.png",
     count: "15+ items",
-    color: "from-primary/15 to-primary/25",
-    bgColor: "bg-gray-50",
-    emoji: "🥛",
   },
   {
     id: 4,
-    name: "Meat & Fish",
+    name: "Seafood",
     image: "/images/thumb-tuna.jpg",
     count: "20+ items",
-    color: "from-primary/25 to-primary/35",
-    bgColor: "bg-primary/5",
-    emoji: "🥩",
   },
   {
     id: 5,
     name: "Beverages",
     image: "/images/thumb-orange-juice.png",
     count: "18+ items",
-    color: "from-primary/20 to-primary/30",
-    bgColor: "bg-gray-50",
-    emoji: "🥤",
   },
   {
     id: 6,
     name: "Bakery",
     image: "/images/thumb-biscuits.png",
     count: "12+ items",
-    color: "from-primary/35 to-primary/45",
-    bgColor: "bg-primary/10",
-    emoji: "🍞",
   },
 ];
 
@@ -154,22 +136,10 @@ export default function CategorySection() {
                   .toLowerCase()
                   .replace(/\s+/g, "-")}`}
               >
-                <div
-                  className={`relative ${category.bgColor} rounded-2xl p-6 text-center transition-all duration-300 hover:shadow-xl border border-white/50 backdrop-blur-sm overflow-hidden`}
-                >
-                  {/* Hover Gradient Overlay */}
-                  <div
-                    className={`absolute inset-0 bg-gradient-to-br ${category.color} opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl`}
-                  ></div>
-
-                  {/* Floating Emoji */}
-                  <div className="absolute -top-2 -right-2 text-2xl animate-bounce group-hover:animate-pulse">
-                    {category.emoji}
-                  </div>
-
+                <div className="relative bg-white group-hover:bg-primary rounded-2xl p-6 text-center transition-all duration-300 hover:shadow-xl border border-gray-100 group-hover:border-primary overflow-hidden">
                   {/* Category Image */}
                   <div className="relative mb-4 group-hover:scale-110 transition-transform duration-300">
-                    <div className="w-20 h-20 mx-auto rounded-full overflow-hidden shadow-lg group-hover:shadow-xl transition-shadow duration-300">
+                    <div className="w-20 h-20 mx-auto rounded-full overflow-hidden shadow-lg group-hover:shadow-xl transition-shadow duration-300 bg-white">
                       <Image
                         src={category.image || "/placeholder.svg"}
                         alt={category.name}
@@ -180,23 +150,21 @@ export default function CategorySection() {
                     </div>
 
                     {/* Glow Effect */}
-                    <div
-                      className={`absolute inset-0 rounded-full bg-gradient-to-br ${category.color} opacity-0 group-hover:opacity-30 blur-xl transition-opacity duration-300`}
-                    ></div>
+                    <div className="absolute inset-0 rounded-full bg-primary/30 opacity-0 group-hover:opacity-50 blur-xl transition-opacity duration-300"></div>
                   </div>
 
                   {/* Category Info */}
                   <div className="relative z-10">
-                    <h3 className="font-semibold text-gray-900 mb-1 group-hover:text-white transition-colors duration-300">
+                    <h3 className="font-semibold text-gray-900 group-hover:text-white mb-1 transition-colors duration-300">
                       {category.name}
                     </h3>
-                    <p className="text-sm text-gray-600 mb-3 group-hover:text-white/90 transition-colors duration-300">
+                    <p className="text-sm text-gray-600 group-hover:text-white/90 mb-3 transition-colors duration-300">
                       {category.count}
                     </p>
 
                     {/* Hover Arrow */}
                     <div
-                      className={`inline-flex items-center gap-1 text-primary font-medium text-sm transform transition-all duration-300 group-hover:text-white ${
+                      className={`inline-flex items-center gap-1 text-primary group-hover:text-white font-medium text-sm transform transition-all duration-300 ${
                         hoveredCategory === category.id
                           ? "translate-x-0 opacity-100"
                           : "-translate-x-2 opacity-0"

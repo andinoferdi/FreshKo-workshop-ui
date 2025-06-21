@@ -3,6 +3,7 @@ import { Poppins } from "next/font/google";
 import "./globals.css";
 import AOSProvider from "@/components/AOSProvider";
 import ScrollToTop from "@/components/ScrollToTop";
+import NavigationHandler from "@/components/NavigationHandler";
 import { HydrationFix } from "@/components/HydrationFix";
 
 const poppins = Poppins({
@@ -22,6 +23,8 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
 };
 
 export default function RootLayout({
@@ -42,8 +45,11 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <HydrationFix />
-        <AOSProvider>{children}</AOSProvider>
-        <ScrollToTop />
+        <AOSProvider>
+          <NavigationHandler />
+          {children}
+          <ScrollToTop />
+        </AOSProvider>
       </body>
     </html>
   );

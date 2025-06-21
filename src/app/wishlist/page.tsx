@@ -51,32 +51,30 @@ export default function WishlistPage() {
         <div className="container mx-auto px-4">
           {/* Page Header */}
           <div className="mb-8 lg:mb-12">
-            <div className="bg-gray-50 rounded-2xl p-8 mb-8">
-              <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-                My Wishlist
-              </h1>
-              <p className="text-lg text-gray-600 mb-6">
-                Your saved items for future purchases
-              </p>
-              <div className="flex items-center gap-2 text-sm text-gray-600">
-                <Link
-                  href="/"
-                  className="hover:text-primary transition-colors duration-300"
-                >
-                  Home
-                </Link>
-                <span>/</span>
-                <span className="text-gray-900">Wishlist</span>
-              </div>
+            <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+              My Wishlist
+            </h1>
+            <p className="text-lg text-gray-600 mb-6">
+              Your saved items for future purchases
+            </p>
+            <div className="flex items-center gap-2 text-sm text-gray-600">
+              <Link
+                href="/"
+                className="hover:text-primary transition-colors duration-300"
+              >
+                Home
+              </Link>
+              <span>/</span>
+              <span className="text-gray-900">Wishlist</span>
             </div>
           </div>
 
           {/* Wishlist Items */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-lg transition-shadow duration-300">
+          <div className="bg-gray-50 rounded-xl border border-gray-100 p-6">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
               <h2 className="text-xl font-bold text-gray-900">
                 Saved Items
-                <span className="ml-2 text-primary bg-green-50 px-3 py-1 rounded-full text-sm font-medium">
+                <span className="ml-2 text-primary bg-primary/10 px-3 py-1 rounded-full text-sm font-medium border border-primary/20">
                   {wishlist.length}
                 </span>
               </h2>
@@ -97,7 +95,7 @@ export default function WishlistPage() {
                 return (
                   <div
                     key={product.id}
-                    className="bg-gray-50 rounded-xl p-4 relative hover:shadow-lg hover:scale-105 transition-all duration-300 group"
+                    className="bg-white rounded-xl p-4 relative hover:shadow-lg hover:scale-105 transition-all duration-300 group border border-gray-100"
                   >
                     {/* Remove Button */}
                     <button
@@ -108,7 +106,7 @@ export default function WishlistPage() {
                     </button>
 
                     {/* Product Image */}
-                    <div className="relative aspect-square mb-4 bg-white rounded-lg overflow-hidden">
+                    <div className="relative aspect-square mb-4 bg-gray-50 rounded-lg overflow-hidden">
                       <Link href={`/product/${product.id}`}>
                         <Image
                           src={product.image || "/placeholder.svg"}
@@ -169,11 +167,11 @@ export default function WishlistPage() {
             </div>
 
             {/* Additional Actions */}
-            <div className="mt-8 pt-6 border-t border-gray-100">
+            <div className="mt-8 pt-6 border-t border-gray-200">
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link
                   href="/shop"
-                  className="inline-flex items-center justify-center gap-2 bg-gray-100 text-gray-700 px-6 py-3 rounded-lg font-medium hover:bg-gray-200 hover:scale-105 transition-all duration-300"
+                  className="inline-flex items-center justify-center gap-2 bg-white text-gray-700 px-6 py-3 rounded-lg font-medium hover:bg-gray-50 hover:scale-105 transition-all duration-300 border border-gray-200"
                 >
                   <ArrowLeft size={16} />
                   Continue Shopping

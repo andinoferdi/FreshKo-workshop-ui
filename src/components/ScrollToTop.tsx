@@ -1,30 +1,42 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { ChevronUp } from "lucide-react"
+import { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
+import { ChevronUp } from "lucide-react";
 
 export default function ScrollToTop() {
-  const [isVisible, setIsVisible] = useState(false)
+  const [isVisible, setIsVisible] = useState(false);
+  const pathname = usePathname();
 
+  // Handle scroll visibility
   useEffect(() => {
     const toggleVisibility = () => {
       if (window.pageYOffset > 300) {
-        setIsVisible(true)
+        setIsVisible(true);
       } else {
-        setIsVisible(false)
+        setIsVisible(false);
       }
-    }
+    };
 
-    window.addEventListener("scroll", toggleVisibility)
-    return () => window.removeEventListener("scroll", toggleVisibility)
-  }, [])
+    window.addEventListener("scroll", toggleVisibility);
+    return () => window.removeEventListener("scroll", toggleVisibility);
+  }, []);
+
+  // Handle navigation - scroll to top when navigating
+  useEffect(() => {
+    // Force scroll to top on navigation
+    window.scrollTo({ top: 0, behavior: "instant" });
+
+    // Hide the scroll to top button immediately after navigation
+    setIsVisible(false);
+  }, [pathname]);
 
   const scrollToTop = () => {
     window.scrollTo({
       top: 0,
       behavior: "smooth",
-    })
-  }
+    });
+  };
 
   return (
     <>
@@ -38,5 +50,5 @@ export default function ScrollToTop() {
         </button>
       )}
     </>
-  )
+  );
 }

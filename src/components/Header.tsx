@@ -2,12 +2,14 @@
 
 import type React from "react";
 import { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { ShoppingCart, Search, User, Heart, Menu, X } from "lucide-react";
 import { useHydratedStore, type CartItem } from "../lib/store";
 import { searchProducts } from "../lib/products";
 import { useRouter } from "next/navigation";
+import { useVisibilityFix } from "@/hooks/useVisibilityFix";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -16,12 +18,15 @@ export default function Header() {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [isScrolled, setIsScrolled] = useState(false);
-  const [isLoaded, setIsLoaded] = useState(false);
+  const { isLoaded } = useVisibilityFix(20); // Faster loading for header
+  const pathname = usePathname();
 
   const {
     cart,
+    wishlist,
     getCartTotal,
     getCartItemsCount,
+    getWishlistCount,
     removeFromCart,
     setSearchQuery: setStoreSearchQuery,
     setSearchResults,
@@ -30,6 +35,7 @@ export default function Header() {
 
   const cartTotal = getCartTotal();
   const cartItemsCount = getCartItemsCount();
+  const wishlistCount = getWishlistCount();
 
   // Handle scroll effect
   useEffect(() => {
@@ -40,10 +46,13 @@ export default function Header() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Loading animation
+  // Close menus on navigation
   useEffect(() => {
-    setIsLoaded(true);
-  }, []);
+    setIsMenuOpen(false);
+    setIsCartOpen(false);
+    setIsSearchOpen(false);
+    setIsUserMenuOpen(false);
+  }, [pathname]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -198,41 +207,39 @@ export default function Header() {
                 </button>
               </div>
 
-              <div className="space-y-6">
-                <form onSubmit={handleSearch} className="relative">
+              <form onSubmit={handleSearch} className="mb-6">
+                <div className="relative">
                   <input
-                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-300"
                     type="text"
-                    placeholder="What are you looking for?"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-300"
+                    placeholder="Search products..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                   />
                   <button
-                    className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-primary text-white p-2 rounded-lg hover:bg-primary/90 transition-colors duration-200"
                     type="submit"
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-primary text-white p-2 rounded-lg hover:bg-primary/90 transition-colors duration-200"
                   >
                     <Search size={16} />
                   </button>
-                </form>
-
-                <div className="space-y-3">
-                  <p className="text-sm text-gray-600 font-medium">
-                    Quick searches:
-                  </p>
-                  <div className="flex flex-wrap gap-2">
-                    {["fruits", "vegetables", "dairy", "beverages"].map(
-                      (term) => (
-                        <button
-                          key={term}
-                          onClick={() => handleQuickSearch(term)}
-                          className="px-3 py-2 bg-gray-100 text-sm rounded-full hover:bg-primary hover:text-white transition-all duration-300 capitalize transform hover:scale-105"
-                        >
-                          {term}
-                        </button>
-                      )
-                    )}
-                  </div>
                 </div>
+              </form>
+
+              <div className="space-y-2">
+                <h5 className="text-sm font-medium text-gray-700 mb-3">
+                  Quick Search
+                </h5>
+                {["Fruits", "Vegetables", "Dairy", "Meat", "Beverages"].map(
+                  (category) => (
+                    <button
+                      key={category}
+                      onClick={() => handleQuickSearch(category)}
+                      className="block w-full text-left px-3 py-2 text-gray-600 hover:bg-gray-50 hover:text-primary rounded-lg transition-all duration-200 hover:translate-x-1"
+                    >
+                      {category}
+                    </button>
+                  )
+                )}
               </div>
             </div>
           </div>
@@ -242,7 +249,9 @@ export default function Header() {
       <header
         className={`bg-white shadow-sm sticky top-0 z-40 transition-all duration-300 ${
           isScrolled ? "shadow-lg backdrop-blur-md bg-white/95" : ""
-        } ${isLoaded ? "translate-y-0" : "-translate-y-full"}`}
+        } ${
+          isLoaded ? "translate-y-0 opacity-100" : "translate-y-0 opacity-90"
+        }`}
       >
         <div className="container mx-auto px-4">
           {/* Top Bar */}
@@ -375,9 +384,11 @@ export default function Header() {
                     size={20}
                     className="text-gray-600 group-hover:text-primary transition-colors duration-200"
                   />
-                  <span className="absolute -top-1 -right-1 bg-primary text-white text-xs rounded-full w-4 h-4 flex items-center justify-center font-medium">
-                    2
-                  </span>
+                  {wishlistCount > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-primary text-white text-xs rounded-full w-4 h-4 flex items-center justify-center font-medium">
+                      {wishlistCount}
+                    </span>
+                  )}
                 </Link>
 
                 {/* Mobile Search */}
@@ -437,103 +448,168 @@ export default function Header() {
             </div>
           </div>
 
-          {/* Navigation Bar */}
-          <div className="py-3">
-            <div className="flex justify-between items-center">
-              <nav className="flex items-center">
-                {/* Mobile Menu */}
-                {isMenuOpen && (
-                  <div className="fixed inset-0 z-50 lg:hidden">
-                    <div
-                      className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm transition-opacity duration-300"
-                      onClick={() => setIsMenuOpen(false)}
-                    />
-                    <div className="fixed left-0 top-0 h-full w-80 bg-white shadow-2xl transform transition-transform duration-300 ease-out">
-                      <div className="p-6">
-                        <div className="flex justify-between items-center mb-8">
-                          <h3 className="text-lg font-semibold text-gray-800">
-                            Navigation
-                          </h3>
-                          <button
-                            onClick={() => setIsMenuOpen(false)}
-                            className="p-2 hover:bg-gray-100 rounded-full transition-colors duration-200"
-                          >
-                            <X size={20} />
-                          </button>
-                        </div>
-                        <div className="space-y-2">
-                          {[
-                            { href: "/", label: "Home" },
-                            { href: "/shop", label: "Shop All Products" },
-                            { href: "/services", label: "Services" },
-                            { href: "/blog", label: "Blog & Tips" },
-                            { href: "/about", label: "About Us" },
-                            { href: "/contact", label: "Contact" },
-                          ].map((item, index) => (
-                            <Link
-                              key={index}
-                              href={item.href}
-                              className="block py-3 px-4 text-gray-700 hover:bg-gray-50 rounded-lg font-medium transition-all duration-200 hover:translate-x-1"
-                              onClick={() => setIsMenuOpen(false)}
-                            >
-                              {item.label}
-                            </Link>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
+          {/* Navigation Menu - Desktop */}
+          <nav className="hidden lg:block py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-8">
+                <Link
+                  href="/"
+                  className="text-gray-700 hover:text-primary font-medium transition-colors duration-300 hover:scale-105 transform"
+                >
+                  Home
+                </Link>
+                <Link
+                  href="/shop"
+                  className="text-gray-700 hover:text-primary font-medium transition-colors duration-300 hover:scale-105 transform"
+                >
+                  Shop by Departments
+                </Link>
+                <Link
+                  href="/services"
+                  className="text-gray-700 hover:text-primary font-medium transition-colors duration-300 hover:scale-105 transform"
+                >
+                  Services
+                </Link>
+                <Link
+                  href="/about"
+                  className="text-gray-700 hover:text-primary font-medium transition-colors duration-300 hover:scale-105 transform"
+                >
+                  About Us
+                </Link>
+                <Link
+                  href="/blog"
+                  className="text-gray-700 hover:text-primary font-medium transition-colors duration-300 hover:scale-105 transform"
+                >
+                  Blog
+                </Link>
+                <Link
+                  href="/contact"
+                  className="text-gray-700 hover:text-primary font-medium transition-colors duration-300 hover:scale-105 transform"
+                >
+                  Contact
+                </Link>
+              </div>
+
+              <div className="flex items-center space-x-4">
+                <span className="text-sm text-gray-600">
+                  Free shipping on orders over $50
+                </span>
+                <div className="flex items-center space-x-2">
+                  <span className="text-sm text-gray-600">Follow us:</span>
+                  <div className="flex space-x-2">
+                    <a
+                      href="#"
+                      className="text-gray-400 hover:text-primary transition-colors duration-300 hover:scale-110 transform"
+                    >
+                      <svg
+                        className="w-4 h-4"
+                        fill="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z" />
+                      </svg>
+                    </a>
+                    <a
+                      href="#"
+                      className="text-gray-400 hover:text-primary transition-colors duration-300 hover:scale-110 transform"
+                    >
+                      <svg
+                        className="w-4 h-4"
+                        fill="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path d="M22.46 6c-.77.35-1.6.58-2.46.69.88-.53 1.56-1.37 1.88-2.38-.83.5-1.75.85-2.72 1.05C18.37 4.5 17.26 4 16 4c-2.35 0-4.27 1.92-4.27 4.29 0 .34.04.67.11.98C8.28 9.09 5.11 7.38 3 4.79c-.37.63-.58 1.37-.58 2.15 0 1.49.75 2.81 1.91 3.56-.71 0-1.37-.2-1.95-.5v.03c0 2.08 1.48 3.82 3.44 4.21a4.22 4.22 0 0 1-1.93.07 4.28 4.28 0 0 0 4 2.98 8.521 8.521 0 0 1-5.33 1.84c-.34 0-.68-.02-1.02-.06C3.44 20.29 5.7 21 8.12 21 16 21 20.33 14.46 20.33 8.79c0-.19 0-.37-.01-.56.84-.6 1.56-1.36 2.14-2.23z" />
+                      </svg>
+                    </a>
                   </div>
-                )}
-
-                {/* Desktop Navigation */}
-                <div className="hidden lg:flex items-center space-x-8">
-                  <Link
-                    href="/shop"
-                    className="text-gray-700 hover:text-primary font-medium transition-colors duration-200 border-b-2 border-transparent hover:border-primary pb-1"
-                  >
-                    Shop by Departments
-                  </Link>
-
-                  <Link
-                    href="/services"
-                    className="text-gray-600 hover:text-primary transition-colors duration-200"
-                  >
-                    Services
-                  </Link>
-
-                  <Link
-                    href="/about"
-                    className="text-gray-600 hover:text-primary transition-colors duration-200"
-                  >
-                    About Us
-                  </Link>
-
-                  <Link
-                    href="/blog"
-                    className="text-gray-600 hover:text-primary transition-colors duration-200"
-                  >
-                    Blog
-                  </Link>
-
-                  <Link
-                    href="/contact"
-                    className="text-gray-600 hover:text-primary transition-colors duration-200"
-                  >
-                    Contact
-                  </Link>
                 </div>
-              </nav>
+              </div>
             </div>
-          </div>
+          </nav>
         </div>
       </header>
 
-      {/* Click outside to close user menu */}
-      {isUserMenuOpen && (
-        <div
-          className="fixed inset-0 z-30"
-          onClick={() => setIsUserMenuOpen(false)}
-        />
+      {/* Mobile Menu */}
+      {isMenuOpen && (
+        <div className="lg:hidden fixed inset-0 z-50">
+          <div
+            className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm transition-opacity duration-300"
+            onClick={() => setIsMenuOpen(false)}
+          />
+          <div className="fixed left-0 top-0 h-full w-80 bg-white shadow-2xl transform transition-transform duration-300 ease-out overflow-y-auto">
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-8">
+                <Image
+                  src="/images/logo.png"
+                  alt="FreshKo Logo"
+                  width={70}
+                  height={22}
+                  className="h-auto"
+                />
+                <button
+                  onClick={() => setIsMenuOpen(false)}
+                  className="text-gray-500 hover:text-gray-700 p-2 hover:bg-gray-100 rounded-full transition-colors duration-200"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+
+              <nav className="space-y-4">
+                <Link
+                  href="/"
+                  className="block text-gray-700 hover:text-primary font-medium py-3 px-4 rounded-lg hover:bg-gray-50 transition-all duration-200 hover:translate-x-1"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Home
+                </Link>
+                <Link
+                  href="/shop"
+                  className="block text-gray-700 hover:text-primary font-medium py-3 px-4 rounded-lg hover:bg-gray-50 transition-all duration-200 hover:translate-x-1"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Shop by Departments
+                </Link>
+                <Link
+                  href="/services"
+                  className="block text-gray-700 hover:text-primary font-medium py-3 px-4 rounded-lg hover:bg-gray-50 transition-all duration-200 hover:translate-x-1"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Services
+                </Link>
+                <Link
+                  href="/about"
+                  className="block text-gray-700 hover:text-primary font-medium py-3 px-4 rounded-lg hover:bg-gray-50 transition-all duration-200 hover:translate-x-1"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  About Us
+                </Link>
+                <Link
+                  href="/blog"
+                  className="block text-gray-700 hover:text-primary font-medium py-3 px-4 rounded-lg hover:bg-gray-50 transition-all duration-200 hover:translate-x-1"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Blog
+                </Link>
+                <Link
+                  href="/contact"
+                  className="block text-gray-700 hover:text-primary font-medium py-3 px-4 rounded-lg hover:bg-gray-50 transition-all duration-200 hover:translate-x-1"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Contact
+                </Link>
+              </nav>
+
+              <div className="mt-8 pt-6 border-t border-gray-200">
+                <div className="text-center">
+                  <p className="text-sm text-gray-600 mb-2">Need Help?</p>
+                  <p className="text-lg font-semibold text-primary">
+                    +1-800-FRESHKO
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </>
   );
