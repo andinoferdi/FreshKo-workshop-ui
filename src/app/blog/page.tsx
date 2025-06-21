@@ -1,48 +1,51 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Image from "next/image"
-import Link from "next/link"
-import { Calendar, Folder, Search, ChevronDown } from "lucide-react"
-import Header from "@/components/Header"
-import Footer from "@/components/Footer"
-import { blogPosts } from "@/lib/blog"
+import { useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { Calendar, Folder, Search, ChevronDown } from "lucide-react";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+import { blogPosts } from "@/lib/blog";
 
 export default function BlogPage() {
-  const [searchQuery, setSearchQuery] = useState("")
-  const [category, setCategory] = useState("all")
-  const [sortBy, setSortBy] = useState("latest")
+  const [searchQuery, setSearchQuery] = useState("");
+  const [category, setCategory] = useState("all");
+  const [sortBy, setSortBy] = useState("latest");
 
   // Filter and sort blog posts
   const filteredPosts = blogPosts
     .filter((post) => {
       const matchesSearch =
         post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        post.excerpt.toLowerCase().includes(searchQuery.toLowerCase())
-      const matchesCategory = category === "all" || post.category === category
-      return matchesSearch && matchesCategory
+        post.excerpt.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesCategory = category === "all" || post.category === category;
+      return matchesSearch && matchesCategory;
     })
     .sort((a, b) => {
       if (sortBy === "latest") {
-        return new Date(b.date).getTime() - new Date(a.date).getTime()
+        return new Date(b.date).getTime() - new Date(a.date).getTime();
       } else if (sortBy === "oldest") {
-        return new Date(a.date).getTime() - new Date(b.date).getTime()
+        return new Date(a.date).getTime() - new Date(b.date).getTime();
       } else {
-        return a.title.localeCompare(b.title)
+        return a.title.localeCompare(b.title);
       }
-    })
+    });
 
   // Get unique categories
-  const categories = ["all", ...new Set(blogPosts.map((post) => post.category))]
+  const categories = [
+    "all",
+    ...new Set(blogPosts.map((post) => post.category)),
+  ];
 
   return (
     <>
       <Header />
-      <main className="min-h-screen bg-gray-50">
+      <main className="min-h-screen bg-white">
         {/* Breadcrumb */}
-        <div className="w-[90%] max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <div className="container mx-auto px-4 py-4">
           <div className="flex items-center gap-2 text-sm text-gray-600">
-            <Link href="/" className="hover:text-primary">
+            <Link href="/" className="hover:text-primary transition-colors">
               Home
             </Link>
             <span>/</span>
@@ -51,30 +54,38 @@ export default function BlogPage() {
         </div>
 
         {/* Page Header */}
-        <section className="py-8 lg:py-12">
-          <div className="w-[90%] max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
+        <section className="py-8 lg:py-12 bg-gray-50">
+          <div className="container mx-auto px-4">
             <div className="text-center mb-8">
-              <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">Fresh Ideas & Tips</h1>
+              <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+                Fresh Ideas & Tips
+              </h1>
               <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                Discover recipes, nutrition tips, seasonal guides, and everything you need to make the most of fresh,
-                healthy ingredients.
+                Discover recipes, nutrition tips, seasonal guides, and
+                everything you need to make the most of fresh, healthy
+                ingredients.
               </p>
             </div>
           </div>
         </section>
 
-        <div className="w-[90%] max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
+        <div className="container mx-auto px-4 pb-16">
           {/* Search and Filters */}
-          <div className="bg-white rounded-2xl shadow-sm p-6 mb-8">
+          <div className="bg-white rounded-2xl shadow-sm p-6 mb-8 border border-gray-100 -mt-8 relative z-10">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="relative">
-                <Search size={20} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                <Search
+                  size={20}
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                />
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search articles..."
-                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg 
+                           focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary
+                           transition-all duration-300"
                 />
               </div>
 
@@ -82,7 +93,9 @@ export default function BlogPage() {
                 <select
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary appearance-none"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-lg 
+                           focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary
+                           appearance-none transition-all duration-300"
                 >
                   {categories.map((cat) => (
                     <option key={cat} value={cat}>
@@ -100,7 +113,9 @@ export default function BlogPage() {
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary appearance-none"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-lg 
+                           focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary
+                           appearance-none transition-all duration-300"
                 >
                   <option value="latest">Latest First</option>
                   <option value="oldest">Oldest First</option>
@@ -120,63 +135,88 @@ export default function BlogPage() {
               {filteredPosts.map((post) => (
                 <article
                   key={post.id}
-                  className="bg-white border-0 shadow-sm rounded-lg p-2 lg:p-3 hover:shadow-lg transition-shadow"
+                  className="bg-white border border-gray-100 shadow-sm rounded-2xl overflow-hidden
+                           hover:shadow-lg hover:scale-105 transition-all duration-300 group"
                 >
-                  <div className="overflow-hidden rounded-lg mb-4">
+                  <div className="overflow-hidden">
                     <Link href={`/blog/${post.id}`}>
                       <Image
                         src={post.image || "/placeholder.svg"}
                         alt={post.title}
                         width={400}
                         height={250}
-                        className="w-full h-auto hover:scale-105 transition-transform duration-300"
+                        className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-500"
                       />
                     </Link>
                   </div>
 
-                  <div className="p-2 lg:p-3">
-                    <div className="flex items-center gap-3 lg:gap-4 text-sm text-gray-500 uppercase mb-2 lg:mb-3">
+                  <div className="p-6">
+                    <div className="flex items-center gap-3 text-sm text-gray-500 mb-3">
                       <div className="flex items-center gap-1">
                         <Calendar size={14} />
                         {post.date}
                       </div>
                       <div className="flex items-center gap-1">
                         <Folder size={14} />
-                        {post.category}
+                        <span className="capitalize">{post.category}</span>
                       </div>
                     </div>
 
-                    <h3 className="text-xl font-semibold mb-3">
-                      <Link href={`/blog/${post.id}`} className="text-dark hover:text-primary transition-colors">
+                    <h3 className="text-xl font-semibold mb-3 line-clamp-2">
+                      <Link
+                        href={`/blog/${post.id}`}
+                        className="text-gray-900 hover:text-primary transition-colors duration-300"
+                      >
                         {post.title}
                       </Link>
                     </h3>
 
-                    <p className="text-gray-600 leading-relaxed mb-4">{post.excerpt}</p>
+                    <p className="text-gray-600 leading-relaxed mb-4 line-clamp-3">
+                      {post.excerpt}
+                    </p>
 
                     <Link
                       href={`/blog/${post.id}`}
-                      className="inline-flex items-center text-primary font-medium hover:underline"
+                      className="inline-flex items-center text-primary font-medium hover:text-primary/80 
+                               transition-colors duration-300 group/link"
                     >
                       Read More
+                      <svg
+                        className="w-4 h-4 ml-1 group-hover/link:translate-x-1 transition-transform duration-300"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M9 5l7 7-7 7"
+                        />
+                      </svg>
                     </Link>
                   </div>
                 </article>
               ))}
             </div>
           ) : (
-            <div className="bg-white rounded-2xl shadow-sm p-12 text-center">
+            <div className="bg-white rounded-2xl shadow-sm p-12 text-center border border-gray-100">
               <div className="text-gray-400 mb-4">
                 <Search size={48} className="mx-auto" />
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">No articles found</h3>
-              <p className="text-gray-600 mb-6">Try adjusting your search criteria</p>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                No articles found
+              </h3>
+              <p className="text-gray-600 mb-6">
+                Try adjusting your search criteria
+              </p>
               <button
                 onClick={() => {
-                  setSearchQuery("")
-                  setCategory("all")
+                  setSearchQuery("");
+                  setCategory("all");
                 }}
-                className="bg-primary text-white px-6 py-2 rounded-lg hover:bg-primary/80"
+                className="bg-primary text-white px-6 py-3 rounded-lg font-medium
+                         hover:bg-primary/90 hover:scale-105 transition-all duration-300 shadow-lg"
               >
                 Clear Filters
               </button>
@@ -186,5 +226,5 @@ export default function BlogPage() {
       </main>
       <Footer />
     </>
-  )
+  );
 }

@@ -1,47 +1,65 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Image from "next/image"
-import Link from "next/link"
-import { Heart, Star, Plus, Minus, ShoppingCart, ArrowLeft, Share2 } from "lucide-react"
-import { useHydratedStore, type Product } from "@/lib/store"
-import ProductCard from "./ProductCard"
-import { products } from "@/lib/products"
+import { useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import {
+  Heart,
+  Star,
+  Plus,
+  Minus,
+  ShoppingCart,
+  ArrowLeft,
+  Share2,
+  Truck,
+  Shield,
+  RotateCcw,
+} from "lucide-react";
+import { useHydratedStore, type Product } from "@/lib/store";
+import ProductCard from "./ProductCard";
+import { products } from "@/lib/products";
 
 interface ProductDetailProps {
-  product: Product
+  product: Product;
 }
 
 export default function ProductDetail({ product }: ProductDetailProps) {
-  const [quantity, setQuantity] = useState(1)
-  const [selectedImage, setSelectedImage] = useState(product.image)
-  const { addToCart, addToWishlist, removeFromWishlist, isInWishlist } = useHydratedStore()
+  const [quantity, setQuantity] = useState(1);
+  const [selectedImage, setSelectedImage] = useState(product.image);
+  const { addToCart, addToWishlist, removeFromWishlist, isInWishlist } =
+    useHydratedStore();
 
-  const isWishlisted = isInWishlist(product.id)
-  const discountedPrice = product.discount ? product.price * (1 - product.discount / 100) : product.price
+  const isWishlisted = isInWishlist(product.id);
+  const discountedPrice = product.discount
+    ? product.price * (1 - product.discount / 100)
+    : product.price;
 
   // Get related products from the same category
-  const relatedProducts = products.filter((p: Product) => p.category === product.category && p.id !== product.id).slice(0, 4)
+  const relatedProducts = products
+    .filter(
+      (p: Product) => p.category === product.category && p.id !== product.id
+    )
+    .slice(0, 4);
 
-  const incrementQuantity = () => setQuantity((prev) => prev + 1)
-  const decrementQuantity = () => setQuantity((prev) => Math.max(1, prev - 1))
+  const incrementQuantity = () => setQuantity((prev) => prev + 1);
+  const decrementQuantity = () => setQuantity((prev) => Math.max(1, prev - 1));
 
   const handleAddToCart = () => {
-    addToCart(product, quantity)
-  }
+    addToCart(product, quantity);
+  };
 
   const handleWishlistToggle = () => {
     if (isWishlisted) {
-      removeFromWishlist(product.id)
+      removeFromWishlist(product.id);
     } else {
-      addToWishlist(product)
+      addToWishlist(product);
     }
-  }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Breadcrumb */}
-      <div className="w-[90%] max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+      <div className="container mx-auto px-4 py-4">
         <div className="flex items-center gap-2 text-sm text-gray-600">
           <Link href="/" className="hover:text-primary">
             Home
@@ -58,7 +76,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
       </div>
 
       {/* Product Detail */}
-      <div className="w-[90%] max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="container mx-auto px-4 py-8">
         <div className="bg-white rounded-2xl shadow-sm p-6 lg:p-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
             {/* Product Images */}
@@ -80,23 +98,27 @@ export default function ProductDetail({ product }: ProductDetailProps) {
 
               {/* Thumbnail images - for now showing the same image */}
               <div className="flex gap-2 justify-center">
-                {[product.image, product.image, product.image].map((img, index) => (
-                  <button
-                    key={index}
-                    onClick={() => setSelectedImage(img)}
-                    className={`w-20 h-20 rounded-lg border-2 overflow-hidden ${
-                      selectedImage === img ? "border-primary" : "border-gray-200"
-                    }`}
-                  >
-                    <Image
-                      src={img || "/placeholder.svg"}
-                      alt={`${product.name} ${index + 1}`}
-                      width={80}
-                      height={80}
-                      className="w-full h-full object-cover"
-                    />
-                  </button>
-                ))}
+                {[product.image, product.image, product.image].map(
+                  (img, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setSelectedImage(img)}
+                      className={`w-20 h-20 rounded-lg border-2 overflow-hidden ${
+                        selectedImage === img
+                          ? "border-primary"
+                          : "border-gray-200"
+                      }`}
+                    >
+                      <Image
+                        src={img || "/placeholder.svg"}
+                        alt={`${product.name} ${index + 1}`}
+                        width={80}
+                        height={80}
+                        className="w-full h-full object-cover"
+                      />
+                    </button>
+                  )
+                )}
               </div>
             </div>
 
@@ -106,11 +128,17 @@ export default function ProductDetail({ product }: ProductDetailProps) {
                 <div className="flex items-center gap-2 text-sm text-gray-600 mb-2">
                   <span className="capitalize">{product.category}</span>
                   <span>•</span>
-                  <span className={product.inStock ? "text-green-600" : "text-red-600"}>
+                  <span
+                    className={
+                      product.inStock ? "text-green-600" : "text-gray-600"
+                    }
+                  >
                     {product.inStock ? "In Stock" : "Out of Stock"}
                   </span>
                 </div>
-                <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">{product.name}</h1>
+                <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+                  {product.name}
+                </h1>
 
                 {/* Rating */}
                 <div className="flex items-center gap-2 mb-4">
@@ -120,12 +148,16 @@ export default function ProductDetail({ product }: ProductDetailProps) {
                         key={i}
                         size={20}
                         className={`${
-                          i < Math.floor(product.rating) ? "text-yellow-400 fill-current" : "text-gray-300"
+                          i < Math.floor(product.rating)
+                            ? "text-green-400 fill-current"
+                            : "text-gray-300"
                         }`}
                       />
                     ))}
                   </div>
-                  <span className="text-lg font-semibold">{product.rating}</span>
+                  <span className="text-lg font-semibold">
+                    {product.rating}
+                  </span>
                   <span className="text-gray-500">(128 reviews)</span>
                 </div>
 
@@ -133,19 +165,26 @@ export default function ProductDetail({ product }: ProductDetailProps) {
                 <div className="flex items-center gap-3 mb-6">
                   {product.discount ? (
                     <>
-                      <span className="text-3xl font-bold text-gray-900">${discountedPrice.toFixed(2)}</span>
-                      <span className="text-xl text-gray-500 line-through">${product.price.toFixed(2)}</span>
+                      <span className="text-3xl font-bold text-gray-900">
+                        ${discountedPrice.toFixed(2)}
+                      </span>
+                      <span className="text-xl text-gray-500 line-through">
+                        ${product.price.toFixed(2)}
+                      </span>
                       <span className="bg-green-100 text-green-800 px-2 py-1 rounded text-sm font-medium">
                         Save ${(product.price - discountedPrice).toFixed(2)}
                       </span>
                     </>
                   ) : (
-                    <span className="text-3xl font-bold text-gray-900">${product.price.toFixed(2)}</span>
+                    <span className="text-3xl font-bold text-gray-900">
+                      ${product.price.toFixed(2)}
+                    </span>
                   )}
                 </div>
 
                 <div className="text-gray-600 mb-6">
-                  <span className="font-medium">Unit:</span> {product.unit || "1 Unit"}
+                  <span className="font-medium">Unit:</span>{" "}
+                  {product.unit || "1 Unit"}
                 </div>
               </div>
 
@@ -153,7 +192,8 @@ export default function ProductDetail({ product }: ProductDetailProps) {
               <div>
                 <h3 className="text-lg font-semibold mb-2">Description</h3>
                 <p className="text-gray-600 leading-relaxed">
-                  {product.description || "Fresh, high-quality product perfect for your daily needs."}
+                  {product.description ||
+                    "Fresh, high-quality product perfect for your daily needs."}
                 </p>
               </div>
 
@@ -161,16 +201,26 @@ export default function ProductDetail({ product }: ProductDetailProps) {
               <div className="space-y-4">
                 <div className="flex items-center gap-4">
                   <div className="flex items-center border border-gray-200 rounded-lg">
-                    <button onClick={decrementQuantity} className="p-3 text-red-500 hover:bg-red-50 rounded-l-lg">
+                    <button
+                      onClick={decrementQuantity}
+                      className="p-3 text-green-500 hover:bg-green-50 rounded-l-lg"
+                    >
                       <Minus size={20} />
                     </button>
                     <input
                       type="text"
                       value={quantity}
-                      onChange={(e) => setQuantity(Math.max(1, Number.parseInt(e.target.value) || 1))}
+                      onChange={(e) =>
+                        setQuantity(
+                          Math.max(1, Number.parseInt(e.target.value) || 1)
+                        )
+                      }
                       className="w-16 text-center border-0 text-lg font-semibold"
                     />
-                    <button onClick={incrementQuantity} className="p-3 text-green-500 hover:bg-green-50 rounded-r-lg">
+                    <button
+                      onClick={incrementQuantity}
+                      className="p-3 text-green-500 hover:bg-green-50 rounded-r-lg"
+                    >
                       <Plus size={20} />
                     </button>
                   </div>
@@ -178,7 +228,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
                   <button
                     onClick={handleAddToCart}
                     disabled={!product.inStock}
-                    className="flex-1 bg-primary text-white py-3 px-6 rounded-lg font-semibold hover:bg-primary/80 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    className="flex-1 bg-primary text-white py-3 px-6 rounded-lg font-semibold hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                   >
                     <ShoppingCart size={20} />
                     Add to Cart - ${(discountedPrice * quantity).toFixed(2)}
@@ -190,11 +240,14 @@ export default function ProductDetail({ product }: ProductDetailProps) {
                     onClick={handleWishlistToggle}
                     className={`flex-1 py-3 px-6 rounded-lg font-semibold border-2 flex items-center justify-center gap-2 ${
                       isWishlisted
-                        ? "bg-red-50 border-red-200 text-red-600"
+                        ? "bg-green-50 border-green-200 text-green-600"
                         : "bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100"
                     }`}
                   >
-                    <Heart size={20} fill={isWishlisted ? "currentColor" : "none"} />
+                    <Heart
+                      size={20}
+                      fill={isWishlisted ? "currentColor" : "none"}
+                    />
                     {isWishlisted ? "Remove from Wishlist" : "Add to Wishlist"}
                   </button>
 
@@ -226,6 +279,25 @@ export default function ProductDetail({ product }: ProductDetailProps) {
                     Money Back Guarantee
                   </li>
                 </ul>
+
+                {/* Shipping Info */}
+                <div className="grid grid-cols-3 gap-4 mt-6 p-4 bg-gray-50 rounded-lg">
+                  <div className="text-center">
+                    <Truck className="w-6 h-6 text-green-500 mx-auto mb-2" />
+                    <div className="text-sm font-medium">Free Shipping</div>
+                    <div className="text-xs text-gray-500">Orders over $50</div>
+                  </div>
+                  <div className="text-center">
+                    <Shield className="w-6 h-6 text-green-500 mx-auto mb-2" />
+                    <div className="text-sm font-medium">Quality Guarantee</div>
+                    <div className="text-xs text-gray-500">100% Fresh</div>
+                  </div>
+                  <div className="text-center">
+                    <RotateCcw className="w-6 h-6 text-green-500 mx-auto mb-2" />
+                    <div className="text-sm font-medium">Easy Returns</div>
+                    <div className="text-xs text-gray-500">30 day policy</div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -245,12 +317,15 @@ export default function ProductDetail({ product }: ProductDetailProps) {
 
         {/* Back to Shop */}
         <div className="mt-8 text-center">
-          <Link href="/shop" className="inline-flex items-center gap-2 text-primary hover:text-primary/80 font-medium">
+          <Link
+            href="/shop"
+            className="inline-flex items-center gap-2 text-primary hover:text-primary/80 font-medium"
+          >
             <ArrowLeft size={20} />
             Back to Shop
           </Link>
         </div>
       </div>
     </div>
-  )
+  );
 }

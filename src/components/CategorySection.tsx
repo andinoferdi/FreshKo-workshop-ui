@@ -1,88 +1,242 @@
-"use client"
+"use client";
 
-import { useRef } from "react"
-import Image from "next/image"
-import Link from "next/link"
-import { getCategories } from "@/lib/products"
+import { useState, useEffect } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { ArrowRight, Sparkles } from "lucide-react";
 
-// Mapping kategori ke icon dan nama display
-const categoryConfig = {
-  fruits: { 
-    name: "Fruits", 
-    image: "/images/icon-vegetables-broccoli.png" 
+const categories = [
+  {
+    id: 1,
+    name: "Fresh Fruits",
+    image: "/images/thumb-avocado.png",
+    count: "25+ items",
+    color: "from-primary/20 to-primary/30",
+    bgColor: "bg-primary/5",
+    emoji: "🍎",
   },
-  vegetables: { 
-    name: "Vegetables", 
-    image: "/images/icon-vegetables-broccoli.png" 
+  {
+    id: 2,
+    name: "Vegetables",
+    image: "/images/thumb-tomatoes.png",
+    count: "30+ items",
+    color: "from-primary/30 to-primary/40",
+    bgColor: "bg-primary/10",
+    emoji: "🥬",
   },
-  dairy: { 
-    name: "Dairy Products", 
-    image: "/images/icon-soft-drinks-bottle.png" 
+  {
+    id: 3,
+    name: "Dairy Products",
+    image: "/images/thumb-milk.png",
+    count: "15+ items",
+    color: "from-primary/15 to-primary/25",
+    bgColor: "bg-gray-50",
+    emoji: "🥛",
   },
-  beverages: { 
-    name: "Beverages", 
-    image: "/images/icon-soft-drinks-bottle.png" 
+  {
+    id: 4,
+    name: "Meat & Fish",
+    image: "/images/thumb-tuna.jpg",
+    count: "20+ items",
+    color: "from-primary/25 to-primary/35",
+    bgColor: "bg-primary/5",
+    emoji: "🥩",
   },
-  condiments: { 
-    name: "Condiments", 
-    image: "/images/icon-bread-baguette.png" 
+  {
+    id: 5,
+    name: "Beverages",
+    image: "/images/thumb-orange-juice.png",
+    count: "18+ items",
+    color: "from-primary/20 to-primary/30",
+    bgColor: "bg-gray-50",
+    emoji: "🥤",
   },
-  bakery: { 
-    name: "Bakery", 
-    image: "/images/icon-bread-baguette.png" 
+  {
+    id: 6,
+    name: "Bakery",
+    image: "/images/thumb-biscuits.png",
+    count: "12+ items",
+    color: "from-primary/35 to-primary/45",
+    bgColor: "bg-primary/10",
+    emoji: "🍞",
   },
-  pantry: { 
-    name: "Pantry", 
-    image: "/images/icon-bread-herb-flour.png" 
-  },
-  seafood: { 
-    name: "Seafood", 
-    image: "/images/icon-animal-products-drumsticks.png" 
-  },
-}
+];
 
 export default function CategorySection() {
-  const categories = getCategories()
+  const [hoveredCategory, setHoveredCategory] = useState<number | null>(null);
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    const section = document.getElementById("categories");
+    if (section) {
+      observer.observe(section);
+    }
+
+    return () => observer.disconnect();
+  }, []);
 
   return (
-    <section className="section-spacing overflow-hidden bg-white">
-      <div className="w-[90%] max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-8 lg:mb-12 text-center">
-          <h2 className="text-3xl lg:text-4xl font-bold text-gray-900">Category</h2>
+    <section
+      id="categories"
+      className="py-16 lg:py-24 bg-gradient-to-b from-white to-gray-50 relative overflow-hidden"
+    >
+      {/* Background Decorations */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute top-20 left-10 w-32 h-32 bg-primary/5 rounded-full animate-pulse"></div>
+        <div className="absolute bottom-20 right-10 w-40 h-40 bg-primary/10 rounded-full animate-pulse delay-1000"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-r from-primary/3 to-primary/5 rounded-full blur-3xl"></div>
+      </div>
+
+      <div className="relative z-10 container mx-auto px-4">
+        {/* Section Header */}
+        <div className="text-center mb-16" data-aos="fade-up">
+          <div className="inline-flex items-center gap-2 bg-primary/10 px-4 py-2 rounded-full mb-4">
+            <Sparkles className="w-4 h-4 text-primary animate-pulse" />
+            <span className="text-sm font-medium text-primary">
+              Shop by Category
+            </span>
+          </div>
+
+          <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+            Browse Our Fresh
+            <span className="text-primary relative ml-2">
+              Categories
+              <svg
+                className="absolute -bottom-1 left-0 w-full h-2 text-primary/30"
+                viewBox="0 0 100 8"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M2 6C20 2 40 1 60 2C80 3 90 4 98 6"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  className="animate-pulse"
+                />
+              </svg>
+            </span>
+          </h2>
+
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            Discover our wide range of fresh, quality products organized by
+            category for your convenience
+          </p>
         </div>
 
-        <div className="flex gap-6 lg:gap-8 justify-center flex-wrap pb-6">
-          {categories.map((category) => {
-            const config = categoryConfig[category as keyof typeof categoryConfig] || {
-              name: category.charAt(0).toUpperCase() + category.slice(1),
-              image: "/images/icon-vegetables-broccoli.png"
-            }
-            
-            return (
-              <Link 
-                key={category} 
-                href={`/shop?category=${category}`}
-                className="flex-shrink-0 group cursor-pointer transition-all duration-300 hover:scale-105"
+        {/* Categories Grid */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 lg:gap-8">
+          {categories.map((category, index) => (
+            <div
+              key={category.id}
+              className={`group relative transform transition-all duration-500 hover:scale-105 ${
+                isVisible
+                  ? "translate-y-0 opacity-100"
+                  : "translate-y-10 opacity-0"
+              }`}
+              style={{ transitionDelay: `${index * 100}ms` }}
+              data-aos="fade-up"
+              data-aos-delay={index * 100}
+              onMouseEnter={() => setHoveredCategory(category.id)}
+              onMouseLeave={() => setHoveredCategory(null)}
+            >
+              <Link
+                href={`/shop?category=${category.name
+                  .toLowerCase()
+                  .replace(/\s+/g, "-")}`}
               >
-                <div className="text-center min-w-[100px] lg:min-w-[120px]">
-                  <div className="w-16 h-16 lg:w-18 lg:h-18 mx-auto mb-3 bg-white rounded-2xl flex items-center justify-center shadow-lg border border-gray-100 group-hover:shadow-xl transition-all duration-300 group-hover:border-primary/20">
-                    <Image
-                      src={config.image}
-                      alt={config.name}
-                      width={40}
-                      height={40}
-                      className="w-8 h-8 lg:w-10 lg:h-10 object-contain group-hover:scale-110 transition-transform duration-300"
-                    />
+                <div
+                  className={`relative ${category.bgColor} rounded-2xl p-6 text-center transition-all duration-300 hover:shadow-xl border border-white/50 backdrop-blur-sm overflow-hidden`}
+                >
+                  {/* Hover Gradient Overlay */}
+                  <div
+                    className={`absolute inset-0 bg-gradient-to-br ${category.color} opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl`}
+                  ></div>
+
+                  {/* Floating Emoji */}
+                  <div className="absolute -top-2 -right-2 text-2xl animate-bounce group-hover:animate-pulse">
+                    {category.emoji}
                   </div>
-                  <h3 className="text-sm lg:text-base font-semibold text-gray-800 group-hover:text-primary transition-colors duration-300 leading-tight">
-                    {config.name}
-                  </h3>
+
+                  {/* Category Image */}
+                  <div className="relative mb-4 group-hover:scale-110 transition-transform duration-300">
+                    <div className="w-20 h-20 mx-auto rounded-full overflow-hidden shadow-lg group-hover:shadow-xl transition-shadow duration-300">
+                      <Image
+                        src={category.image || "/placeholder.svg"}
+                        alt={category.name}
+                        width={80}
+                        height={80}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      />
+                    </div>
+
+                    {/* Glow Effect */}
+                    <div
+                      className={`absolute inset-0 rounded-full bg-gradient-to-br ${category.color} opacity-0 group-hover:opacity-30 blur-xl transition-opacity duration-300`}
+                    ></div>
+                  </div>
+
+                  {/* Category Info */}
+                  <div className="relative z-10">
+                    <h3 className="font-semibold text-gray-900 mb-1 group-hover:text-white transition-colors duration-300">
+                      {category.name}
+                    </h3>
+                    <p className="text-sm text-gray-600 mb-3 group-hover:text-white/90 transition-colors duration-300">
+                      {category.count}
+                    </p>
+
+                    {/* Hover Arrow */}
+                    <div
+                      className={`inline-flex items-center gap-1 text-primary font-medium text-sm transform transition-all duration-300 group-hover:text-white ${
+                        hoveredCategory === category.id
+                          ? "translate-x-0 opacity-100"
+                          : "-translate-x-2 opacity-0"
+                      }`}
+                    >
+                      Shop Now
+                      <ArrowRight className="w-3 h-3" />
+                    </div>
+                  </div>
+
+                  {/* Animated Border */}
+                  <div className="absolute inset-0 rounded-2xl border-2 border-transparent group-hover:border-white/30 transition-colors duration-300"></div>
+
+                  {/* Sparkle Effect */}
+                  <div className="absolute top-2 left-2 w-2 h-2 bg-white rounded-full opacity-0 group-hover:opacity-100 animate-ping transition-opacity duration-300"></div>
                 </div>
               </Link>
-            )
-          })}
+            </div>
+          ))}
+        </div>
+
+        {/* Call to Action */}
+        <div
+          className="text-center mt-12"
+          data-aos="fade-up"
+          data-aos-delay="600"
+        >
+          <p className="text-gray-600 mb-6">
+            Can't find what you're looking for?
+          </p>
+          <Link
+            href="/shop"
+            className="inline-flex items-center gap-2 bg-primary text-white px-8 py-4 rounded-xl font-semibold 
+                     hover:bg-primary/90 hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl"
+          >
+            Browse All Products
+            <ArrowRight className="w-4 h-4" />
+          </Link>
         </div>
       </div>
     </section>
-  )
+  );
 }

@@ -1,12 +1,12 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import Link from "next/link"
-import { MapPin, Phone, Mail, Clock, Send } from "lucide-react"
-import Header from "@/components/Header"
-import Footer from "@/components/Footer"
+import { useState } from "react";
+import Link from "next/link";
+import { MapPin, Phone, Mail, Clock, Send } from "lucide-react";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -15,29 +15,33 @@ export default function ContactPage() {
     phone: "",
     subject: "",
     message: "",
-  })
+  });
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     // Handle form submission here
-    console.log("Contact form submitted:", formData)
-    alert("Thank you for your message! We'll get back to you soon.")
-    setFormData({ name: "", email: "", phone: "", subject: "", message: "" })
-  }
+    console.log("Contact form submitted:", formData);
+    alert("Thank you for your message! We'll get back to you soon.");
+    setFormData({ name: "", email: "", phone: "", subject: "", message: "" });
+  };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
-  }
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
   return (
     <>
       <Header />
-      <main className="min-h-screen bg-gray-50">
+      <main className="min-h-screen bg-white">
         {/* Breadcrumb */}
-        <div className="w-[90%] max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <div className="container mx-auto px-4 py-4">
           <div className="flex items-center gap-2 text-sm text-gray-600">
-            <Link href="/" className="hover:text-primary">
+            <Link href="/" className="hover:text-primary transition-colors">
               Home
             </Link>
             <span>/</span>
@@ -46,59 +50,86 @@ export default function ContactPage() {
         </div>
 
         {/* Contact Section */}
-        <section className="py-16">
-          <div className="w-[90%] max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
+        <section className="py-16 bg-gray-50">
+          <div className="container mx-auto px-4">
             <div className="text-center mb-12">
-              <h1 className="text-4xl font-bold text-gray-900 mb-4">Get in Touch</h1>
+              <h1 className="text-4xl font-bold text-gray-900 mb-4">
+                Get in Touch
+              </h1>
               <p className="text-gray-600 max-w-2xl mx-auto">
-                Have questions about our products or services? We'd love to hear from you. Send us a message and we'll
-                respond as soon as possible.
+                Have questions about our products or services? We'd love to hear
+                from you. Send us a message and we'll respond as soon as
+                possible.
               </p>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               {/* Contact Info */}
               <div className="lg:col-span-1">
-                <div className="bg-white rounded-2xl shadow-sm p-8">
-                  <h2 className="text-2xl font-bold text-gray-900 mb-6">Contact Information</h2>
+                <div className="bg-white rounded-2xl shadow-sm p-8 border border-gray-100 h-fit">
+                  <h2 className="text-2xl font-bold text-gray-900 mb-6">
+                    Contact Information
+                  </h2>
 
                   <div className="space-y-6">
-                    <div className="flex items-start gap-4">
-                      <div className="flex-shrink-0 w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
+                    <div className="flex items-start gap-4 group">
+                      <div
+                        className="flex-shrink-0 w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center
+                                    group-hover:bg-primary/20 transition-colors duration-300"
+                      >
                         <MapPin className="w-6 h-6 text-primary" />
                       </div>
                       <div>
-                        <h3 className="font-semibold text-gray-900 mb-1">Address</h3>
-                        <p className="text-gray-600">123 Main Street, City, Country 12345</p>
+                        <h3 className="font-semibold text-gray-900 mb-1">
+                          Address
+                        </h3>
+                        <p className="text-gray-600">
+                          123 Main Street, City, Country 12345
+                        </p>
                       </div>
                     </div>
 
-                    <div className="flex items-start gap-4">
-                      <div className="flex-shrink-0 w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
+                    <div className="flex items-start gap-4 group">
+                      <div
+                        className="flex-shrink-0 w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center
+                                    group-hover:bg-primary/20 transition-colors duration-300"
+                      >
                         <Phone className="w-6 h-6 text-primary" />
                       </div>
                       <div>
-                        <h3 className="font-semibold text-gray-900 mb-1">Phone</h3>
+                        <h3 className="font-semibold text-gray-900 mb-1">
+                          Phone
+                        </h3>
                         <p className="text-gray-600">+1 (555) 123-4567</p>
                       </div>
                     </div>
 
-                    <div className="flex items-start gap-4">
-                      <div className="flex-shrink-0 w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
+                    <div className="flex items-start gap-4 group">
+                      <div
+                        className="flex-shrink-0 w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center
+                                    group-hover:bg-primary/20 transition-colors duration-300"
+                      >
                         <Mail className="w-6 h-6 text-primary" />
                       </div>
                       <div>
-                        <h3 className="font-semibold text-gray-900 mb-1">Email</h3>
+                        <h3 className="font-semibold text-gray-900 mb-1">
+                          Email
+                        </h3>
                         <p className="text-gray-600">contact@freshko.com</p>
                       </div>
                     </div>
 
-                    <div className="flex items-start gap-4">
-                      <div className="flex-shrink-0 w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
+                    <div className="flex items-start gap-4 group">
+                      <div
+                        className="flex-shrink-0 w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center
+                                    group-hover:bg-primary/20 transition-colors duration-300"
+                      >
                         <Clock className="w-6 h-6 text-primary" />
                       </div>
                       <div>
-                        <h3 className="font-semibold text-gray-900 mb-1">Business Hours</h3>
+                        <h3 className="font-semibold text-gray-900 mb-1">
+                          Business Hours
+                        </h3>
                         <div className="text-gray-600 space-y-1">
                           <p>Monday - Friday: 8:00 AM - 8:00 PM</p>
                           <p>Saturday: 9:00 AM - 6:00 PM</p>
@@ -110,18 +141,32 @@ export default function ContactPage() {
 
                   {/* Quick Links */}
                   <div className="mt-8 pt-8 border-t border-gray-100">
-                    <h3 className="font-semibold text-gray-900 mb-4">Quick Links</h3>
+                    <h3 className="font-semibold text-gray-900 mb-4">
+                      Quick Links
+                    </h3>
                     <div className="space-y-2">
-                      <Link href="/shop" className="block text-gray-600 hover:text-primary transition-colors">
+                      <Link
+                        href="/shop"
+                        className="block text-gray-600 hover:text-primary transition-colors py-1"
+                      >
                         Shop Products
                       </Link>
-                      <Link href="/account/orders" className="block text-gray-600 hover:text-primary transition-colors">
+                      <Link
+                        href="/account/orders"
+                        className="block text-gray-600 hover:text-primary transition-colors py-1"
+                      >
                         Track Your Order
                       </Link>
-                      <Link href="/blog" className="block text-gray-600 hover:text-primary transition-colors">
+                      <Link
+                        href="/blog"
+                        className="block text-gray-600 hover:text-primary transition-colors py-1"
+                      >
                         Read Our Blog
                       </Link>
-                      <Link href="/about" className="block text-gray-600 hover:text-primary transition-colors">
+                      <Link
+                        href="/about"
+                        className="block text-gray-600 hover:text-primary transition-colors py-1"
+                      >
                         About Us
                       </Link>
                     </div>
@@ -131,13 +176,18 @@ export default function ContactPage() {
 
               {/* Contact Form */}
               <div className="lg:col-span-2">
-                <div className="bg-white rounded-2xl shadow-sm p-8">
-                  <h2 className="text-2xl font-bold text-gray-900 mb-6">Send us a Message</h2>
+                <div className="bg-white rounded-2xl shadow-sm p-8 border border-gray-100">
+                  <h2 className="text-2xl font-bold text-gray-900 mb-6">
+                    Send us a Message
+                  </h2>
 
                   <form onSubmit={handleSubmit} className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div>
-                        <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+                        <label
+                          htmlFor="name"
+                          className="block text-sm font-medium text-gray-700 mb-2"
+                        >
                           Full Name *
                         </label>
                         <input
@@ -147,13 +197,18 @@ export default function ContactPage() {
                           value={formData.name}
                           onChange={handleChange}
                           required
-                          className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                          className="w-full px-4 py-3 border border-gray-200 rounded-lg 
+                                   focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary
+                                   transition-all duration-300 hover:border-gray-300"
                           placeholder="Your full name"
                         />
                       </div>
 
                       <div>
-                        <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                        <label
+                          htmlFor="email"
+                          className="block text-sm font-medium text-gray-700 mb-2"
+                        >
                           Email Address *
                         </label>
                         <input
@@ -163,7 +218,9 @@ export default function ContactPage() {
                           value={formData.email}
                           onChange={handleChange}
                           required
-                          className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                          className="w-full px-4 py-3 border border-gray-200 rounded-lg 
+                                   focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary
+                                   transition-all duration-300 hover:border-gray-300"
                           placeholder="your@email.com"
                         />
                       </div>
@@ -171,7 +228,10 @@ export default function ContactPage() {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div>
-                        <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
+                        <label
+                          htmlFor="phone"
+                          className="block text-sm font-medium text-gray-700 mb-2"
+                        >
                           Phone Number
                         </label>
                         <input
@@ -180,13 +240,18 @@ export default function ContactPage() {
                           name="phone"
                           value={formData.phone}
                           onChange={handleChange}
-                          className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                          className="w-full px-4 py-3 border border-gray-200 rounded-lg 
+                                   focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary
+                                   transition-all duration-300 hover:border-gray-300"
                           placeholder="(555) 123-4567"
                         />
                       </div>
 
                       <div>
-                        <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-2">
+                        <label
+                          htmlFor="subject"
+                          className="block text-sm font-medium text-gray-700 mb-2"
+                        >
                           Subject *
                         </label>
                         <select
@@ -195,7 +260,9 @@ export default function ContactPage() {
                           value={formData.subject}
                           onChange={handleChange}
                           required
-                          className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                          className="w-full px-4 py-3 border border-gray-200 rounded-lg 
+                                   focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary
+                                   transition-all duration-300 hover:border-gray-300"
                         >
                           <option value="">Select a subject</option>
                           <option value="general">General Inquiry</option>
@@ -209,7 +276,10 @@ export default function ContactPage() {
                     </div>
 
                     <div>
-                      <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">
+                      <label
+                        htmlFor="message"
+                        className="block text-sm font-medium text-gray-700 mb-2"
+                      >
                         Message *
                       </label>
                       <textarea
@@ -219,14 +289,18 @@ export default function ContactPage() {
                         onChange={handleChange}
                         required
                         rows={6}
-                        className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary resize-none"
+                        className="w-full px-4 py-3 border border-gray-200 rounded-lg 
+                                 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary
+                                 transition-all duration-300 hover:border-gray-300 resize-none"
                         placeholder="Tell us how we can help you..."
                       />
                     </div>
 
                     <button
                       type="submit"
-                      className="w-full bg-primary text-white py-3 px-6 rounded-lg font-semibold hover:bg-primary/80 transition-colors flex items-center justify-center gap-2"
+                      className="w-full bg-primary text-white py-4 px-6 rounded-lg font-semibold 
+                               hover:bg-primary/90 hover:scale-105 transition-all duration-300 
+                               flex items-center justify-center gap-2 shadow-lg hover:shadow-xl"
                     >
                       <Send size={20} />
                       Send Message
@@ -240,60 +314,103 @@ export default function ContactPage() {
 
         {/* Map Section */}
         <section className="py-16 bg-white">
-          <div className="w-[90%] max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="container mx-auto px-4">
             <div className="text-center mb-8">
               <h2 className="text-3xl font-bold text-gray-900 mb-4">Find Us</h2>
-              <p className="text-gray-600">Visit our store or warehouse location</p>
+              <p className="text-gray-600">
+                Visit our store or warehouse location
+              </p>
             </div>
 
-            <div className="bg-gray-200 rounded-2xl h-96 flex items-center justify-center">
-              <div className="text-center">
-                <MapPin size={48} className="mx-auto text-gray-400 mb-4" />
-                <p className="text-gray-600">Interactive map would be displayed here</p>
-                <p className="text-sm text-gray-500 mt-2">123 Main Street, City, Country 12345</p>
+            <div
+              className="bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl h-96 flex items-center justify-center
+                          border border-gray-200 overflow-hidden relative"
+            >
+              <div className="absolute inset-0 bg-gradient-to-t from-primary/5 to-transparent"></div>
+              <div className="text-center relative z-10">
+                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <MapPin size={32} className="text-primary" />
+                </div>
+                <p className="text-gray-700 font-medium mb-2">
+                  Interactive map would be displayed here
+                </p>
+                <p className="text-sm text-gray-600">
+                  123 Main Street, City, Country 12345
+                </p>
+                <button
+                  className="mt-4 bg-primary text-white px-6 py-2 rounded-lg text-sm font-medium
+                                 hover:bg-primary/90 transition-colors"
+                >
+                  Get Directions
+                </button>
               </div>
             </div>
           </div>
         </section>
 
         {/* FAQ Section */}
-        <section className="py-16">
-          <div className="w-[90%] max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
+        <section className="py-16 bg-gray-50">
+          <div className="container mx-auto px-4">
             <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold text-gray-900 mb-4">Frequently Asked Questions</h2>
+              <h2 className="text-3xl font-bold text-gray-900 mb-4">
+                Frequently Asked Questions
+              </h2>
               <p className="text-gray-600">Quick answers to common questions</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-              <div className="bg-white rounded-xl p-6 shadow-sm">
-                <h3 className="font-semibold text-gray-900 mb-2">What are your delivery hours?</h3>
-                <p className="text-gray-600 text-sm">
-                  We deliver Monday through Sunday from 8 AM to 8 PM. Same-day delivery is available for orders placed
-                  before 2 PM.
+              <div
+                className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 
+                            hover:shadow-lg hover:scale-105 transition-all duration-300 group"
+              >
+                <h3 className="font-semibold text-gray-900 mb-3 group-hover:text-primary transition-colors">
+                  What are your delivery hours?
+                </h3>
+                <p className="text-gray-600 text-sm leading-relaxed">
+                  We deliver Monday through Sunday from 8 AM to 8 PM. Same-day
+                  delivery is available for orders placed before 2 PM.
                 </p>
               </div>
 
-              <div className="bg-white rounded-xl p-6 shadow-sm">
-                <h3 className="font-semibold text-gray-900 mb-2">Do you offer organic products?</h3>
-                <p className="text-gray-600 text-sm">
-                  Yes! We have a wide selection of organic fruits, vegetables, dairy products, and pantry items from
-                  certified organic suppliers.
+              <div
+                className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 
+                            hover:shadow-lg hover:scale-105 transition-all duration-300 group"
+              >
+                <h3 className="font-semibold text-gray-900 mb-3 group-hover:text-primary transition-colors">
+                  Do you offer organic products?
+                </h3>
+                <p className="text-gray-600 text-sm leading-relaxed">
+                  Yes! We have a wide selection of organic fruits, vegetables,
+                  dairy products, and pantry items from certified organic
+                  suppliers.
                 </p>
               </div>
 
-              <div className="bg-white rounded-xl p-6 shadow-sm">
-                <h3 className="font-semibold text-gray-900 mb-2">What's your return policy?</h3>
-                <p className="text-gray-600 text-sm">
-                  We offer a 100% satisfaction guarantee. If you're not happy with any product, contact us within 24
-                  hours for a full refund or replacement.
+              <div
+                className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 
+                            hover:shadow-lg hover:scale-105 transition-all duration-300 group"
+              >
+                <h3 className="font-semibold text-gray-900 mb-3 group-hover:text-primary transition-colors">
+                  What's your return policy?
+                </h3>
+                <p className="text-gray-600 text-sm leading-relaxed">
+                  We offer a 100% satisfaction guarantee. If you're not happy
+                  with any product, contact us within 24 hours for a full refund
+                  or replacement.
                 </p>
               </div>
 
-              <div className="bg-white rounded-xl p-6 shadow-sm">
-                <h3 className="font-semibold text-gray-900 mb-2">How can I track my order?</h3>
-                <p className="text-gray-600 text-sm">
-                  Once your order is confirmed, you'll receive a tracking link via email and SMS. You can also check
-                  your order status in your account dashboard.
+              <div
+                className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 
+                            hover:shadow-lg hover:scale-105 transition-all duration-300 group"
+              >
+                <h3 className="font-semibold text-gray-900 mb-3 group-hover:text-primary transition-colors">
+                  How can I track my order?
+                </h3>
+                <p className="text-gray-600 text-sm leading-relaxed">
+                  Once your order is confirmed, you'll receive a tracking link
+                  via email and SMS. You can also check your order status in
+                  your account dashboard.
                 </p>
               </div>
             </div>
@@ -302,5 +419,5 @@ export default function ContactPage() {
       </main>
       <Footer />
     </>
-  )
+  );
 }

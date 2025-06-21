@@ -1,55 +1,83 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Image from "next/image"
-import { Search, Filter, Eye, Edit, MoreHorizontal, Download } from "lucide-react"
-import DashboardLayout from "@/components/dashboard/DashboardLayout"
-import { orders } from "@/lib/orders"
+import { useState } from "react";
+import Image from "next/image";
+import {
+  Search,
+  Filter,
+  Eye,
+  Edit,
+  MoreHorizontal,
+  Download,
+} from "lucide-react";
+import DashboardLayout from "@/components/dashboard/DashboardLayout";
+import { orders } from "@/lib/orders";
 
 export default function DashboardOrdersPage() {
-  const [searchQuery, setSearchQuery] = useState("")
-  const [statusFilter, setStatusFilter] = useState("all")
-  const [dateFilter, setDateFilter] = useState("all")
-  const [showFilters, setShowFilters] = useState(false)
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [dateFilter, setDateFilter] = useState("all");
+  const [showFilters, setShowFilters] = useState(false);
 
   // Filter orders
   const filteredOrders = orders.filter((order) => {
     const matchesSearch =
       order.id.toString().includes(searchQuery) ||
       order.customer?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      order.items.some((item) => item.name.toLowerCase().includes(searchQuery.toLowerCase()))
-    const matchesStatus = statusFilter === "all" || order.status === statusFilter
-    const matchesDate = dateFilter === "all" || filterByDate(order.date, dateFilter)
-    return matchesSearch && matchesStatus && matchesDate
-  })
+      order.items.some((item) =>
+        item.name.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    const matchesStatus =
+      statusFilter === "all" || order.status === statusFilter;
+    const matchesDate =
+      dateFilter === "all" || filterByDate(order.date, dateFilter);
+    return matchesSearch && matchesStatus && matchesDate;
+  });
 
   function filterByDate(dateString: string, filter: string) {
-    const orderDate = new Date(dateString)
-    const today = new Date()
-    const lastWeek = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000)
-    const lastMonth = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000)
+    const orderDate = new Date(dateString);
+    const today = new Date();
+    const lastWeek = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+    const lastMonth = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
 
     switch (filter) {
       case "today":
-        return orderDate.toDateString() === today.toDateString()
+        return orderDate.toDateString() === today.toDateString();
       case "week":
-        return orderDate >= lastWeek
+        return orderDate >= lastWeek;
       case "month":
-        return orderDate >= lastMonth
+        return orderDate >= lastMonth;
       default:
-        return true
+        return true;
+    }
+  }
+
+  function getStatusStyle(status: string) {
+    switch (status) {
+      case "completed":
+        return "bg-green-100 text-green-800";
+      case "processing":
+        return "bg-green-50 text-green-700";
+      case "shipped":
+        return "bg-green-200 text-green-900";
+      case "cancelled":
+        return "bg-gray-100 text-gray-600";
+      default:
+        return "bg-gray-100 text-gray-600";
     }
   }
 
   return (
     <DashboardLayout>
-      <div className="p-6">
+      <div className="container mx-auto px-4 py-6">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Orders</h1>
-            <p className="text-gray-600 mt-1">Manage customer orders and track deliveries</p>
+            <p className="text-gray-600 mt-1">
+              Manage customer orders and track deliveries
+            </p>
           </div>
-          <button className="mt-4 md:mt-0 bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/80 flex items-center gap-2">
+          <button className="mt-4 md:mt-0 bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors flex items-center gap-2">
             <Download size={20} />
             Export Orders
           </button>
@@ -59,29 +87,36 @@ export default function DashboardOrdersPage() {
         <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1 relative">
-              <Search size={20} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              <Search
+                size={20}
+                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+              />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search orders..."
-                className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition-all"
               />
             </div>
 
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className="flex items-center gap-2 px-4 py-3 bg-gray-100 rounded-lg md:hidden"
+              className="flex items-center gap-2 px-4 py-3 bg-gray-100 rounded-lg md:hidden hover:bg-gray-200 transition-colors"
             >
               <Filter size={20} />
               Filters
             </button>
 
-            <div className={`flex flex-col md:flex-row gap-4 ${showFilters ? "block" : "hidden md:flex"}`}>
+            <div
+              className={`flex flex-col md:flex-row gap-4 ${
+                showFilters ? "block" : "hidden md:flex"
+              }`}
+            >
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                className="px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition-all"
               >
                 <option value="all">All Status</option>
                 <option value="completed">Completed</option>
@@ -93,7 +128,7 @@ export default function DashboardOrdersPage() {
               <select
                 value={dateFilter}
                 onChange={(e) => setDateFilter(e.target.value)}
-                className="px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                className="px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition-all"
               >
                 <option value="all">All Time</option>
                 <option value="today">Today</option>
@@ -135,12 +170,19 @@ export default function DashboardOrdersPage() {
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {filteredOrders.map((order) => (
-                  <tr key={order.id} className="hover:bg-gray-50">
+                  <tr
+                    key={order.id}
+                    className="hover:bg-gray-50 transition-colors"
+                  >
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">#{order.id}</div>
+                      <div className="text-sm font-medium text-gray-900">
+                        #{order.id}
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{order.customer || "Guest"}</div>
+                      <div className="text-sm text-gray-900">
+                        {order.customer || "Guest"}
+                      </div>
                       <div className="text-sm text-gray-500">{order.email}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -160,39 +202,40 @@ export default function DashboardOrdersPage() {
                         ))}
                         {order.items.length > 3 && (
                           <div className="w-8 h-8 rounded-full bg-gray-100 border-2 border-white flex items-center justify-center">
-                            <span className="text-xs text-gray-600">+{order.items.length - 3}</span>
+                            <span className="text-xs text-gray-600">
+                              +{order.items.length - 3}
+                            </span>
                           </div>
                         )}
                       </div>
-                      <div className="text-xs text-gray-500 mt-1">{order.items.length} items</div>
+                      <div className="text-xs text-gray-500 mt-1">
+                        {order.items.length} items
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span
-                        className={`px-2 py-1 text-xs font-medium rounded-full ${
-                          order.status === "completed"
-                            ? "bg-green-100 text-green-800"
-                            : order.status === "processing"
-                              ? "bg-blue-100 text-blue-800"
-                              : order.status === "shipped"
-                                ? "bg-purple-100 text-purple-800"
-                                : "bg-red-100 text-red-800"
-                        }`}
+                        className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusStyle(
+                          order.status
+                        )}`}
                       >
-                        {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                        {order.status.charAt(0).toUpperCase() +
+                          order.status.slice(1)}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">${order.total.toFixed(2)}</div>
+                      <div className="text-sm font-medium text-gray-900">
+                        ${order.total.toFixed(2)}
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <div className="flex items-center gap-2">
-                        <button className="text-blue-600 hover:text-blue-900 p-1">
+                        <button className="text-gray-600 hover:text-primary p-1 transition-colors">
                           <Eye size={16} />
                         </button>
-                        <button className="text-green-600 hover:text-green-900 p-1">
+                        <button className="text-gray-600 hover:text-primary p-1 transition-colors">
                           <Edit size={16} />
                         </button>
-                        <button className="text-gray-600 hover:text-gray-900 p-1">
+                        <button className="text-gray-600 hover:text-primary p-1 transition-colors">
                           <MoreHorizontal size={16} />
                         </button>
                       </div>
@@ -208,8 +251,12 @@ export default function DashboardOrdersPage() {
               <div className="text-gray-400 mb-4">
                 <Search size={48} className="mx-auto" />
               </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No orders found</h3>
-              <p className="text-gray-500">Try adjusting your search criteria</p>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">
+                No orders found
+              </h3>
+              <p className="text-gray-500">
+                Try adjusting your search criteria
+              </p>
             </div>
           )}
         </div>
@@ -219,17 +266,26 @@ export default function DashboardOrdersPage() {
           <div className="flex items-center justify-between mt-6">
             <div className="text-sm text-gray-700">
               Showing <span className="font-medium">1</span> to{" "}
-              <span className="font-medium">{Math.min(10, filteredOrders.length)}</span> of{" "}
-              <span className="font-medium">{filteredOrders.length}</span> results
+              <span className="font-medium">
+                {Math.min(10, filteredOrders.length)}
+              </span>{" "}
+              of <span className="font-medium">{filteredOrders.length}</span>{" "}
+              results
             </div>
             <div className="flex gap-2">
-              <button className="px-3 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50">Previous</button>
-              <button className="px-3 py-2 text-sm bg-primary text-white rounded-lg">1</button>
-              <button className="px-3 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50">Next</button>
+              <button className="px-3 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                Previous
+              </button>
+              <button className="px-3 py-2 text-sm bg-primary text-white rounded-lg">
+                1
+              </button>
+              <button className="px-3 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                Next
+              </button>
             </div>
           </div>
         )}
       </div>
     </DashboardLayout>
-  )
+  );
 }

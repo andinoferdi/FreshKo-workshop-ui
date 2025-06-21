@@ -1,40 +1,53 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Image from "next/image"
-import { Plus, Search, Filter, Edit, Trash2, Eye, MoreHorizontal } from "lucide-react"
-import DashboardLayout from "@/components/dashboard/DashboardLayout"
-import { blogPosts } from "@/lib/blog"
+import { useState } from "react";
+import Image from "next/image";
+import {
+  Plus,
+  Search,
+  Filter,
+  Edit,
+  Trash2,
+  Eye,
+  MoreHorizontal,
+} from "lucide-react";
+import DashboardLayout from "@/components/dashboard/DashboardLayout";
+import { blogPosts } from "@/lib/blog";
 
 export default function DashboardArticlesPage() {
-  const [searchQuery, setSearchQuery] = useState("")
-  const [categoryFilter, setCategoryFilter] = useState("all")
-  const [statusFilter, setStatusFilter] = useState("all")
-  const [showFilters, setShowFilters] = useState(false)
+  const [searchQuery, setSearchQuery] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [showFilters, setShowFilters] = useState(false);
 
   // Filter articles
   const filteredArticles = blogPosts.filter((article) => {
     const matchesSearch =
       article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      article.excerpt.toLowerCase().includes(searchQuery.toLowerCase())
-    const matchesCategory = categoryFilter === "all" || article.category === categoryFilter
+      article.excerpt.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCategory =
+      categoryFilter === "all" || article.category === categoryFilter;
     // For demo purposes, all articles are published
-    const matchesStatus = statusFilter === "all" || statusFilter === "published"
-    return matchesSearch && matchesCategory && matchesStatus
-  })
+    const matchesStatus =
+      statusFilter === "all" || statusFilter === "published";
+    return matchesSearch && matchesCategory && matchesStatus;
+  });
 
   // Get unique categories
-  const categories = ["all", ...new Set(blogPosts.map((article) => article.category))]
+  const categories = [
+    "all",
+    ...new Set(blogPosts.map((article) => article.category)),
+  ];
 
   return (
     <DashboardLayout>
-      <div className="p-6">
+      <div className="container mx-auto px-4 py-6">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Articles</h1>
             <p className="text-gray-600 mt-1">Manage blog posts and content</p>
           </div>
-          <button className="mt-4 md:mt-0 bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/80 flex items-center gap-2">
+          <button className="mt-4 md:mt-0 bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors flex items-center gap-2">
             <Plus size={20} />
             New Article
           </button>
@@ -44,33 +57,42 @@ export default function DashboardArticlesPage() {
         <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1 relative">
-              <Search size={20} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              <Search
+                size={20}
+                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+              />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search articles..."
-                className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition-all"
               />
             </div>
 
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className="flex items-center gap-2 px-4 py-3 bg-gray-100 rounded-lg md:hidden"
+              className="flex items-center gap-2 px-4 py-3 bg-gray-100 rounded-lg md:hidden hover:bg-gray-200 transition-colors"
             >
               <Filter size={20} />
               Filters
             </button>
 
-            <div className={`flex flex-col md:flex-row gap-4 ${showFilters ? "block" : "hidden md:flex"}`}>
+            <div
+              className={`flex flex-col md:flex-row gap-4 ${
+                showFilters ? "block" : "hidden md:flex"
+              }`}
+            >
               <select
                 value={categoryFilter}
                 onChange={(e) => setCategoryFilter(e.target.value)}
-                className="px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                className="px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition-all"
               >
                 {categories.map((category) => (
                   <option key={category} value={category}>
-                    {category === "all" ? "All Categories" : category.charAt(0).toUpperCase() + category.slice(1)}
+                    {category === "all"
+                      ? "All Categories"
+                      : category.charAt(0).toUpperCase() + category.slice(1)}
                   </option>
                 ))}
               </select>
@@ -78,7 +100,7 @@ export default function DashboardArticlesPage() {
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                className="px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition-all"
               >
                 <option value="all">All Status</option>
                 <option value="published">Published</option>
@@ -117,7 +139,10 @@ export default function DashboardArticlesPage() {
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {filteredArticles.map((article) => (
-                  <tr key={article.id} className="hover:bg-gray-50">
+                  <tr
+                    key={article.id}
+                    className="hover:bg-gray-50 transition-colors"
+                  >
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <div className="flex-shrink-0 h-12 w-12">
@@ -130,8 +155,12 @@ export default function DashboardArticlesPage() {
                           />
                         </div>
                         <div className="ml-4">
-                          <div className="text-sm font-medium text-gray-900 line-clamp-2 max-w-xs">{article.title}</div>
-                          <div className="text-sm text-gray-500 line-clamp-1 max-w-xs">{article.excerpt}</div>
+                          <div className="text-sm font-medium text-gray-900 line-clamp-2 max-w-xs">
+                            {article.title}
+                          </div>
+                          <div className="text-sm text-gray-500 line-clamp-1 max-w-xs">
+                            {article.excerpt}
+                          </div>
                         </div>
                       </div>
                     </td>
@@ -141,10 +170,14 @@ export default function DashboardArticlesPage() {
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{article.author}</div>
+                      <div className="text-sm text-gray-900">
+                        {article.author}
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{article.date}</div>
+                      <div className="text-sm text-gray-900">
+                        {article.date}
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">
@@ -153,16 +186,16 @@ export default function DashboardArticlesPage() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <div className="flex items-center gap-2">
-                        <button className="text-blue-600 hover:text-blue-900 p-1">
+                        <button className="text-gray-600 hover:text-primary p-1 transition-colors">
                           <Eye size={16} />
                         </button>
-                        <button className="text-green-600 hover:text-green-900 p-1">
+                        <button className="text-gray-600 hover:text-primary p-1 transition-colors">
                           <Edit size={16} />
                         </button>
-                        <button className="text-red-600 hover:text-red-900 p-1">
+                        <button className="text-gray-600 hover:text-primary p-1 transition-colors">
                           <Trash2 size={16} />
                         </button>
-                        <button className="text-gray-600 hover:text-gray-900 p-1">
+                        <button className="text-gray-600 hover:text-primary p-1 transition-colors">
                           <MoreHorizontal size={16} />
                         </button>
                       </div>
@@ -178,8 +211,12 @@ export default function DashboardArticlesPage() {
               <div className="text-gray-400 mb-4">
                 <Search size={48} className="mx-auto" />
               </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No articles found</h3>
-              <p className="text-gray-500">Try adjusting your search criteria</p>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">
+                No articles found
+              </h3>
+              <p className="text-gray-500">
+                Try adjusting your search criteria
+              </p>
             </div>
           )}
         </div>
@@ -189,17 +226,26 @@ export default function DashboardArticlesPage() {
           <div className="flex items-center justify-between mt-6">
             <div className="text-sm text-gray-700">
               Showing <span className="font-medium">1</span> to{" "}
-              <span className="font-medium">{Math.min(10, filteredArticles.length)}</span> of{" "}
-              <span className="font-medium">{filteredArticles.length}</span> results
+              <span className="font-medium">
+                {Math.min(10, filteredArticles.length)}
+              </span>{" "}
+              of <span className="font-medium">{filteredArticles.length}</span>{" "}
+              results
             </div>
             <div className="flex gap-2">
-              <button className="px-3 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50">Previous</button>
-              <button className="px-3 py-2 text-sm bg-primary text-white rounded-lg">1</button>
-              <button className="px-3 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50">Next</button>
+              <button className="px-3 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                Previous
+              </button>
+              <button className="px-3 py-2 text-sm bg-primary text-white rounded-lg">
+                1
+              </button>
+              <button className="px-3 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                Next
+              </button>
             </div>
           </div>
         )}
       </div>
     </DashboardLayout>
-  )
+  );
 }
