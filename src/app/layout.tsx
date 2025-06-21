@@ -5,6 +5,7 @@ import AOSProvider from "@/components/AOSProvider";
 import ScrollToTop from "@/components/ScrollToTop";
 import NavigationHandler from "@/components/NavigationHandler";
 import { HydrationFix } from "@/components/HydrationFix";
+import LoadingScreen from "@/components/LoadingScreen";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -44,6 +45,7 @@ export default function RootLayout({
         className="font-body text-light-dark leading-relaxed tracking-wide"
         suppressHydrationWarning
       >
+        <LoadingScreen />
         <HydrationFix />
         <AOSProvider>
           <NavigationHandler />

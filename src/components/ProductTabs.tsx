@@ -1,43 +1,51 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import AOS from "aos";
 import ProductCard from "./ProductCard";
 import {
   products,
   getProductsByCategory,
   getFeaturedProducts,
+  getCategories,
 } from "../lib/products";
 
 export default function ProductTabs() {
   const [activeTab, setActiveTab] = useState("all");
+  const [key, setKey] = useState(0); // Force re-render untuk animasi
+
+  // Refresh AOS ketika tab berubah
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      AOS.refresh();
+    }, 100);
+    return () => clearTimeout(timer);
+  }, [activeTab]);
+
+  const handleTabChange = (tabId: string) => {
+    setActiveTab(tabId);
+    setKey((prev) => prev + 1); // Force re-render semua produk
+  };
 
   const getFilteredProducts = () => {
-    switch (activeTab) {
-      case "featured":
-        return getFeaturedProducts().slice(0, 8);
-      case "fruits":
-        return getProductsByCategory("fruits");
-      case "vegetables":
-        return getProductsByCategory("vegetables");
-      case "dairy":
-        return getProductsByCategory("dairy");
-      case "meat":
-        return getProductsByCategory("meat");
-      case "beverages":
-        return getProductsByCategory("beverages");
-      default:
-        return products.slice(0, 8);
+    if (activeTab === "featured") {
+      return getFeaturedProducts().slice(0, 8);
+    } else if (activeTab === "all") {
+      return products.slice(0, 8);
+    } else {
+      return getProductsByCategory(activeTab);
     }
   };
 
+  // Generate tabs dynamically from available categories
+  const categories = getCategories();
   const tabs = [
     { id: "all", label: "All Products" },
     { id: "featured", label: "Featured" },
-    { id: "fruits", label: "Fruits" },
-    { id: "vegetables", label: "Vegetables" },
-    { id: "dairy", label: "Dairy" },
-    { id: "meat", label: "Meat" },
-    { id: "beverages", label: "Beverages" },
+    ...categories.map((category) => ({
+      id: category,
+      label: category.charAt(0).toUpperCase() + category.slice(1),
+    })),
   ];
 
   return (
@@ -62,7 +70,7 @@ export default function ProductTabs() {
           {tabs.map((tab, index) => (
             <button
               key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
+              onClick={() => handleTabChange(tab.id)}
               className={`px-6 py-3 rounded-full text-sm font-semibold transition-all duration-300 border ${
                 activeTab === tab.id
                   ? "bg-primary text-white border-primary shadow-lg transform scale-105"
@@ -78,7 +86,10 @@ export default function ProductTabs() {
         </div>
 
         {/* Products Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div
+          key={key}
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+        >
           {getFilteredProducts().map((product, index) => {
             // Create staggered animations with different directions
             const animationTypes = [
@@ -88,15 +99,16 @@ export default function ProductTabs() {
               "zoom-in",
             ];
             const animationType = animationTypes[index % 4];
-            const delay = 400 + index * 150;
+            const delay = 100 + index * 100; // Delay lebih pendek untuk responsivitas
 
             return (
               <div
-                key={product.id}
+                key={`${product.id}-${key}`} // Unique key untuk force re-render
                 data-aos={animationType}
                 data-aos-delay={delay}
-                data-aos-duration="600"
+                data-aos-duration="500"
                 data-aos-easing="ease-out-cubic"
+                data-aos-once="false" // Allow re-animation
               >
                 <ProductCard product={product} />
               </div>
