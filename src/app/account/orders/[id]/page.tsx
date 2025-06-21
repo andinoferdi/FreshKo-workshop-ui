@@ -44,33 +44,30 @@ export default function OrderDetailPage() {
   return (
     <>
       <Header />
-      <main className="min-h-screen bg-white py-8">
+      <main className="min-h-screen bg-white py-8 lg:py-12">
         <div className="container mx-auto px-4">
-          {/* Breadcrumb */}
-          <div className="mb-8">
+          {/* Page Header */}
+          <div className="mb-8 lg:mb-12">
+            <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+              Order Details
+            </h1>
+            <p className="text-lg text-gray-600 mb-6">
+              View and track your order progress, items, and delivery
+              information
+            </p>
             <div className="flex items-center gap-2 text-sm text-gray-600">
-              <Link
-                href="/"
-                className="hover:text-primary transition-colors duration-300"
-              >
+              <Link href="/" className="hover:text-primary transition-colors">
                 Home
               </Link>
               <span>/</span>
               <Link
-                href="/account"
-                className="hover:text-primary transition-colors duration-300"
-              >
-                Account
-              </Link>
-              <span>/</span>
-              <Link
                 href="/account/orders"
-                className="hover:text-primary transition-colors duration-300"
+                className="hover:text-primary transition-colors"
               >
                 Orders
               </Link>
               <span>/</span>
-              <span className="text-gray-900">#{orderId}</span>
+              <span className="text-gray-900">Order #{orderId}</span>
             </div>
           </div>
 
@@ -78,9 +75,9 @@ export default function OrderDetailPage() {
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-8">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">
+                <h2 className="text-2xl font-bold text-gray-900">
                   Order #{order.id}
-                </h1>
+                </h2>
                 <p className="text-gray-500">Placed on {order.date}</p>
               </div>
               <div className="flex items-center gap-3">
@@ -226,12 +223,13 @@ export default function OrderDetailPage() {
             )}
           </div>
 
+          {/* Page Content */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Order Items */}
             <div className="lg:col-span-2">
               <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
                 <div className="p-6 border-b border-gray-100 bg-gray-50">
-                  <h2 className="text-xl font-semibold">Order Items</h2>
+                  <h3 className="text-xl font-semibold">Order Items</h3>
                 </div>
 
                 <div className="p-6">
@@ -283,7 +281,7 @@ export default function OrderDetailPage() {
             {/* Order Summary */}
             <div className="lg:col-span-1">
               <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sticky top-8 hover:shadow-lg transition-shadow duration-300">
-                <h2 className="text-xl font-semibold mb-6">Order Summary</h2>
+                <h3 className="text-xl font-semibold mb-6">Order Summary</h3>
 
                 <div className="space-y-3 mb-6">
                   <div className="flex justify-between">
@@ -324,7 +322,7 @@ export default function OrderDetailPage() {
 
                 {/* Shipping Information */}
                 <div className="border-t pt-6">
-                  <h3 className="font-semibold mb-3">Shipping Information</h3>
+                  <h4 className="font-semibold mb-3">Shipping Information</h4>
                   <div className="space-y-2 text-sm">
                     <p>
                       <span className="text-gray-600">Name:</span>{" "}
@@ -347,7 +345,7 @@ export default function OrderDetailPage() {
 
                 {/* Payment Information */}
                 <div className="border-t pt-6 mt-6">
-                  <h3 className="font-semibold mb-3">Payment Information</h3>
+                  <h4 className="font-semibold mb-3">Payment Information</h4>
                   <div className="space-y-2 text-sm">
                     <p>
                       <span className="text-gray-600">Method:</span>{" "}

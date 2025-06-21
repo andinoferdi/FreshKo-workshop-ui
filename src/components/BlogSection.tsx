@@ -7,7 +7,7 @@ export default function BlogSection() {
   const featuredPosts = blogPosts.slice(0, 3);
 
   return (
-    <section className="bg-white py-12 lg:py-20">
+    <section className="bg-gray-50 py-12 lg:py-20">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-5 lg:mb-5" data-aos="fade-up">
           <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-2">

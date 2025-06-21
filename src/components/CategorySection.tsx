@@ -4,49 +4,38 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Sparkles } from "lucide-react";
+import { getCategoriesWithCount } from "@/lib/products";
 
-const categories = [
-  {
-    id: 1,
-    name: "Fruits",
-    image: "/images/thumb-avocado.png",
-    count: "25+ items",
-  },
-  {
-    id: 2,
-    name: "Vegetables",
-    image: "/images/thumb-tomatoes.png",
-    count: "30+ items",
-  },
-  {
-    id: 3,
-    name: "Dairy",
-    image: "/images/thumb-milk.png",
-    count: "15+ items",
-  },
-  {
-    id: 4,
-    name: "Seafood",
-    image: "/images/thumb-tuna.jpg",
-    count: "20+ items",
-  },
-  {
-    id: 5,
-    name: "Beverages",
-    image: "/images/thumb-orange-juice.png",
-    count: "18+ items",
-  },
-  {
-    id: 6,
-    name: "Bakery",
-    image: "/images/thumb-biscuits.png",
-    count: "12+ items",
-  },
-];
+// Category images mapping
+const categoryImages: { [key: string]: string } = {
+  fruits: "/images/thumb-avocado.png",
+  vegetables: "/images/thumb-tomatoes.png",
+  dairy: "/images/thumb-milk.png",
+  seafood: "/images/thumb-tuna.jpg",
+  beverages: "/images/thumb-orange-juice.png",
+  bakery: "/images/thumb-biscuits.png",
+  pantry: "/images/thumb-honey.jpg",
+  condiments: "/images/thumb-tomatoketchup.png",
+};
 
 export default function CategorySection() {
   const [hoveredCategory, setHoveredCategory] = useState<number | null>(null);
   const [isVisible, setIsVisible] = useState(false);
+  const [categories, setCategories] = useState<
+    { name: string; count: string; image: string; id: number }[]
+  >([]);
+
+  useEffect(() => {
+    // Get real categories with counts
+    const categoriesWithCount = getCategoriesWithCount();
+    const categoriesData = categoriesWithCount.map((category, index) => ({
+      id: index + 1,
+      name: category.name.charAt(0).toUpperCase() + category.name.slice(1),
+      image: categoryImages[category.name] || "/placeholder.svg",
+      count: `${category.count} item${category.count !== 1 ? "s" : ""}`,
+    }));
+    setCategories(categoriesData);
+  }, []);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
