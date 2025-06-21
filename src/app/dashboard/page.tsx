@@ -12,9 +12,54 @@ import {
   Package,
   Clock,
 } from "lucide-react";
+import {
+  LineChart,
+  Line,
+  AreaChart,
+  Area,
+  BarChart,
+  Bar,
+  PieChart,
+  Pie,
+  Cell,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import { orders } from "@/lib/orders";
 import { products } from "@/lib/products";
+
+// Sample data for charts
+const salesData = [
+  { name: "Mon", sales: 4000, orders: 24, revenue: 2400 },
+  { name: "Tue", sales: 3000, orders: 18, revenue: 1398 },
+  { name: "Wed", sales: 2000, orders: 32, revenue: 9800 },
+  { name: "Thu", sales: 2780, orders: 28, revenue: 3908 },
+  { name: "Fri", sales: 1890, orders: 35, revenue: 4800 },
+  { name: "Sat", sales: 2390, orders: 42, revenue: 3800 },
+  { name: "Sun", sales: 3490, orders: 38, revenue: 4300 },
+];
+
+const categoryData = [
+  { name: "Vegetables", value: 35, color: "#10B981" },
+  { name: "Fruits", value: 25, color: "#059669" },
+  { name: "Dairy", value: 20, color: "#047857" },
+  { name: "Meat", value: 12, color: "#065F46" },
+  { name: "Others", value: 8, color: "#064E3B" },
+];
+
+const monthlyData = [
+  { month: "Jan", revenue: 12000, customers: 145, orders: 89 },
+  { month: "Feb", revenue: 15000, customers: 167, orders: 102 },
+  { month: "Mar", revenue: 18000, customers: 189, orders: 125 },
+  { month: "Apr", revenue: 22000, customers: 201, orders: 148 },
+  { month: "May", revenue: 25000, customers: 223, orders: 167 },
+  { month: "Jun", revenue: 28000, customers: 245, orders: 189 },
+];
 
 // Helper function to get status style
 const getStatusStyle = (status: string) => {
@@ -150,34 +195,153 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Charts and Tables */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          {/* Sales Chart */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-lg transition-shadow duration-300">
+        {/* Main Charts Row */}
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-8">
+          {/* Sales Overview - Line Chart */}
+          <div className="xl:col-span-2 bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-lg transition-shadow duration-300">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-lg font-semibold">Sales Overview</h2>
-              <select className="text-sm border border-gray-200 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-primary hover:border-gray-300 transition-all duration-300">
+              <select className="text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary hover:border-gray-300 transition-all duration-300">
                 <option>Last 7 Days</option>
                 <option>Last 30 Days</option>
                 <option>Last 90 Days</option>
               </select>
             </div>
-            <div className="h-64 flex items-end justify-between px-2">
-              {/* Simplified bar chart */}
-              {[65, 40, 80, 55, 95, 60, 70].map((height, i) => (
-                <div key={i} className="flex flex-col items-center group">
-                  <div
-                    className="w-8 bg-primary rounded-t-md hover:bg-green-700 transition-colors duration-300 cursor-pointer"
-                    style={{ height: `${height}%` }}
-                  ></div>
-                  <span className="text-xs mt-2 text-gray-500 group-hover:text-primary transition-colors duration-300">
-                    {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"][i]}
-                  </span>
-                </div>
-              ))}
-            </div>
+            <ResponsiveContainer width="100%" height={300}>
+              <AreaChart data={salesData}>
+                <defs>
+                  <linearGradient id="colorSales" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#10B981" stopOpacity={0.3} />
+                    <stop offset="95%" stopColor="#10B981" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                <XAxis dataKey="name" stroke="#6B7280" fontSize={12} />
+                <YAxis stroke="#6B7280" fontSize={12} />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: "white",
+                    border: "1px solid #e5e7eb",
+                    borderRadius: "8px",
+                    boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+                  }}
+                />
+                <Area
+                  type="monotone"
+                  dataKey="sales"
+                  stroke="#10B981"
+                  fillOpacity={1}
+                  fill="url(#colorSales)"
+                  strokeWidth={2}
+                />
+              </AreaChart>
+            </ResponsiveContainer>
           </div>
 
+          {/* Category Distribution - Pie Chart */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-lg transition-shadow duration-300">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-lg font-semibold">Category Sales</h2>
+            </div>
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Pie
+                  data={categoryData}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={60}
+                  outerRadius={100}
+                  paddingAngle={5}
+                  dataKey="value"
+                >
+                  {categoryData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: "white",
+                    border: "1px solid #e5e7eb",
+                    borderRadius: "8px",
+                    boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+                  }}
+                />
+                <Legend />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* Secondary Charts Row */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          {/* Monthly Revenue Trend */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-lg transition-shadow duration-300">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-lg font-semibold">Monthly Revenue</h2>
+            </div>
+            <ResponsiveContainer width="100%" height={250}>
+              <LineChart data={monthlyData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                <XAxis dataKey="month" stroke="#6B7280" fontSize={12} />
+                <YAxis stroke="#6B7280" fontSize={12} />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: "white",
+                    border: "1px solid #e5e7eb",
+                    borderRadius: "8px",
+                    boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+                  }}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="revenue"
+                  stroke="#10B981"
+                  strokeWidth={3}
+                  dot={{ fill: "#10B981", strokeWidth: 2, r: 4 }}
+                  activeDot={{ r: 6, stroke: "#10B981", strokeWidth: 2 }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+
+          {/* Orders vs Customers */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-lg transition-shadow duration-300">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-lg font-semibold">Orders vs Customers</h2>
+            </div>
+            <ResponsiveContainer width="100%" height={250}>
+              <BarChart data={monthlyData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                <XAxis dataKey="month" stroke="#6B7280" fontSize={12} />
+                <YAxis stroke="#6B7280" fontSize={12} />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: "white",
+                    border: "1px solid #e5e7eb",
+                    borderRadius: "8px",
+                    boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+                  }}
+                />
+                <Legend />
+                <Bar
+                  dataKey="orders"
+                  fill="#10B981"
+                  name="Orders"
+                  radius={[4, 4, 0, 0]}
+                />
+                <Bar
+                  dataKey="customers"
+                  fill="#059669"
+                  name="Customers"
+                  radius={[4, 4, 0, 0]}
+                />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* Tables Row */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           {/* Recent Orders */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-lg transition-shadow duration-300">
             <div className="flex justify-between items-center mb-6">
@@ -230,9 +394,7 @@ export default function DashboardPage() {
               </table>
             </div>
           </div>
-        </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Popular Products */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-lg transition-shadow duration-300">
             <div className="flex justify-between items-center mb-6">
@@ -298,94 +460,92 @@ export default function DashboardPage() {
               ))}
             </div>
           </div>
+        </div>
 
-          {/* Recent Activity */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-lg transition-shadow duration-300">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-lg font-semibold">Recent Activity</h2>
-              <a
-                href="#"
-                className="text-primary text-sm hover:underline hover:text-green-700 transition-colors duration-300"
-              >
-                View All
-              </a>
+        {/* Recent Activity */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-lg transition-shadow duration-300">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-lg font-semibold">Recent Activity</h2>
+            <a
+              href="#"
+              className="text-primary text-sm hover:underline hover:text-green-700 transition-colors duration-300"
+            >
+              View All
+            </a>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="flex gap-4 p-3 rounded-lg hover:bg-gray-50 transition-colors duration-300">
+              <div className="flex-shrink-0">
+                <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center hover:bg-green-200 transition-colors duration-300">
+                  <ShoppingBag className="text-green-600" size={20} />
+                </div>
+              </div>
+              <div>
+                <p className="font-medium text-sm">
+                  New order{" "}
+                  <span className="font-semibold text-primary">
+                    #{orders[0].id}
+                  </span>{" "}
+                  was placed
+                </p>
+                <p className="text-xs text-gray-500 mt-1">
+                  <Clock size={12} className="inline mr-1" />
+                  30 minutes ago
+                </p>
+              </div>
             </div>
-            <div className="space-y-6">
-              <div className="flex gap-4 p-3 rounded-lg hover:bg-gray-50 transition-colors duration-300">
-                <div className="flex-shrink-0">
-                  <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center hover:bg-green-200 transition-colors duration-300">
-                    <ShoppingBag className="text-green-600" size={20} />
-                  </div>
-                </div>
-                <div>
-                  <p className="font-medium">
-                    New order{" "}
-                    <span className="font-semibold text-primary">
-                      #{orders[0].id}
-                    </span>{" "}
-                    was placed
-                  </p>
-                  <p className="text-sm text-gray-500 mt-1">
-                    <Clock size={14} className="inline mr-1" />
-                    30 minutes ago
-                  </p>
+
+            <div className="flex gap-4 p-3 rounded-lg hover:bg-gray-50 transition-colors duration-300">
+              <div className="flex-shrink-0">
+                <div className="w-10 h-10 rounded-full bg-green-200 flex items-center justify-center hover:bg-green-300 transition-colors duration-300">
+                  <Package className="text-green-700" size={20} />
                 </div>
               </div>
+              <div>
+                <p className="font-medium text-sm">
+                  Product{" "}
+                  <span className="font-semibold text-primary">
+                    {products[0].name}
+                  </span>{" "}
+                  is low in stock
+                </p>
+                <p className="text-xs text-gray-500 mt-1">
+                  <Clock size={12} className="inline mr-1" />2 hours ago
+                </p>
+              </div>
+            </div>
 
-              <div className="flex gap-4 p-3 rounded-lg hover:bg-gray-50 transition-colors duration-300">
-                <div className="flex-shrink-0">
-                  <div className="w-10 h-10 rounded-full bg-green-200 flex items-center justify-center hover:bg-green-300 transition-colors duration-300">
-                    <Package className="text-green-700" size={20} />
-                  </div>
-                </div>
-                <div>
-                  <p className="font-medium">
-                    Product{" "}
-                    <span className="font-semibold text-primary">
-                      {products[0].name}
-                    </span>{" "}
-                    is low in stock
-                  </p>
-                  <p className="text-sm text-gray-500 mt-1">
-                    <Clock size={14} className="inline mr-1" />2 hours ago
-                  </p>
+            <div className="flex gap-4 p-3 rounded-lg hover:bg-gray-50 transition-colors duration-300">
+              <div className="flex-shrink-0">
+                <div className="w-10 h-10 rounded-full bg-green-50 flex items-center justify-center hover:bg-green-100 transition-colors duration-300">
+                  <BarChart3 className="text-green-600" size={20} />
                 </div>
               </div>
+              <div>
+                <p className="font-medium text-sm">
+                  Monthly sales report is available
+                </p>
+                <p className="text-xs text-gray-500 mt-1">
+                  <Clock size={12} className="inline mr-1" />5 hours ago
+                </p>
+              </div>
+            </div>
 
-              <div className="flex gap-4 p-3 rounded-lg hover:bg-gray-50 transition-colors duration-300">
-                <div className="flex-shrink-0">
-                  <div className="w-10 h-10 rounded-full bg-green-50 flex items-center justify-center hover:bg-green-100 transition-colors duration-300">
-                    <BarChart3 className="text-green-600" size={20} />
-                  </div>
-                </div>
-                <div>
-                  <p className="font-medium">
-                    Monthly sales report is available
-                  </p>
-                  <p className="text-sm text-gray-500 mt-1">
-                    <Clock size={14} className="inline mr-1" />5 hours ago
-                  </p>
+            <div className="flex gap-4 p-3 rounded-lg hover:bg-gray-50 transition-colors duration-300">
+              <div className="flex-shrink-0">
+                <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors duration-300">
+                  <Users className="text-gray-600" size={20} />
                 </div>
               </div>
-
-              <div className="flex gap-4 p-3 rounded-lg hover:bg-gray-50 transition-colors duration-300">
-                <div className="flex-shrink-0">
-                  <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors duration-300">
-                    <Users className="text-gray-600" size={20} />
-                  </div>
-                </div>
-                <div>
-                  <p className="font-medium">
-                    New customer{" "}
-                    <span className="font-semibold text-primary">
-                      Jane Smith
-                    </span>{" "}
-                    registered
-                  </p>
-                  <p className="text-sm text-gray-500 mt-1">
-                    <Clock size={14} className="inline mr-1" />1 day ago
-                  </p>
-                </div>
+              <div>
+                <p className="font-medium text-sm">
+                  New customer{" "}
+                  <span className="font-semibold text-primary">Jane Smith</span>{" "}
+                  registered
+                </p>
+                <p className="text-xs text-gray-500 mt-1">
+                  <Clock size={12} className="inline mr-1" />1 day ago
+                </p>
               </div>
             </div>
           </div>

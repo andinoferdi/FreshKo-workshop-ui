@@ -316,27 +316,18 @@ export default function ContactPage() {
               </p>
             </div>
 
-            <div
-              className="bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl h-96 flex items-center justify-center
-                          border border-gray-200 overflow-hidden relative"
-            >
-              <div className="absolute inset-0 bg-gradient-to-t from-primary/5 to-transparent"></div>
-              <div className="text-center relative z-10">
-                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <MapPin size={32} className="text-primary" />
-                </div>
-                <p className="text-gray-700 font-medium mb-2">
-                  Interactive map would be displayed here
-                </p>
-                <p className="text-sm text-gray-600">
-                  123 Main Street, City, Country 12345
-                </p>
-                <button
-                  className="mt-4 bg-primary text-white px-6 py-2 rounded-lg text-sm font-medium
-                                 hover:bg-primary/90 transition-colors"
-                >
-                  Get Directions
-                </button>
+            <div className="flex justify-center">
+              <div className="rounded-2xl overflow-hidden border border-gray-200 shadow-lg hover:shadow-xl transition-shadow duration-300 w-full max-w-7xl">
+                <iframe
+                  src="https://www.google.com/maps/embed?pb=!1m17!1m12!1m3!1d349.8248504294586!2d112.67460968333233!3d-7.261726972345004!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m2!1m1!2s!5e0!3m2!1sid!2sid!4v1750509862705!5m2!1sid!2sid"
+                  width="1080"
+                  height="600"
+                  style={{ border: 0 }}
+                  allowFullScreen
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  className="w-full h-96"
+                />
               </div>
             </div>
           </div>
