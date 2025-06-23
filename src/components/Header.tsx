@@ -1,77 +1,96 @@
-"use client"
+"use client";
 
-import type React from "react"
-import { useState, useEffect } from "react"
-import { usePathname } from "next/navigation"
-import Image from "next/image"
-import Link from "next/link"
-import { ShoppingCart, Search, User, Heart, Menu, X } from "lucide-react"
-import { useHydratedStore, type CartItem } from "../lib/store"
-import { searchProducts } from "../lib/products"
-import { useRouter } from "next/navigation"
-import { useVisibilityFix } from "@/hooks/useVisibilityFix"
+import type React from "react";
+import { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
+import Image from "next/image";
+import Link from "next/link";
+import { ShoppingCart, Search, User, Heart, Menu, X } from "lucide-react";
+import { useHydratedStore, type CartItem } from "../lib/store";
+import { searchProducts } from "../lib/products";
+import { useRouter } from "next/navigation";
+import { useVisibilityFix } from "@/hooks/useVisibilityFix";
 
 export default function Header() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [isCartOpen, setIsCartOpen] = useState(false)
-  const [isSearchOpen, setIsSearchOpen] = useState(false)
-  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
-  const [searchQuery, setSearchQuery] = useState("")
-  const [isScrolled, setIsScrolled] = useState(false)
-  const { isLoaded } = useVisibilityFix(20) // Faster loading for header
-  const pathname = usePathname()
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isScrolled, setIsScrolled] = useState(false);
+  const { isLoaded } = useVisibilityFix(20);
+  const pathname = usePathname();
 
   const {
     cart,
     wishlist,
+    user,
+    isAuthenticated,
     getCartTotal,
     getCartItemsCount,
     getWishlistCount,
     removeFromCart,
     setSearchQuery: setStoreSearchQuery,
     setSearchResults,
-  } = useHydratedStore()
-  const router = useRouter()
+    logout,
+  } = useHydratedStore();
+  const router = useRouter();
 
-  const cartTotal = getCartTotal()
-  const cartItemsCount = getCartItemsCount()
-  const wishlistCount = getWishlistCount()
+  const cartTotal = getCartTotal();
+  const cartItemsCount = getCartItemsCount();
+  const wishlistCount = getWishlistCount();
 
   // Handle scroll effect
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20)
-    }
-    window.addEventListener("scroll", handleScroll)
-    return () => window.removeEventListener("scroll", handleScroll)
-  }, [])
+      setIsScrolled(window.scrollY > 20);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   // Close menus on navigation
   useEffect(() => {
-    setIsMenuOpen(false)
-    setIsCartOpen(false)
-    setIsSearchOpen(false)
-    setIsUserMenuOpen(false)
-  }, [pathname])
+    setIsMenuOpen(false);
+    setIsCartOpen(false);
+    setIsSearchOpen(false);
+    setIsUserMenuOpen(false);
+  }, [pathname]);
 
   const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     if (searchQuery.trim()) {
-      const results = searchProducts(searchQuery)
-      setStoreSearchQuery(searchQuery)
-      setSearchResults(results)
-      router.push("/search")
-      setIsSearchOpen(false)
+      const results = searchProducts(searchQuery);
+      setStoreSearchQuery(searchQuery);
+      setSearchResults(results);
+      router.push("/search");
+      setIsSearchOpen(false);
     }
-  }
+  };
 
   const handleQuickSearch = (query: string) => {
-    setSearchQuery(query)
-    const results = searchProducts(query)
-    setStoreSearchQuery(query)
-    setSearchResults(results)
-    router.push("/search")
-  }
+    setSearchQuery(query);
+    const results = searchProducts(query);
+    setStoreSearchQuery(query);
+    setSearchResults(results);
+    router.push("/search");
+  };
+
+  const handleCartClick = () => {
+    if (!isAuthenticated) {
+      router.push("/account/login");
+      return;
+    }
+    setIsCartOpen(true);
+  };
+
+  const handleWishlistClick = () => {
+    if (!isAuthenticated) {
+      router.push("/account/login");
+      return;
+    }
+    router.push("/wishlist");
+  };
 
   return (
     <>
@@ -135,7 +154,9 @@ export default function Header() {
                             <h6 className="font-medium text-sm text-gray-900 hover:text-primary transition-colors duration-200">
                               {item.name}
                             </h6>
-                            <small className="text-gray-500">Qty: {item.quantity}</small>
+                            <small className="text-gray-500">
+                              Qty: {item.quantity}
+                            </small>
                           </div>
                         </div>
                         <div className="text-right">
@@ -155,7 +176,9 @@ export default function Header() {
 
                   <div className="flex justify-between items-center pt-4 border-t border-gray-200 font-semibold text-lg">
                     <span>Total</span>
-                    <strong className="text-primary">${cartTotal.toFixed(2)}</strong>
+                    <strong className="text-primary">
+                      ${cartTotal.toFixed(2)}
+                    </strong>
                   </div>
 
                   <div className="space-y-3 pt-4">
@@ -222,16 +245,20 @@ export default function Header() {
               </form>
 
               <div className="space-y-2">
-                <h5 className="text-sm font-medium text-gray-700 mb-3">Quick Search</h5>
-                {["Fruits", "Vegetables", "Dairy", "Meat", "Beverages"].map((category) => (
-                  <button
-                    key={category}
-                    onClick={() => handleQuickSearch(category)}
-                    className="block w-full text-left px-3 py-2 text-gray-600 hover:bg-gray-50 hover:text-primary rounded-lg transition-all duration-200 hover:translate-x-1"
-                  >
-                    {category}
-                  </button>
-                ))}
+                <h5 className="text-sm font-medium text-gray-700 mb-3">
+                  Quick Search
+                </h5>
+                {["Fruits", "Vegetables", "Dairy", "Meat", "Beverages"].map(
+                  (category) => (
+                    <button
+                      key={category}
+                      onClick={() => handleQuickSearch(category)}
+                      className="block w-full text-left px-3 py-2 text-gray-600 hover:bg-gray-50 hover:text-primary rounded-lg transition-all duration-200 hover:translate-x-1"
+                    >
+                      {category}
+                    </button>
+                  )
+                )}
               </div>
             </div>
           </div>
@@ -241,7 +268,9 @@ export default function Header() {
       <header
         className={`bg-white/80 backdrop-blur-md border-b border-white/20 sticky top-0 z-40 transition-all duration-500 ${
           isScrolled ? "shadow-lg bg-white/90" : ""
-        } ${isLoaded ? "translate-y-0 opacity-100" : "translate-y-0 opacity-90"}`}
+        } ${
+          isLoaded ? "translate-y-0 opacity-100" : "translate-y-0 opacity-90"
+        }`}
       >
         <div className="container mx-auto px-4">
           {/* Top Bar */}
@@ -301,17 +330,46 @@ export default function Header() {
                 <div className="relative">
                   <button
                     onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                    className="p-3 glass-effect rounded-xl hover:bg-white/20 transition-all duration-300 hover:scale-110 transform group"
+                    className="relative group"
                     title="My Account"
                   >
-                    <User size={20} className="text-gray-600 group-hover:text-primary transition-colors duration-200" />
+                    {isAuthenticated && user ? (
+                      user.avatar ? (
+                        <div className="relative">
+                          <img
+                            src={user.avatar}
+                            alt={`${user.firstName} ${user.lastName}`}
+                            className="w-10 h-10 rounded-full object-cover border-2 border-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 ring-2 ring-primary/20 hover:ring-primary/40"
+                          />
+                          <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></div>
+                        </div>
+                      ) : (
+                        <div className="relative">
+                          <div className="w-10 h-10 bg-gradient-primary rounded-full flex items-center justify-center text-white text-sm font-bold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 ring-2 ring-primary/20 hover:ring-primary/40">
+                            {user.firstName[0]}
+                            {user.lastName[0]}
+                          </div>
+                          <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></div>
+                        </div>
+                      )
+                    ) : (
+                      <div className="p-3 glass-effect rounded-xl hover:bg-white/20 transition-all duration-300 hover:scale-110 transform">
+                        <User
+                          size={20}
+                          className="text-gray-600 group-hover:text-primary transition-colors duration-200"
+                        />
+                      </div>
+                    )}
                   </button>
 
                   {/* User Dropdown */}
                   {isUserMenuOpen && (
                     <>
                       {/* Mobile Overlay */}
-                      <div className="sm:hidden fixed inset-0 z-40" onClick={() => setIsUserMenuOpen(false)} />
+                      <div
+                        className="sm:hidden fixed inset-0 z-40"
+                        onClick={() => setIsUserMenuOpen(false)}
+                      />
 
                       <div
                         className="absolute top-full mt-3 modern-card z-50 transform transition-all duration-300 scale-100 opacity-100 
@@ -319,50 +377,132 @@ export default function Header() {
                                 max-sm:fixed max-sm:top-16 max-sm:right-4 max-sm:left-4 max-sm:w-auto max-sm:mx-auto"
                       >
                         <div className="py-2">
-                          <div className="px-6 py-4 border-b border-gray-100/50 bg-gradient-to-r from-primary/5 to-primary/10 rounded-t-xl">
-                            <p className="text-sm font-semibold text-gray-800">Welcome back!</p>
-                            <p className="text-xs text-gray-500 font-medium">john.doe@email.com</p>
-                          </div>
-                          <Link
-                            href="/account/orders"
-                            className="block px-6 py-3 text-gray-700 hover:bg-gray-50/50 hover:text-primary transition-all duration-200 hover:translate-x-1 font-medium"
-                            onClick={() => setIsUserMenuOpen(false)}
-                          >
-                            Order History
-                          </Link>
-                          <Link
-                            href="/dashboard"
-                            className="block px-6 py-3 text-gray-700 hover:bg-gray-50/50 hover:text-primary transition-all duration-200 hover:translate-x-1 font-medium"
-                            onClick={() => setIsUserMenuOpen(false)}
-                          >
-                            Dashboard
-                          </Link>
-                          <div className="border-t border-gray-100/50 my-1"></div>
-                          <Link
-                            href="/account/profile"
-                            className="block px-6 py-3 text-gray-700 hover:bg-gray-50/50 hover:text-primary transition-all duration-200 hover:translate-x-1 font-medium"
-                            onClick={() => setIsUserMenuOpen(false)}
-                          >
-                            Account Settings
-                          </Link>
+                          {isAuthenticated && user ? (
+                            <>
+                              <div className="px-6 py-4 border-b border-gray-100/50 bg-gradient-to-r from-primary/5 to-primary/10 rounded-t-xl">
+                                <div className="flex items-center space-x-4">
+                                  {user.avatar ? (
+                                    <div className="relative">
+                                      <img
+                                        src={user.avatar}
+                                        alt={`${user.firstName} ${user.lastName}`}
+                                        className="w-12 h-12 rounded-full object-cover border-2 border-white shadow-lg ring-2 ring-primary/20"
+                                      />
+                                      <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-white rounded-full"></div>
+                                    </div>
+                                  ) : (
+                                    <div className="relative">
+                                      <div className="w-12 h-12 bg-gradient-primary rounded-full flex items-center justify-center text-white text-base font-bold shadow-lg ring-2 ring-primary/20">
+                                        {user.firstName[0]}
+                                        {user.lastName[0]}
+                                      </div>
+                                      <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-white rounded-full"></div>
+                                    </div>
+                                  )}
+                                  <div className="flex-1 min-w-0">
+                                    <p className="text-sm font-semibold text-gray-800 truncate">
+                                      Welcome back, {user.firstName}!
+                                    </p>
+                                    <p className="text-xs text-gray-500 font-medium truncate">
+                                      {user.email}
+                                    </p>
+                                    {user.role === "admin" && (
+                                      <span className="inline-block px-2 py-1 mt-2 text-xs bg-purple-100 text-purple-800 rounded-full font-semibold">
+                                        <span className="flex items-center gap-1">
+                                          <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                                          Administrator
+                                        </span>
+                                      </span>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                              {user.role !== "admin" && (
+                                <Link
+                                  href="/account/orders"
+                                  className="block px-6 py-3 text-gray-700 hover:bg-gray-50/50 hover:text-primary transition-all duration-200 hover:translate-x-1 font-medium"
+                                  onClick={() => setIsUserMenuOpen(false)}
+                                >
+                                  Order History
+                                </Link>
+                              )}
+                              {user.role === "admin" && (
+                                <Link
+                                  href="/dashboard"
+                                  className="block px-6 py-3 text-gray-700 hover:bg-gray-50/50 hover:text-primary transition-all duration-200 hover:translate-x-1 font-medium"
+                                  onClick={() => setIsUserMenuOpen(false)}
+                                >
+                                  Dashboard
+                                </Link>
+                              )}
+                              <div className="border-t border-gray-100/50 my-1"></div>
+                              {user.role !== "admin" && (
+                                <Link
+                                  href="/account/profile"
+                                  className="block px-6 py-3 text-gray-700 hover:bg-gray-50/50 hover:text-primary transition-all duration-200 hover:translate-x-1 font-medium"
+                                  onClick={() => setIsUserMenuOpen(false)}
+                                >
+                                  Account Settings
+                                </Link>
+                              )}
+                              <button
+                                onClick={() => {
+                                  logout();
+                                  setIsUserMenuOpen(false);
+                                  router.push("/");
+                                }}
+                                className="w-full text-left px-6 py-3 text-red-600 hover:bg-red-50/50 hover:text-red-700 transition-all duration-200 hover:translate-x-1 font-medium"
+                              >
+                                Sign Out
+                              </button>
+                            </>
+                          ) : (
+                            <>
+                              <div className="px-6 py-4 border-b border-gray-100/50 bg-gradient-to-r from-primary/5 to-primary/10 rounded-t-xl">
+                                <p className="text-sm font-semibold text-gray-800">
+                                  Welcome to FreshKo!
+                                </p>
+                                <p className="text-xs text-gray-500 font-medium">
+                                  Sign in to your account
+                                </p>
+                              </div>
+                              <Link
+                                href="/account/login"
+                                className="block px-6 py-3 text-primary hover:bg-gray-50/50 hover:text-primary transition-all duration-200 hover:translate-x-1 font-semibold"
+                                onClick={() => setIsUserMenuOpen(false)}
+                              >
+                                Sign In
+                              </Link>
+                              <Link
+                                href="/account/register"
+                                className="block px-6 py-3 text-gray-700 hover:bg-gray-50/50 hover:text-primary transition-all duration-200 hover:translate-x-1 font-medium"
+                                onClick={() => setIsUserMenuOpen(false)}
+                              >
+                                Create Account
+                              </Link>
+                            </>
+                          )}
                         </div>
                       </div>
                     </>
                   )}
                 </div>
 
-                <Link
-                  href="/wishlist"
+                <button
                   className="relative p-3 glass-effect rounded-xl hover:bg-white/20 transition-all duration-300 hover:scale-110 transform group"
+                  onClick={handleWishlistClick}
                   title="Wishlist"
                 >
-                  <Heart size={20} className="text-gray-600 group-hover:text-primary transition-colors duration-200" />
+                  <Heart
+                    size={20}
+                    className="text-gray-600 group-hover:text-primary transition-colors duration-200"
+                  />
                   {wishlistCount > 0 && (
                     <span className="absolute -top-1 -right-1 bg-gradient-primary text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold animate-pulse">
                       {wishlistCount}
                     </span>
                   )}
-                </Link>
+                </button>
 
                 {/* Mobile Search */}
                 <button
@@ -370,13 +510,16 @@ export default function Header() {
                   onClick={() => setIsSearchOpen(true)}
                   title="Search"
                 >
-                  <Search size={20} className="text-gray-600 group-hover:text-primary transition-colors duration-200" />
+                  <Search
+                    size={20}
+                    className="text-gray-600 group-hover:text-primary transition-colors duration-200"
+                  />
                 </button>
 
                 {/* Cart Button */}
                 <button
                   className="relative p-3 glass-effect rounded-xl hover:bg-white/20 transition-all duration-300 hover:scale-110 transform group"
-                  onClick={() => setIsCartOpen(true)}
+                  onClick={handleCartClick}
                   title="Shopping Cart"
                 >
                   <ShoppingCart
@@ -396,12 +539,18 @@ export default function Header() {
                   onClick={() => setIsMenuOpen(!isMenuOpen)}
                   title="Menu"
                 >
-                  <Menu size={20} className="text-gray-600 group-hover:text-primary transition-colors duration-200" />
+                  <Menu
+                    size={20}
+                    className="text-gray-600 group-hover:text-primary transition-colors duration-200"
+                  />
                 </button>
               </div>
 
               {/* Desktop Cart Info */}
-              <div className="hidden lg:block text-right group cursor-pointer" onClick={() => setIsCartOpen(true)}>
+              <div
+                className="hidden lg:block text-right group cursor-pointer"
+                onClick={handleCartClick}
+              >
                 <span className="block text-xs text-gray-500 group-hover:text-primary transition-colors duration-200 font-medium">
                   Cart ({cartItemsCount} items)
                 </span>
@@ -418,45 +567,99 @@ export default function Header() {
               <div className="flex items-center space-x-8">
                 <Link
                   href="/"
-                  className="text-gray-700 hover:text-primary font-semibold transition-all duration-300 hover:scale-105 transform relative group"
+                  className={`font-semibold transition-all duration-300 hover:scale-105 transform relative group ${
+                    pathname === "/"
+                      ? "text-primary"
+                      : "text-gray-700 hover:text-primary"
+                  }`}
                 >
                   Home
-                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-primary transition-all duration-300 group-hover:w-full"></span>
+                  <span
+                    className={`absolute -bottom-1 left-0 h-0.5 bg-gradient-primary transition-all duration-300 ${
+                      pathname === "/" ? "w-full" : "w-0 group-hover:w-full"
+                    }`}
+                  ></span>
                 </Link>
                 <Link
                   href="/shop"
-                  className="text-gray-700 hover:text-primary font-semibold transition-all duration-300 hover:scale-105 transform relative group"
+                  className={`font-semibold transition-all duration-300 hover:scale-105 transform relative group ${
+                    pathname === "/shop"
+                      ? "text-primary"
+                      : "text-gray-700 hover:text-primary"
+                  }`}
                 >
                   Shop by Departments
-                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-primary transition-all duration-300 group-hover:w-full"></span>
+                  <span
+                    className={`absolute -bottom-1 left-0 h-0.5 bg-gradient-primary transition-all duration-300 ${
+                      pathname === "/shop" ? "w-full" : "w-0 group-hover:w-full"
+                    }`}
+                  ></span>
                 </Link>
                 <Link
                   href="/services"
-                  className="text-gray-700 hover:text-primary font-semibold transition-all duration-300 hover:scale-105 transform relative group"
+                  className={`font-semibold transition-all duration-300 hover:scale-105 transform relative group ${
+                    pathname === "/services"
+                      ? "text-primary"
+                      : "text-gray-700 hover:text-primary"
+                  }`}
                 >
                   Services
-                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-primary transition-all duration-300 group-hover:w-full"></span>
+                  <span
+                    className={`absolute -bottom-1 left-0 h-0.5 bg-gradient-primary transition-all duration-300 ${
+                      pathname === "/services"
+                        ? "w-full"
+                        : "w-0 group-hover:w-full"
+                    }`}
+                  ></span>
                 </Link>
                 <Link
                   href="/about"
-                  className="text-gray-700 hover:text-primary font-semibold transition-all duration-300 hover:scale-105 transform relative group"
+                  className={`font-semibold transition-all duration-300 hover:scale-105 transform relative group ${
+                    pathname === "/about"
+                      ? "text-primary"
+                      : "text-gray-700 hover:text-primary"
+                  }`}
                 >
                   About Us
-                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-primary transition-all duration-300 group-hover:w-full"></span>
+                  <span
+                    className={`absolute -bottom-1 left-0 h-0.5 bg-gradient-primary transition-all duration-300 ${
+                      pathname === "/about"
+                        ? "w-full"
+                        : "w-0 group-hover:w-full"
+                    }`}
+                  ></span>
                 </Link>
                 <Link
                   href="/blog"
-                  className="text-gray-700 hover:text-primary font-semibold transition-all duration-300 hover:scale-105 transform relative group"
+                  className={`font-semibold transition-all duration-300 hover:scale-105 transform relative group ${
+                    pathname === "/blog"
+                      ? "text-primary"
+                      : "text-gray-700 hover:text-primary"
+                  }`}
                 >
                   Blog
-                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-primary transition-all duration-300 group-hover:w-full"></span>
+                  <span
+                    className={`absolute -bottom-1 left-0 h-0.5 bg-gradient-primary transition-all duration-300 ${
+                      pathname === "/blog" ? "w-full" : "w-0 group-hover:w-full"
+                    }`}
+                  ></span>
                 </Link>
                 <Link
                   href="/contact"
-                  className="text-gray-700 hover:text-primary font-semibold transition-all duration-300 hover:scale-105 transform relative group"
+                  className={`font-semibold transition-all duration-300 hover:scale-105 transform relative group ${
+                    pathname === "/contact"
+                      ? "text-primary"
+                      : "text-gray-700 hover:text-primary"
+                  }`}
                 >
                   Contact
-                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-primary transition-all duration-300 group-hover:w-full"></span>
+                  <span
+                    className={`absolute -bottom-1 left-0 h-0.5 bg-gradient-primary transition-all duration-300 ${
+                      pathname === "/contact"
+                        ? "w-full"
+                        : "w-0 group-hover:w-full"
+                    }`}
+                  ></span>
                 </Link>
               </div>
             </div>
@@ -474,7 +677,13 @@ export default function Header() {
           <div className="fixed left-0 top-0 h-full w-80 bg-white shadow-2xl transform transition-transform duration-300 ease-out overflow-y-auto">
             <div className="p-6">
               <div className="flex justify-between items-center mb-8">
-                <Image src="/images/logo.png" alt="FreshKo Logo" width={70} height={22} className="h-auto" />
+                <Image
+                  src="/images/logo.png"
+                  alt="FreshKo Logo"
+                  width={70}
+                  height={22}
+                  className="h-auto"
+                />
                 <button
                   onClick={() => setIsMenuOpen(false)}
                   className="text-gray-500 hover:text-gray-700 p-2 hover:bg-gray-100 rounded-full transition-colors duration-200"
@@ -486,42 +695,66 @@ export default function Header() {
               <nav className="space-y-4">
                 <Link
                   href="/"
-                  className="block text-gray-700 hover:text-primary font-medium py-3 px-4 rounded-lg hover:bg-gray-50 transition-all duration-200 hover:translate-x-1"
+                  className={`block font-medium py-3 px-4 rounded-lg transition-all duration-200 hover:translate-x-1 ${
+                    pathname === "/"
+                      ? "text-primary bg-primary/10"
+                      : "text-gray-700 hover:text-primary hover:bg-gray-50"
+                  }`}
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Home
                 </Link>
                 <Link
                   href="/shop"
-                  className="block text-gray-700 hover:text-primary font-medium py-3 px-4 rounded-lg hover:bg-gray-50 transition-all duration-200 hover:translate-x-1"
+                  className={`block font-medium py-3 px-4 rounded-lg transition-all duration-200 hover:translate-x-1 ${
+                    pathname === "/shop"
+                      ? "text-primary bg-primary/10"
+                      : "text-gray-700 hover:text-primary hover:bg-gray-50"
+                  }`}
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Shop by Departments
                 </Link>
                 <Link
                   href="/services"
-                  className="block text-gray-700 hover:text-primary font-medium py-3 px-4 rounded-lg hover:bg-gray-50 transition-all duration-200 hover:translate-x-1"
+                  className={`block font-medium py-3 px-4 rounded-lg transition-all duration-200 hover:translate-x-1 ${
+                    pathname === "/services"
+                      ? "text-primary bg-primary/10"
+                      : "text-gray-700 hover:text-primary hover:bg-gray-50"
+                  }`}
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Services
                 </Link>
                 <Link
                   href="/about"
-                  className="block text-gray-700 hover:text-primary font-medium py-3 px-4 rounded-lg hover:bg-gray-50 transition-all duration-200 hover:translate-x-1"
+                  className={`block font-medium py-3 px-4 rounded-lg transition-all duration-200 hover:translate-x-1 ${
+                    pathname === "/about"
+                      ? "text-primary bg-primary/10"
+                      : "text-gray-700 hover:text-primary hover:bg-gray-50"
+                  }`}
                   onClick={() => setIsMenuOpen(false)}
                 >
                   About Us
                 </Link>
                 <Link
                   href="/blog"
-                  className="block text-gray-700 hover:text-primary font-medium py-3 px-4 rounded-lg hover:bg-gray-50 transition-all duration-200 hover:translate-x-1"
+                  className={`block font-medium py-3 px-4 rounded-lg transition-all duration-200 hover:translate-x-1 ${
+                    pathname === "/blog"
+                      ? "text-primary bg-primary/10"
+                      : "text-gray-700 hover:text-primary hover:bg-gray-50"
+                  }`}
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Blog
                 </Link>
                 <Link
                   href="/contact"
-                  className="block text-gray-700 hover:text-primary font-medium py-3 px-4 rounded-lg hover:bg-gray-50 transition-all duration-200 hover:translate-x-1"
+                  className={`block font-medium py-3 px-4 rounded-lg transition-all duration-200 hover:translate-x-1 ${
+                    pathname === "/contact"
+                      ? "text-primary bg-primary/10"
+                      : "text-gray-700 hover:text-primary hover:bg-gray-50"
+                  }`}
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Contact
@@ -531,7 +764,9 @@ export default function Header() {
               <div className="mt-8 pt-6 border-t border-gray-200">
                 <div className="text-center">
                   <p className="text-sm text-gray-600 mb-2">Need Help?</p>
-                  <p className="text-lg font-semibold text-primary">+1-800-FRESHKO</p>
+                  <p className="text-lg font-semibold text-primary">
+                    +1-800-FRESHKO
+                  </p>
                 </div>
               </div>
             </div>
@@ -539,5 +774,5 @@ export default function Header() {
         </div>
       )}
     </>
-  )
+  );
 }

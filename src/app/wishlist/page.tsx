@@ -1,13 +1,47 @@
 "use client";
+
+import { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
 import Link from "next/link";
-import { Heart, ShoppingCart, ArrowLeft } from "lucide-react";
+import { Heart, ShoppingCart, Star, ArrowLeft } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import ClientOnly from "@/components/ClientOnly";
+import { useHydratedStore, type Product } from "@/lib/store";
 import ProductCard from "@/components/ProductCard";
-import { useStore } from "@/lib/store";
 
-export default function WishlistPage() {
-  const { wishlist, addToCart } = useStore();
+// Wishlist skeleton
+function WishlistSkeleton() {
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+      <Header />
+      <main className="pt-20 pb-16">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="h-8 bg-gray-200 animate-pulse rounded mb-8 w-32"></div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {[...Array(8)].map((_, i) => (
+              <div key={i} className="modern-card overflow-hidden">
+                <div className="aspect-square bg-gray-200 animate-pulse"></div>
+                <div className="p-6">
+                  <div className="h-6 bg-gray-200 animate-pulse rounded mb-3"></div>
+                  <div className="h-4 bg-gray-200 animate-pulse rounded mb-4 w-20"></div>
+                  <div className="h-10 bg-gray-200 animate-pulse rounded"></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </main>
+      <Footer />
+    </div>
+  );
+}
+
+function WishlistContent() {
+  const { wishlist, removeFromWishlist, addToCart, isInWishlist } =
+    useHydratedStore();
+  const [isRemoving, setIsRemoving] = useState<number | null>(null);
 
   if (wishlist.length === 0) {
     return (
@@ -118,4 +152,33 @@ export default function WishlistPage() {
       <Footer />
     </>
   );
+}
+
+export default function WishlistPage() {
+  const [mounted, setMounted] = useState(false);
+  const hasRedirected = useRef(false);
+  const router = useRouter();
+  const { isAuthenticated } = useHydratedStore();
+
+  // Wait for hydration to complete
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!mounted) return;
+
+    if (!isAuthenticated && !hasRedirected.current) {
+      hasRedirected.current = true;
+      router.replace("/account/login");
+    }
+  }, [mounted, isAuthenticated, router]);
+
+  // Don't render anything during hydration or if redirecting
+  if (!mounted || !isAuthenticated) {
+    return null;
+  }
+
+  return <WishlistContent />;
 }

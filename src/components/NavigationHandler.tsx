@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
+import { toast } from "sonner";
 
 /**
  * NavigationHandler component that manages scroll position and animations
@@ -33,6 +34,33 @@ export default function NavigationHandler() {
 
     handleNavigation();
   }, [pathname]);
+
+  // Listen for custom toast events
+  useEffect(() => {
+    const handleToast = (event: CustomEvent) => {
+      const { message, type } = event.detail;
+
+      switch (type) {
+        case "success":
+          toast.success(message);
+          break;
+        case "error":
+          toast.error(message);
+          break;
+        case "info":
+          toast.info(message);
+          break;
+        default:
+          toast(message);
+      }
+    };
+
+    window.addEventListener("show-toast" as any, handleToast);
+
+    return () => {
+      window.removeEventListener("show-toast" as any, handleToast);
+    };
+  }, []);
 
   // This component doesn't render anything
   return null;

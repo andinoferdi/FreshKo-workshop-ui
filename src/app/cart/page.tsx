@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -11,12 +12,54 @@ import {
   ArrowLeft,
   Truck,
   Shield,
+  Tag,
+  RotateCcw,
 } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { useHydratedStore } from "@/lib/store";
+import ClientOnly from "@/components/ClientOnly";
+import { useHydratedStore, type CartItem } from "@/lib/store";
 
-export default function CartPage() {
+// Cart page skeleton
+function CartSkeleton() {
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+      <Header />
+      <main className="pt-20 pb-16">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="h-8 bg-gray-200 animate-pulse rounded mb-8 w-32"></div>
+          <div className="grid lg:grid-cols-3 gap-8">
+            <div className="lg:col-span-2 space-y-4">
+              {[...Array(3)].map((_, i) => (
+                <div key={i} className="modern-card p-6">
+                  <div className="flex items-center gap-4">
+                    <div className="w-20 h-20 bg-gray-200 animate-pulse rounded-lg"></div>
+                    <div className="flex-1">
+                      <div className="h-6 bg-gray-200 animate-pulse rounded mb-2"></div>
+                      <div className="h-4 bg-gray-200 animate-pulse rounded w-20"></div>
+                    </div>
+                    <div className="h-6 bg-gray-200 animate-pulse rounded w-16"></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="modern-card p-6 h-fit">
+              <div className="h-6 bg-gray-200 animate-pulse rounded mb-4"></div>
+              <div className="space-y-3">
+                <div className="h-4 bg-gray-200 animate-pulse rounded"></div>
+                <div className="h-4 bg-gray-200 animate-pulse rounded"></div>
+                <div className="h-4 bg-gray-200 animate-pulse rounded"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+      <Footer />
+    </div>
+  );
+}
+
+function CartContent() {
   const { cart, updateQuantity, removeFromCart, getCartTotal, clearCart } =
     useHydratedStore();
   const [isClearing, setIsClearing] = useState(false);
@@ -279,4 +322,33 @@ export default function CartPage() {
       <Footer />
     </>
   );
+}
+
+export default function CartPage() {
+  const [mounted, setMounted] = useState(false);
+  const hasRedirected = useRef(false);
+  const router = useRouter();
+  const { isAuthenticated } = useHydratedStore();
+
+  // Wait for hydration to complete
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!mounted) return;
+
+    if (!isAuthenticated && !hasRedirected.current) {
+      hasRedirected.current = true;
+      router.replace("/account/login");
+    }
+  }, [mounted, isAuthenticated, router]);
+
+  // Don't render anything during hydration or if redirecting
+  if (!mounted || !isAuthenticated) {
+    return null;
+  }
+
+  return <CartContent />;
 }

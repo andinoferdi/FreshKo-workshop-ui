@@ -2,7 +2,7 @@
 
 import type React from "react";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -12,13 +12,56 @@ import {
   Shield,
   Lock,
   ShoppingCart,
+  CheckCircle,
+  MapPin,
+  User,
+  Mail,
+  Phone,
+  Home,
 } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { useStore } from "@/lib/store";
+import ClientOnly from "@/components/ClientOnly";
+import { useHydratedStore } from "@/lib/store";
+import { useRouter } from "next/navigation";
 
-export default function CheckoutPage() {
-  const { cart, getCartTotal, clearCart } = useStore();
+// Checkout skeleton
+function CheckoutSkeleton() {
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+      <Header />
+      <main className="pt-20 pb-16">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="h-8 bg-gray-200 animate-pulse rounded mb-8 w-32"></div>
+          <div className="grid lg:grid-cols-2 gap-8">
+            <div className="space-y-6">
+              <div className="modern-card p-6">
+                <div className="h-6 bg-gray-200 animate-pulse rounded mb-4"></div>
+                <div className="space-y-4">
+                  <div className="h-10 bg-gray-200 animate-pulse rounded"></div>
+                  <div className="h-10 bg-gray-200 animate-pulse rounded"></div>
+                  <div className="h-10 bg-gray-200 animate-pulse rounded"></div>
+                </div>
+              </div>
+            </div>
+            <div className="modern-card p-6">
+              <div className="h-6 bg-gray-200 animate-pulse rounded mb-4"></div>
+              <div className="space-y-3">
+                <div className="h-4 bg-gray-200 animate-pulse rounded"></div>
+                <div className="h-4 bg-gray-200 animate-pulse rounded"></div>
+                <div className="h-4 bg-gray-200 animate-pulse rounded"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+      <Footer />
+    </div>
+  );
+}
+
+function CheckoutContent() {
+  const { cart, getCartTotal, clearCart } = useHydratedStore();
   const [isProcessing, setIsProcessing] = useState(false);
   const [orderComplete, setOrderComplete] = useState(false);
 
@@ -504,5 +547,38 @@ export default function CheckoutPage() {
       </main>
       <Footer />
     </>
+  );
+}
+
+export default function CheckoutPage() {
+  const [mounted, setMounted] = useState(false);
+  const hasRedirected = useRef(false);
+  const router = useRouter();
+  const { isAuthenticated } = useHydratedStore();
+
+  // Wait for hydration to complete
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!mounted) return;
+
+    if (!isAuthenticated && !hasRedirected.current) {
+      hasRedirected.current = true;
+      router.replace("/account/login");
+    }
+  }, [mounted, isAuthenticated, router]);
+
+  // Don't render anything during hydration or if redirecting
+  if (!mounted || !isAuthenticated) {
+    return null;
+  }
+
+  return (
+    <ClientOnly fallback={<CheckoutSkeleton />}>
+      <CheckoutContent />
+    </ClientOnly>
   );
 }

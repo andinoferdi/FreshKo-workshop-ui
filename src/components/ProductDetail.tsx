@@ -1,37 +1,109 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   Star,
   Heart,
   ShoppingCart,
   Plus,
   Minus,
+  Share2,
   Truck,
   Shield,
-  RotateCcw,
   ArrowLeft,
+  CheckCircle,
+  ArrowRight,
 } from "lucide-react";
 import { useHydratedStore, type Product } from "@/lib/store";
 import { getProductsByCategory } from "@/lib/products";
 import ProductCard from "./ProductCard";
 import Header from "./Header";
 import Footer from "./Footer";
+import ClientOnly from "./ClientOnly";
 
 interface ProductDetailProps {
-  product: Product;
+  productId: string;
 }
 
-export default function ProductDetail({ product }: ProductDetailProps) {
-  const [quantity, setQuantity] = useState(1);
-  const [selectedImage, setSelectedImage] = useState(product.image);
+// Product detail skeleton
+function ProductDetailSkeleton() {
+  return (
+    <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+        <div className="space-y-4">
+          <div className="aspect-square bg-gray-200 animate-pulse rounded-2xl"></div>
+          <div className="grid grid-cols-4 gap-2">
+            {[...Array(4)].map((_, i) => (
+              <div
+                key={i}
+                className="aspect-square bg-gray-200 animate-pulse rounded-lg"
+              ></div>
+            ))}
+          </div>
+        </div>
+        <div className="space-y-6">
+          <div className="h-8 bg-gray-200 animate-pulse rounded"></div>
+          <div className="h-6 bg-gray-200 animate-pulse rounded w-32"></div>
+          <div className="h-20 bg-gray-200 animate-pulse rounded"></div>
+          <div className="h-12 bg-gray-200 animate-pulse rounded"></div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
-  const { addToCart, addToWishlist, removeFromWishlist, isInWishlist } =
-    useHydratedStore();
+function ProductDetailContent({ productId }: ProductDetailProps) {
+  const {
+    cart,
+    addToCart,
+    updateQuantity,
+    wishlist,
+    addToWishlist,
+    removeFromWishlist,
+    isInWishlist,
+  } = useHydratedStore();
+
+  const [selectedImage, setSelectedImage] = useState<string>("");
+  const [quantity, setQuantity] = useState(1);
+  const [activeTab, setActiveTab] = useState("description");
+  const [isZoomed, setIsZoomed] = useState(false);
+  const router = useRouter();
+
+  const product = getProductsByCategory(productId).find(
+    (p) => p.id === parseInt(productId)
+  );
+
+  useEffect(() => {
+    if (product) {
+      setSelectedImage(product.image || "");
+    }
+  }, [product]);
+
+  if (!product) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 py-8 text-center">
+        <h1 className="text-2xl font-bold text-gray-900 mb-4">
+          Product Not Found
+        </h1>
+        <Link href="/shop" className="text-primary hover:underline">
+          Back to Shop
+        </Link>
+      </div>
+    );
+  }
 
   const isWishlisted = isInWishlist(product.id);
+
+  // Product images array for thumbnails
+  const productImages = [
+    product.image,
+    product.image,
+    product.image,
+    product.image,
+  ];
 
   // Calculate discounted price
   const discountedPrice = product.discount
@@ -40,7 +112,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
 
   // Get related products
   const relatedProducts = getProductsByCategory(product.category || "")
-    .filter((p) => p.id !== product.id)
+    .filter((p) => p.category === product.category && p.id !== product.id)
     .slice(0, 4);
 
   const incrementQuantity = () => setQuantity((prev) => prev + 1);
@@ -114,27 +186,25 @@ export default function ProductDetail({ product }: ProductDetailProps) {
 
                 {/* Thumbnail images */}
                 <div className="flex gap-2 justify-center">
-                  {[product.image, product.image, product.image].map(
-                    (img, index) => (
-                      <button
-                        key={index}
-                        onClick={() => setSelectedImage(img)}
-                        className={`w-20 h-20 rounded-lg border-2 overflow-hidden transition-all duration-300 ${
-                          selectedImage === img
-                            ? "border-primary"
-                            : "border-gray-200 hover:border-gray-300"
-                        }`}
-                      >
-                        <Image
-                          src={img || "/placeholder.svg"}
-                          alt={`${product.name} ${index + 1}`}
-                          width={80}
-                          height={80}
-                          className="w-full h-full object-cover"
-                        />
-                      </button>
-                    )
-                  )}
+                  {productImages.map((img, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setSelectedImage(img || "")}
+                      className={`w-20 h-20 rounded-lg border-2 overflow-hidden transition-all duration-300 ${
+                        selectedImage === img
+                          ? "border-primary"
+                          : "border-gray-200 hover:border-gray-300"
+                      }`}
+                    >
+                      <Image
+                        src={img || "/placeholder.svg"}
+                        alt={`${product.name} ${index + 1}`}
+                        width={80}
+                        height={80}
+                        className="w-full h-full object-cover"
+                      />
+                    </button>
+                  ))}
                 </div>
               </div>
 
@@ -309,7 +379,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
                       <div className="text-xs text-gray-500">100% Fresh</div>
                     </div>
                     <div className="text-center">
-                      <RotateCcw className="w-6 h-6 text-primary mx-auto mb-2" />
+                      <ArrowRight className="w-6 h-6 text-primary mx-auto mb-2" />
                       <div className="text-sm font-medium">Easy Returns</div>
                       <div className="text-xs text-gray-500">30 day policy</div>
                     </div>
@@ -349,4 +419,8 @@ export default function ProductDetail({ product }: ProductDetailProps) {
       <Footer />
     </>
   );
+}
+
+export default function ProductDetail({ productId }: ProductDetailProps) {
+  return <ProductDetailContent productId={productId} />;
 }
