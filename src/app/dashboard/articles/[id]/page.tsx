@@ -22,6 +22,29 @@ import { useHydratedStore } from "@/lib/store";
 import type { BlogPost } from "@/lib/blog";
 import { toast } from "sonner";
 
+// Helper function to strip HTML tags and get plain text
+const stripHtmlTags = (html: string): string => {
+  if (typeof window !== "undefined") {
+    const div = document.createElement("div");
+    div.innerHTML = html;
+    return div.textContent || div.innerText || "";
+  }
+  // Fallback for server-side: simple regex to remove HTML tags
+  return html
+    .replace(/<[^>]*>/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+};
+
+// Helper function to calculate read time
+const calculateReadTime = (content: string): string => {
+  const plainText = stripHtmlTags(content);
+  const wordsPerMinute = 200;
+  const wordCount = plainText.split(/\s+/).length;
+  const readTime = Math.ceil(wordCount / wordsPerMinute);
+  return `${readTime} min`;
+};
+
 export default function DashboardArticleDetailPage() {
   const { id } = useParams();
   const articleId = Number(id);
@@ -95,6 +118,9 @@ export default function DashboardArticleDetailPage() {
   if (!article) {
     return notFound();
   }
+
+  const readTime = calculateReadTime(article.content || "");
+  const plainTextContent = stripHtmlTags(article.content || "");
 
   return (
     <DashboardLayout>
@@ -204,8 +230,16 @@ export default function DashboardArticleDetailPage() {
                     <Clock className="text-orange-500" size={16} />
                     <span className="text-sm font-medium">Read Time</span>
                   </div>
+                  <span className="font-bold text-gray-900">{readTime}</span>
+                </div>
+
+                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div className="flex items-center gap-2">
+                    <FileText className="text-indigo-500" size={16} />
+                    <span className="text-sm font-medium">Word Count</span>
+                  </div>
                   <span className="font-bold text-gray-900">
-                    {article.readTime || "5 min"}
+                    {plainTextContent.split(/\s+/).length} words
                   </span>
                 </div>
               </div>
@@ -268,9 +302,7 @@ export default function DashboardArticleDetailPage() {
                     Read Time
                   </label>
                   <div className="p-3 bg-gray-50 rounded-lg">
-                    <span className="text-gray-900">
-                      {article.readTime || "5 min"}
-                    </span>
+                    <span className="text-gray-900">{readTime}</span>
                   </div>
                 </div>
 
@@ -302,15 +334,41 @@ export default function DashboardArticleDetailPage() {
               <h2 className="text-xl font-bold text-gray-900 mb-4">
                 Content Preview
               </h2>
-              <div className="p-4 bg-gray-50 rounded-lg">
-                <p className="text-gray-700 leading-relaxed">
-                  {article.content
-                    ? article.content.substring(0, 500) +
-                      (article.content.length > 500 ? "..." : "")
+              <div className="p-4 bg-gray-50 rounded-lg max-h-60 overflow-y-auto">
+                <p className="text-gray-700 leading-relaxed whitespace-pre-line">
+                  {plainTextContent
+                    ? plainTextContent.substring(0, 800) +
+                      (plainTextContent.length > 800 ? "..." : "")
                     : "No content available for this article."}
                 </p>
               </div>
+              <div className="mt-3 text-right">
+                <Link
+                  href={`/blog/${article.id}`}
+                  target="_blank"
+                  className="text-primary font-medium hover:underline"
+                >
+                  View full article on website →
+                </Link>
+              </div>
             </div>
+
+            {/* Tags */}
+            {article.tags && article.tags.length > 0 && (
+              <div className="modern-card p-6">
+                <h2 className="text-xl font-bold text-gray-900 mb-4">Tags</h2>
+                <div className="flex flex-wrap gap-2">
+                  {article.tags.map((tag, index) => (
+                    <span
+                      key={index}
+                      className="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium"
+                    >
+                      #{tag}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Management Information */}
             <div className="modern-card p-6">
@@ -331,7 +389,7 @@ export default function DashboardArticleDetailPage() {
                   <div>
                     <p className="text-sm text-gray-600">Created By</p>
                     <p className="font-semibold text-gray-900">
-                      {article.createdBy || "System"}
+                      {(article as any).createdBy || "System"}
                     </p>
                   </div>
                 </div>
@@ -341,7 +399,7 @@ export default function DashboardArticleDetailPage() {
                   <div>
                     <p className="text-sm text-gray-600">Editable</p>
                     <p className="font-semibold text-gray-900">
-                      {article.isEditable !== false ? "Yes" : "No"}
+                      {(article as any).isEditable !== false ? "Yes" : "No"}
                     </p>
                   </div>
                 </div>
@@ -357,7 +415,7 @@ export default function DashboardArticleDetailPage() {
             </div>
 
             {/* Actions */}
-            {article.isEditable !== false && (
+            {(article as any).isEditable !== false && (
               <div className="modern-card p-6">
                 <h2 className="text-xl font-bold text-gray-900 mb-4">
                   Quick Actions

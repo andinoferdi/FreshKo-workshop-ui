@@ -173,9 +173,13 @@ export default function DashboardCustomersPage() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <div className="flex items-center gap-2">
-                        <button className="text-gray-600 hover:text-primary p-1 transition-colors">
+                        <Link
+                          href={`/dashboard/customers/${customer.id}`}
+                          className="text-gray-600 hover:text-primary p-1 transition-colors"
+                          title="View Customer Details"
+                        >
                           <Eye size={16} />
-                        </button>
+                        </Link>
                         <Link
                           href={`/dashboard/customers/edit/${customer.id}`}
                           className="text-gray-600 hover:text-primary p-1 transition-colors"

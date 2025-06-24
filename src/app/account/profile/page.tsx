@@ -145,24 +145,72 @@ function ProfileContent() {
       return;
     }
 
-    // Validate file size (max 5MB)
-    if (file.size > 5 * 1024 * 1024) {
+    // Validate file size (max 2MB for better localStorage compatibility)
+    if (file.size > 2 * 1024 * 1024) {
       toast.error("File too large", {
-        description: "Please select an image smaller than 5MB",
+        description:
+          "Please select an image smaller than 2MB for better performance",
       });
       return;
     }
 
     setIsUploadingAvatar(true);
 
-    // Create preview
+    // Compress and create preview
     const reader = new FileReader();
     reader.onload = (e) => {
       const result = e.target?.result as string;
-      setAvatarPreview(result);
 
-      // Auto-save avatar
-      saveAvatar(result);
+      // Create image for compression
+      const img = new Image();
+      img.onload = () => {
+        // Calculate optimal dimensions (max 400x400 for profile photo)
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+
+        let { width, height } = img;
+        const maxSize = 400;
+
+        if (width > height) {
+          if (width > maxSize) {
+            height = (height * maxSize) / width;
+            width = maxSize;
+          }
+        } else {
+          if (height > maxSize) {
+            width = (width * maxSize) / height;
+            height = maxSize;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+
+        // Draw and compress
+        ctx?.drawImage(img, 0, 0, width, height);
+
+        // Convert to base64 with compression (0.8 quality for JPEG-like compression)
+        const compressedBase64 = canvas.toDataURL("image/jpeg", 0.8);
+
+        // Check final size (base64 string length approximates storage size)
+        const sizeInBytes = compressedBase64.length * 0.75; // rough base64 to bytes conversion
+        const sizeInMB = sizeInBytes / (1024 * 1024);
+
+        if (sizeInMB > 1) {
+          toast.error("Compressed image still too large", {
+            description: "Please try a smaller image or different format",
+          });
+          setIsUploadingAvatar(false);
+          return;
+        }
+
+        setAvatarPreview(compressedBase64);
+
+        // Auto-save compressed avatar
+        saveAvatar(compressedBase64);
+      };
+
+      img.src = result;
     };
     reader.readAsDataURL(file);
   };

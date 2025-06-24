@@ -36,7 +36,22 @@ export const blogPosts: BlogPost[] = [
       <h3>5. Keep Onions and Potatoes Separate</h3>
       <p>Storing these together can cause both to spoil faster due to the gases they emit.</p>
       
-      <p>Following these simple guidelines will help you reduce food waste and enjoy fresher produce for longer periods.</p>
+      <h3>6. Use Paper Bags for Mushrooms</h3>
+      <p>Paper bags allow mushrooms to breathe while preventing them from drying out. Avoid plastic bags which can cause them to become slimy.</p>
+      
+      <h3>7. Store Herbs Like Fresh Flowers</h3>
+      <p>Place soft herbs like basil and cilantro in water and cover with a plastic bag. Store in the refrigerator for maximum freshness.</p>
+      
+      <h3>8. Ripen Fruits on the Counter First</h3>
+      <p>Many fruits like peaches, pears, and avocados should ripen at room temperature before being moved to the refrigerator.</p>
+      
+      <h3>9. Separate Different Types of Produce</h3>
+      <p>Don't store fruits and vegetables together in the same drawer or container, as they have different humidity and temperature requirements.</p>
+      
+      <h3>10. Check and Rotate Regularly</h3>
+      <p>Inspect your produce regularly and use items that are ripening first. Remove any spoiled items immediately to prevent them from affecting others.</p>
+      
+      <p>Following these simple guidelines will help you reduce food waste and enjoy fresher produce for longer periods. Remember, proper storage not only maintains quality but also maximizes the nutritional benefits of your fresh foods.</p>
     `,
     author: "Sarah Johnson",
     date: "2024-01-15",
@@ -148,13 +163,56 @@ export const blogPosts: BlogPost[] = [
     id: 6,
     title: "Seasonal Produce Guide: What to Buy When",
     excerpt:
-      "Eating seasonally not only saves money but also ensures you get the freshest, most nutritious produce. Here's your complete seasonal guide...",
-    content:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, nisl vel ultricies lacinia, nisl nisl aliquam nisl, eu aliquam nisl nisl eu nisl. Sed euismod, nisl vel ultricies lacinia, nisl nisl aliquam nisl, eu aliquam nisl nisl eu nisl. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, nisl vel ultricies lacinia, nisl nisl aliquam nisl, eu aliquam nisl nisl eu nisl.",
+      "Eating seasonally not only saves money but also ensures you get the freshest, most nutritious produce. Here's your complete seasonal guide.",
+    content: `
+      <p>Eating seasonally not only saves money but also ensures you get the freshest, most nutritious produce. Here's your complete seasonal guide to help you make the best choices throughout the year.</p>
+      
+      <h3>Spring (March - May)</h3>
+      <p>Spring brings fresh, tender vegetables that are perfect after a long winter. Look for:</p>
+      <ul>
+        <li><strong>Asparagus</strong> - Peak season for the most tender spears</li>
+        <li><strong>Artichokes</strong> - Young, tender hearts with less choke</li>
+        <li><strong>Spring onions</strong> - Mild and sweet, perfect for salads</li>
+        <li><strong>Peas</strong> - Sugar snap and snow peas at their sweetest</li>
+        <li><strong>Strawberries</strong> - Early season berries with intense flavor</li>
+      </ul>
+      
+      <h3>Summer (June - August)</h3>
+      <p>Summer is the peak season for most fruits and many vegetables. Enjoy:</p>
+      <ul>
+        <li><strong>Tomatoes</strong> - Vine-ripened perfection from local farms</li>
+        <li><strong>Stone fruits</strong> - Peaches, plums, nectarines, and apricots</li>
+        <li><strong>Berries</strong> - Blueberries, raspberries, and blackberries</li>
+        <li><strong>Corn</strong> - Sweet corn at its peak freshness</li>
+        <li><strong>Zucchini and summer squash</strong> - Tender and versatile</li>
+      </ul>
+      
+      <h3>Fall (September - November)</h3>
+      <p>Fall brings hearty vegetables and late-season fruits perfect for comfort foods:</p>
+      <ul>
+        <li><strong>Apples</strong> - Crisp, fresh from the orchard</li>
+        <li><strong>Pumpkins and winter squash</strong> - Perfect for soups and roasting</li>
+        <li><strong>Brussels sprouts</strong> - Sweet and nutty after first frost</li>
+        <li><strong>Cranberries</strong> - Tart and fresh for holiday dishes</li>
+        <li><strong>Sweet potatoes</strong> - Freshly harvested and naturally sweet</li>
+      </ul>
+      
+      <h3>Winter (December - February)</h3>
+      <p>Winter produce focuses on storage crops and citrus fruits:</p>
+      <ul>
+        <li><strong>Citrus fruits</strong> - Oranges, lemons, limes, and grapefruits</li>
+        <li><strong>Root vegetables</strong> - Carrots, parsnips, turnips, and beets</li>
+        <li><strong>Cabbage family</strong> - Kale, collards, and hearty cabbages</li>
+        <li><strong>Pomegranates</strong> - Antioxidant-rich winter superfruit</li>
+        <li><strong>Leeks</strong> - Mild onion flavor for winter soups</li>
+      </ul>
+      
+      <p>By following this seasonal guide, you'll not only enjoy the best flavors and nutrition but also support local agriculture and reduce your environmental impact. Start incorporating seasonal eating into your routine and discover the joy of eating with nature's rhythm.</p>
+    `,
     image: "/images/post-thumb-3.jpg",
-    date: "5 Dec 2023",
+    date: "2024-01-05",
     category: "seasonal",
-    author: "Chef",
+    author: "FreshKo Team",
     tags: ["seasonal", "produce", "fresh", "guide"],
   },
 ];

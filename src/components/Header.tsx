@@ -10,6 +10,7 @@ import { useHydratedStore, type CartItem } from "../lib/store";
 // Dynamic search function will be defined locally
 import { useRouter } from "next/navigation";
 import { useVisibilityFix } from "@/hooks/useVisibilityFix";
+import { useSession, signOut } from "next-auth/react";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -20,6 +21,9 @@ export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const { isLoaded } = useVisibilityFix(20);
   const pathname = usePathname();
+
+  // NextAuth session
+  const { data: session, status } = useSession();
 
   const {
     cart,
@@ -49,6 +53,18 @@ export default function Header() {
   useEffect(() => {
     initializeOriginalData();
   }, [initializeOriginalData]);
+
+  // Sync NextAuth session with FreshKo store
+  useEffect(() => {
+    if (status === "unauthenticated" && isAuthenticated && user) {
+      // NextAuth logged out but FreshKo store still thinks user is logged in
+      // Check if user has avatar (Google users typically have profile photos)
+      // This is a simple heuristic to identify Google OAuth users
+      if (user.avatar && user.avatar.includes("googleusercontent.com")) {
+        logout();
+      }
+    }
+  }, [status, isAuthenticated, user, logout]);
 
   // Handle scroll effect
   useEffect(() => {
@@ -456,7 +472,17 @@ export default function Header() {
                                 </Link>
                               )}
                               <button
-                                onClick={() => {
+                                onClick={async () => {
+                                  // Check if this is a Google user
+                                  if (
+                                    user?.avatar &&
+                                    user.avatar.includes(
+                                      "googleusercontent.com"
+                                    )
+                                  ) {
+                                    // Sign out from both NextAuth and FreshKo store
+                                    await signOut({ redirect: false });
+                                  }
                                   logout();
                                   setIsUserMenuOpen(false);
                                   router.push("/");

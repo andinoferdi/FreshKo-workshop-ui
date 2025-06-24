@@ -165,6 +165,10 @@ interface StoreState {
 
   // Data initialization functions
   initializeOriginalData: () => void;
+
+  // Storage management functions
+  clearStorageCache: () => void;
+  getStorageInfo: () => { used: number; available: number };
 }
 
 export interface RegisterData {
@@ -179,13 +183,61 @@ export interface RegisterData {
 // Simulated user database using localStorage
 const getUsersFromStorage = (): User[] => {
   if (typeof window === "undefined") return [];
+
+  // Try IndexedDB first for massive storage
+  if ("indexedDB" in window) {
+    // For now, fallback to localStorage until async loading is implemented
+    // TODO: Implement async loading in components
+    const users = localStorage.getItem("freshko-users");
+    return users ? JSON.parse(users) : [];
+  }
+
+  // Fallback to localStorage
   const users = localStorage.getItem("freshko-users");
   return users ? JSON.parse(users) : [];
 };
 
 const saveUsersToStorage = (users: User[]): void => {
   if (typeof window === "undefined") return;
-  localStorage.setItem("freshko-users", JSON.stringify(users));
+
+  // Always use IndexedDB now - massive storage capacity!
+  if ("indexedDB" in window) {
+    const dbName = "freshko-main";
+    const request = indexedDB.open(dbName, 1);
+
+    request.onupgradeneeded = (event) => {
+      const db = (event.target as IDBOpenDBRequest).result;
+      if (!db.objectStoreNames.contains("users")) {
+        db.createObjectStore("users", { keyPath: "storageKey" });
+      }
+    };
+
+    request.onsuccess = () => {
+      const db = request.result;
+      const transaction = db.transaction(["users"], "readwrite");
+      const store = transaction.objectStore("users");
+
+      store.put({
+        storageKey: "freshko-users",
+        data: users,
+        timestamp: Date.now(),
+      });
+
+      db.close();
+    };
+
+    request.onerror = () => {
+      // Fallback to localStorage with enhanced error handling
+      try {
+        localStorage.setItem("freshko-users", JSON.stringify(users));
+      } catch (error) {
+        console.warn("Storage quota exceeded. Unable to save user data.");
+      }
+    };
+  } else {
+    // Fallback for very old browsers
+    localStorage.setItem("freshko-users", JSON.stringify(users));
+  }
 };
 
 const findUserByEmail = (email: string): User | null => {
@@ -205,7 +257,45 @@ const getOrdersFromStorage = (): Order[] => {
 
 const saveOrdersToStorage = (orders: Order[]): void => {
   if (typeof window === "undefined") return;
-  localStorage.setItem("freshko-orders", JSON.stringify(orders));
+
+  // Use IndexedDB for massive storage capacity!
+  if ("indexedDB" in window) {
+    const dbName = "freshko-main";
+    const request = indexedDB.open(dbName, 1);
+
+    request.onupgradeneeded = (event) => {
+      const db = (event.target as IDBOpenDBRequest).result;
+      if (!db.objectStoreNames.contains("orders")) {
+        db.createObjectStore("orders", { keyPath: "storageKey" });
+      }
+    };
+
+    request.onsuccess = () => {
+      const db = request.result;
+      const transaction = db.transaction(["orders"], "readwrite");
+      const store = transaction.objectStore("orders");
+
+      store.put({
+        storageKey: "freshko-orders",
+        data: orders,
+        timestamp: Date.now(),
+      });
+
+      db.close();
+    };
+
+    request.onerror = () => {
+      // Fallback to localStorage
+      try {
+        localStorage.setItem("freshko-orders", JSON.stringify(orders));
+      } catch (error) {
+        console.warn("Storage quota exceeded. Unable to save order data.");
+      }
+    };
+  } else {
+    // Fallback for old browsers
+    localStorage.setItem("freshko-orders", JSON.stringify(orders));
+  }
 };
 
 // Pre-defined admin account (like Laravel seeder)
@@ -470,26 +560,52 @@ export const useStore = create<StoreState>()(
             if (userData.avatar !== undefined)
               updatedUserData.avatar = userData.avatar;
 
-            users[userIndex] = updatedUserData;
-            saveUsersToStorage(users);
+            // Check if we're updating avatar and validate storage space
+            if (userData.avatar !== undefined && userData.avatar) {
+              // Estimate storage usage
+              const dataSize = new Blob([JSON.stringify(users)]).size;
+              const avatarSize = new Blob([userData.avatar]).size;
+              const totalEstimatedSize = dataSize + avatarSize;
 
-            // Update current user state
-            const updatedUser: User = {
-              id: updatedUserData.id,
-              firstName: updatedUserData.firstName,
-              lastName: updatedUserData.lastName,
-              email: updatedUserData.email,
-              phone: updatedUserData.phone,
-              avatar: updatedUserData.avatar,
-              role: updatedUserData.role,
-              createdAt: updatedUserData.createdAt,
-            };
+              // localStorage limit is ~5MB, but leave buffer
+              if (totalEstimatedSize > 4 * 1024 * 1024) {
+                resolve({
+                  success: false,
+                  message:
+                    "Storage space insufficient. Please clear browser data or try a smaller image.",
+                });
+                return;
+              }
+            }
 
-            set({ user: updatedUser });
-            resolve({
-              success: true,
-              message: "Profile updated successfully!",
-            });
+            try {
+              users[userIndex] = updatedUserData;
+              saveUsersToStorage(users);
+
+              // Update current user state
+              const updatedUser: User = {
+                id: updatedUserData.id,
+                firstName: updatedUserData.firstName,
+                lastName: updatedUserData.lastName,
+                email: updatedUserData.email,
+                phone: updatedUserData.phone,
+                avatar: updatedUserData.avatar,
+                role: updatedUserData.role,
+                createdAt: updatedUserData.createdAt,
+              };
+
+              set({ user: updatedUser });
+              resolve({
+                success: true,
+                message: "Profile updated successfully!",
+              });
+            } catch (error) {
+              resolve({
+                success: false,
+                message:
+                  "Storage quota exceeded. Please clear browser data and try again, or use a smaller image.",
+              });
+            }
           }, 1000);
         });
       },
@@ -1365,6 +1481,48 @@ export const useStore = create<StoreState>()(
           }));
           localStorage.setItem(articlesKey, JSON.stringify(protectedArticles));
         }
+      },
+
+      // Storage management functions
+      clearStorageCache: () => {
+        if (typeof window === "undefined") return;
+
+        // Remove temporary and cache data
+        const keysToRemove = [];
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (
+            key &&
+            (key.includes("temp") ||
+              key.includes("cache") ||
+              key.includes("draft"))
+          ) {
+            keysToRemove.push(key);
+          }
+        }
+
+        keysToRemove.forEach((key) => {
+          localStorage.removeItem(key);
+        });
+
+        console.log(`Cleared ${keysToRemove.length} cache items from storage`);
+      },
+
+      getStorageInfo: () => {
+        if (typeof window === "undefined") return { used: 0, available: 0 };
+
+        let used = 0;
+        for (let key in localStorage) {
+          if (localStorage.hasOwnProperty(key)) {
+            used += localStorage[key].length + key.length;
+          }
+        }
+
+        // Estimate available space (most browsers have ~10MB limit)
+        const maxStorage = 10 * 1024 * 1024; // 10MB in bytes
+        const available = Math.max(0, maxStorage - used);
+
+        return { used, available };
       },
     }),
     {

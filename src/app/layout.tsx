@@ -7,6 +7,8 @@ import ScrollToTop from "@/components/ScrollToTop";
 import NavigationHandler from "@/components/NavigationHandler";
 import { HydrationFix } from "@/components/HydrationFix";
 import { Toaster } from "sonner";
+import NextAuthSessionProvider from "@/components/providers/SessionProvider";
+import GoogleUserSync from "@/components/GoogleUserSync";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -46,28 +48,31 @@ export default function RootLayout({
         className="font-body text-foreground leading-relaxed tracking-wide antialiased"
         suppressHydrationWarning
       >
-        <HydrationFix />
-        <AOSProvider>
-          <NavigationHandler />
-          {children}
-          <ScrollToTop />
-          <Toaster
-            position="top-right"
-            expand={false}
-            richColors
-            closeButton
-            toastOptions={{
-              style: {
-                background: "rgba(255, 255, 255, 0.95)",
-                backdropFilter: "blur(20px)",
-                border: "1px solid rgba(255, 255, 255, 0.2)",
-                borderRadius: "16px",
-                fontSize: "14px",
-                fontWeight: "500",
-              },
-            }}
-          />
-        </AOSProvider>
+        <NextAuthSessionProvider>
+          <GoogleUserSync />
+          <HydrationFix />
+          <AOSProvider>
+            <NavigationHandler />
+            {children}
+            <ScrollToTop />
+            <Toaster
+              position="top-right"
+              expand={false}
+              richColors
+              closeButton
+              toastOptions={{
+                style: {
+                  background: "rgba(255, 255, 255, 0.95)",
+                  backdropFilter: "blur(20px)",
+                  border: "1px solid rgba(255, 255, 255, 0.2)",
+                  borderRadius: "16px",
+                  fontSize: "14px",
+                  fontWeight: "500",
+                },
+              }}
+            />
+          </AOSProvider>
+        </NextAuthSessionProvider>
       </body>
     </html>
   );
