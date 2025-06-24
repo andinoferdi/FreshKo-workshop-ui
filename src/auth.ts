@@ -1,9 +1,12 @@
 import NextAuth from "next-auth";
 import { authConfig } from "@/lib/auth.config";
 
+// Load environment variables from config file
+const envConfig = require("../env.config.js");
+
 export const { handlers, signIn, signOut, auth } = NextAuth({
   ...authConfig,
-  secret: "freshko-secret-key-2024-production-change-me",
+  secret: envConfig.AUTH_SECRET,
   trustHost: true,
   session: {
     strategy: "jwt",

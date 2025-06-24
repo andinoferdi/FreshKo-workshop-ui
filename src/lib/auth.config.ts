@@ -1,11 +1,13 @@
 import Google from "next-auth/providers/google";
 
+// Load environment variables from config file
+const envConfig = require("../../env.config.js");
+
 export const authConfig = {
   providers: [
     Google({
-      clientId:
-        "1076117647515-ler43v7batfuj3ocb1bvq2kg4apcu6qj.apps.googleusercontent.com",
-      clientSecret: "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",
+      clientId: envConfig.AUTH_GOOGLE_ID,
+      clientSecret: envConfig.AUTH_GOOGLE_SECRET,
     }),
   ],
 };

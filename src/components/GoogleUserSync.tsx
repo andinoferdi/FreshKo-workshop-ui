@@ -7,6 +7,7 @@ import { useHydratedStore } from "@/lib/store";
 export default function GoogleUserSync() {
   const { data: session, status } = useSession();
   const { isAuthenticated, user, initializeOriginalData } = useHydratedStore();
+  const store = useHydratedStore();
 
   // Enhanced debug logging
   console.log(
@@ -76,21 +77,21 @@ export default function GoogleUserSync() {
     try {
       console.log("🔄 Starting sync process for Google user:", googleUser);
 
-      // Create user data in FreshKo format
+      // Create user data in FreshKo format - MATCH EXACTLY with store User interface
       const userData = {
-        id: googleUser.id || Date.now().toString(),
+        id: `google_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
         firstName: googleUser.name?.split(" ")[0] || "",
         lastName: googleUser.name?.split(" ").slice(1).join(" ") || "",
         email: googleUser.email || "",
         phone: "",
-        role: "customer" as const,
+        role: "user", // Use "user" role, not "customer" to match store
         createdAt: new Date().toISOString(),
-        avatar: googleUser.image || "", // Use avatar field to match User interface
+        avatar: googleUser.image || "", // Google profile image
       };
 
       console.log("📝 Created user data:", userData);
 
-      // Get existing users
+      // Get existing users from localStorage
       let users = [];
       try {
         const existingUsers = localStorage.getItem("freshko-users");
@@ -107,7 +108,7 @@ export default function GoogleUserSync() {
       );
 
       if (existingUserIndex === -1) {
-        // Add new user
+        // Add new Google user
         users.push(userData);
         localStorage.setItem("freshko-users", JSON.stringify(users));
         console.log(
@@ -115,36 +116,43 @@ export default function GoogleUserSync() {
           userData.email
         );
       } else {
-        // Update existing user avatar
-        users[existingUserIndex].avatar = userData.avatar;
+        // Update existing user with Google data
+        users[existingUserIndex] = { ...users[existingUserIndex], ...userData };
         localStorage.setItem("freshko-users", JSON.stringify(users));
         console.log(
-          "🔄 Existing Google user updated in FreshKo store:",
+          "🔄 Existing user updated with Google data:",
           userData.email
         );
       }
 
-      // Set as current user
-      localStorage.setItem("freshko-current-user", JSON.stringify(userData));
-      console.log("💾 User data saved to localStorage");
+      // AUTO-LOGIN: Simulate the same login process as regular users
+      // Use store's login method with a dummy password for Google users
+      const { login } = store;
 
-      // Initialize data to refresh the store
-      initializeOriginalData();
-      console.log("🔄 Store initialized");
+      try {
+        // Save Google user in a way that the login method can find them
+        const result = await login(userData.email, "google-oauth-login");
 
-      // Dispatch event to notify store update without page reload
-      window.dispatchEvent(
-        new CustomEvent("userCreated", { detail: userData })
-      );
-      console.log("📡 userCreated event dispatched");
+        if (!result.success) {
+          // If login fails, try to set user state directly
+          // This is a fallback for Google users
+          console.log("🔄 Regular login failed, setting Google user directly");
 
-      // Force a small delay and then reload to ensure proper state sync
-      setTimeout(() => {
-        console.log("🔄 Reloading page to complete sync...");
-        window.location.reload();
-      }, 1000);
+          // Force state update by dispatching custom event
+          window.dispatchEvent(
+            new CustomEvent("google-user-login", {
+              detail: userData,
+            })
+          );
+        }
 
-      console.log("🎉 Google user successfully synced to FreshKo store!");
+        console.log("🎉 Google user successfully logged in to FreshKo store!");
+      } catch (error) {
+        console.error("❌ Failed to auto-login Google user:", error);
+      }
+
+      // Remove sync flag after successful sync
+      sessionStorage.removeItem(`freshko-sync-${userData.email}`);
     } catch (error) {
       console.error("❌ Error syncing Google user to FreshKo store:", error);
     }

@@ -369,9 +369,13 @@ export const useStore = create<StoreState>()(
             // Check for registered users
             const registeredUser = findUserByEmail(emailLower);
             if (registeredUser) {
+              // Special case for Google OAuth users - they use a special password
               // In real app, you'd verify password hash
-              // For demo, we'll just check if password is not empty
-              if (password.trim().length > 0) {
+              // For demo, we'll just check if password is not empty OR if it's Google OAuth
+              if (
+                password.trim().length > 0 ||
+                password === "google-oauth-login"
+              ) {
                 const userForState: User = {
                   id: registeredUser.id,
                   firstName: registeredUser.firstName,
