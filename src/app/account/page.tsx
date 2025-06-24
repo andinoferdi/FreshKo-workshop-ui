@@ -217,7 +217,9 @@ function AccountDashboard() {
             <h2 className="text-lg font-bold text-gray-900 mb-2">
               {user.firstName} {user.lastName}
             </h2>
-            <p className="text-small text-gray-600 mb-4">{user.email}</p>
+            <p className="text-small text-gray-600 mb-4 break-all">
+              {user.email}
+            </p>
 
             {/* Role Badge */}
             <div className="inline-flex items-center gap-2 px-3 py-1 bg-gradient-primary text-white rounded-full text-small font-medium mb-6">

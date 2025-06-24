@@ -342,7 +342,9 @@ function ProfileContent() {
                 <h2 className="text-2xl font-bold text-gray-900 mb-2">
                   {user.firstName} {user.lastName}
                 </h2>
-                <p className="text-gray-600 font-medium">{user.email}</p>
+                <p className="text-gray-600 font-medium break-all text-sm">
+                  {user.email}
+                </p>
               </div>
 
               {/* Role Badge */}
