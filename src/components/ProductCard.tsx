@@ -105,7 +105,7 @@ function ProductCardContent({ product }: ProductCardProps) {
           className={`absolute top-3 right-3 p-2.5 rounded-full transition-all duration-300 shadow-lg ${
             inWishlist
               ? "bg-gradient-primary text-white scale-110"
-              : "glass-effect text-gray-600 hover:bg-primary/10 hover:text-primary hover:scale-110"
+              : "bg-white text-gray-600 hover:bg-primary/10 hover:text-primary hover:scale-110"
           }`}
         >
           <Heart

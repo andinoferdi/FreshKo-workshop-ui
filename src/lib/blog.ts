@@ -8,6 +8,8 @@ export interface BlogPost {
   category: string;
   author: string;
   tags: string[];
+  isEditable?: boolean;
+  createdBy?: string;
 }
 
 export const blogPosts: BlogPost[] = [

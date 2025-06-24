@@ -7,15 +7,43 @@ import { Search, ChevronDown } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import BlogCard from "@/components/BlogCard";
-import { blogPosts } from "@/lib/blog";
+import { useHydratedStore } from "@/lib/store";
 
 function BlogContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const { getAllArticles, initializeOriginalData } = useHydratedStore();
 
   const [searchQuery, setSearchQuery] = useState("");
   const [category, setCategory] = useState("all");
   const [sortBy, setSortBy] = useState("latest");
+  const [allArticles, setAllArticles] = useState<any[]>([]);
+
+  // Initialize data and load articles
+  useEffect(() => {
+    const loadArticles = () => {
+      initializeOriginalData();
+      const articles = getAllArticles();
+      setAllArticles(articles);
+    };
+
+    loadArticles();
+
+    // Listen for article updates
+    const handleArticleUpdate = () => {
+      setTimeout(loadArticles, 100);
+    };
+
+    window.addEventListener("articleCreated", handleArticleUpdate);
+    window.addEventListener("articleUpdated", handleArticleUpdate);
+    window.addEventListener("articleDeleted", handleArticleUpdate);
+
+    return () => {
+      window.removeEventListener("articleCreated", handleArticleUpdate);
+      window.removeEventListener("articleUpdated", handleArticleUpdate);
+      window.removeEventListener("articleDeleted", handleArticleUpdate);
+    };
+  }, [getAllArticles, initializeOriginalData]);
 
   // Initialize state from URL parameters
   useEffect(() => {
@@ -57,7 +85,7 @@ function BlogContent() {
   };
 
   // Filter and sort blog posts
-  const filteredPosts = blogPosts
+  const filteredPosts = allArticles
     .filter((post) => {
       const matchesSearch =
         post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -78,7 +106,7 @@ function BlogContent() {
   // Get unique categories
   const categories = [
     "all",
-    ...new Set(blogPosts.map((post) => post.category)),
+    ...new Set(allArticles.map((post) => post.category)),
   ];
 
   return (

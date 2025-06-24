@@ -64,17 +64,44 @@ function ProductDetailContent({ productId }: ProductDetailProps) {
     addToWishlist,
     removeFromWishlist,
     isInWishlist,
+    getAllProducts,
+    initializeOriginalData,
   } = useHydratedStore();
 
   const [selectedImage, setSelectedImage] = useState<string>("");
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState("description");
   const [isZoomed, setIsZoomed] = useState(false);
+  const [allProducts, setAllProducts] = useState<any[]>([]);
   const router = useRouter();
 
-  const product = getProductsByCategory(productId).find(
-    (p) => p.id === parseInt(productId)
-  );
+  // Initialize data and load products
+  useEffect(() => {
+    const loadProducts = () => {
+      initializeOriginalData();
+      const products = getAllProducts();
+      setAllProducts(products);
+    };
+
+    loadProducts();
+
+    // Listen for product updates
+    const handleProductUpdate = () => {
+      setTimeout(loadProducts, 100);
+    };
+
+    window.addEventListener("productCreated", handleProductUpdate);
+    window.addEventListener("productUpdated", handleProductUpdate);
+    window.addEventListener("productDeleted", handleProductUpdate);
+
+    return () => {
+      window.removeEventListener("productCreated", handleProductUpdate);
+      window.removeEventListener("productUpdated", handleProductUpdate);
+      window.removeEventListener("productDeleted", handleProductUpdate);
+    };
+  }, [getAllProducts, initializeOriginalData]);
+
+  const product = allProducts.find((p) => p.id === parseInt(productId));
 
   useEffect(() => {
     if (product) {
@@ -111,8 +138,8 @@ function ProductDetailContent({ productId }: ProductDetailProps) {
     : product.price;
 
   // Get related products
-  const relatedProducts = getProductsByCategory(product.category || "")
-    .filter((p) => p.category === product.category && p.id !== product.id)
+  const relatedProducts = allProducts
+    .filter((p) => p.category === product?.category && p.id !== product?.id)
     .slice(0, 4);
 
   const incrementQuantity = () => setQuantity((prev) => prev + 1);

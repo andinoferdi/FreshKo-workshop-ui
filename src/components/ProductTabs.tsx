@@ -3,18 +3,52 @@
 import { useState, useEffect } from "react";
 import AOS from "aos";
 import ProductCard from "./ProductCard";
-import {
-  products,
-  getProductsByCategory,
-  getFeaturedProducts,
-  getCategories,
-} from "../lib/products";
+import { getCategories } from "../lib/products";
+import { useHydratedStore } from "../lib/store";
 
 export default function ProductTabs() {
   const [activeTab, setActiveTab] = useState("all");
-  const [key, setKey] = useState(0); // Force re-render untuk animasi
+  const [key, setKey] = useState(0);
+  const [allProducts, setAllProducts] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Refresh AOS ketika tab berubah
+  const { getAllProducts, initializeOriginalData } = useHydratedStore();
+
+  // Force refresh products data
+  const refreshProducts = () => {
+    setIsLoading(true);
+    setTimeout(() => {
+      initializeOriginalData();
+      const products = getAllProducts();
+      setAllProducts(products);
+      setIsLoading(false);
+      setKey((prev) => prev + 1);
+    }, 50);
+  };
+
+  // Initialize data on mount
+  useEffect(() => {
+    refreshProducts();
+  }, []);
+
+  // Listen for product updates
+  useEffect(() => {
+    const handleProductUpdate = () => {
+      refreshProducts();
+    };
+
+    window.addEventListener("productCreated", handleProductUpdate);
+    window.addEventListener("productUpdated", handleProductUpdate);
+    window.addEventListener("productDeleted", handleProductUpdate);
+
+    return () => {
+      window.removeEventListener("productCreated", handleProductUpdate);
+      window.removeEventListener("productUpdated", handleProductUpdate);
+      window.removeEventListener("productDeleted", handleProductUpdate);
+    };
+  }, []);
+
+  // Refresh AOS when tab changes
   useEffect(() => {
     const timer = setTimeout(() => {
       AOS.refresh();
@@ -24,21 +58,40 @@ export default function ProductTabs() {
 
   const handleTabChange = (tabId: string) => {
     setActiveTab(tabId);
-    setKey((prev) => prev + 1); // Force re-render semua produk
+    setKey((prev) => prev + 1);
   };
 
   const getFilteredProducts = () => {
+    let filtered;
     if (activeTab === "featured") {
-      return getFeaturedProducts().slice(0, 8);
+      filtered = allProducts
+        .filter((product) => product.discount && product.discount > 0)
+        .slice(0, 8);
     } else if (activeTab === "all") {
-      return products.slice(0, 8);
+      // Sort by newest first (highest ID) and show more products
+      filtered = allProducts.sort((a, b) => b.id - a.id).slice(0, 12);
     } else {
-      return getProductsByCategory(activeTab);
+      filtered = allProducts
+        .filter((product) => product.category === activeTab)
+        .sort((a, b) => b.id - a.id)
+        .slice(0, 8);
     }
+
+    return filtered;
   };
 
-  // Generate tabs dynamically from available categories
-  const categories = getCategories();
+  // Generate tabs dynamically from loaded products
+  const categories =
+    allProducts.length > 0
+      ? [
+          ...new Set(
+            allProducts
+              .map((product) => product.category)
+              .filter(Boolean) as string[]
+          ),
+        ]
+      : getCategories();
+
   const tabs = [
     { id: "all", label: "All Products" },
     { id: "featured", label: "Featured" },
@@ -47,6 +100,21 @@ export default function ProductTabs() {
       label: category.charAt(0).toUpperCase() + category.slice(1),
     })),
   ];
+
+  const filteredProducts = getFilteredProducts();
+
+  if (isLoading) {
+    return (
+      <section className="py-12 lg:py-16 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="text-center">
+            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            <p className="mt-2 text-gray-600">Loading products...</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="py-12 lg:py-16 bg-white">
@@ -86,45 +154,34 @@ export default function ProductTabs() {
         </div>
 
         {/* Products Grid */}
-        <div
-          key={key}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
-        >
-          {getFilteredProducts().map((product, index) => {
-            // Create staggered animations with different directions
-            const animationTypes = [
-              "fade-up",
-              "fade-left",
-              "fade-right",
-              "zoom-in",
-            ];
-            const animationType = animationTypes[index % 4];
-            const delay = 100 + index * 100; // Delay lebih pendek untuk responsivitas
-
-            return (
-              <div
-                key={`${product.id}-${key}`} // Unique key untuk force re-render
-                data-aos={animationType}
-                data-aos-delay={delay}
-                data-aos-duration="500"
-                data-aos-easing="ease-out-cubic"
-                data-aos-once="false" // Allow re-animation
-              >
-                <ProductCard product={product} />
-              </div>
-            );
-          })}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {filteredProducts.map((product, index) => (
+            <div
+              key={`${product.id}-${key}`}
+              data-aos="fade-up"
+              data-aos-delay={100 + index * 100}
+              data-aos-duration="600"
+            >
+              <ProductCard product={product} />
+            </div>
+          ))}
         </div>
 
-        {getFilteredProducts().length === 0 && (
-          <div
-            className="text-center py-12"
-            data-aos="fade-up"
-            data-aos-delay="500"
-          >
+        {/* No products message */}
+        {filteredProducts.length === 0 && (
+          <div className="text-center py-12" data-aos="fade-up">
             <p className="text-gray-500 text-lg">
               No products found in this category.
             </p>
+            <p className="text-gray-400 text-sm mt-2">
+              Total products available: {allProducts.length}
+            </p>
+            <button
+              onClick={refreshProducts}
+              className="mt-4 px-4 py-2 bg-primary text-white rounded-lg hover:bg-green-700 transition-colors"
+            >
+              Refresh Products
+            </button>
           </div>
         )}
       </div>

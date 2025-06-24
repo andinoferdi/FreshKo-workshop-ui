@@ -8,7 +8,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
 import { useStore } from "@/lib/store";
-import { searchProducts } from "@/lib/products";
+import { useHydratedStore } from "@/lib/store";
 
 export default function SearchPage() {
   const searchParams = useSearchParams();
@@ -17,13 +17,40 @@ export default function SearchPage() {
   const { searchQuery, searchResults, setSearchQuery, setSearchResults } =
     useStore();
 
+  const { getAllProducts, initializeOriginalData, searchProducts } =
+    useHydratedStore();
+
+  useEffect(() => {
+    // Initialize data first
+    const loadProducts = () => {
+      initializeOriginalData();
+    };
+
+    loadProducts();
+
+    // Listen for product updates
+    const handleProductUpdate = () => {
+      setTimeout(loadProducts, 100);
+    };
+
+    window.addEventListener("productCreated", handleProductUpdate);
+    window.addEventListener("productUpdated", handleProductUpdate);
+    window.addEventListener("productDeleted", handleProductUpdate);
+
+    return () => {
+      window.removeEventListener("productCreated", handleProductUpdate);
+      window.removeEventListener("productUpdated", handleProductUpdate);
+      window.removeEventListener("productDeleted", handleProductUpdate);
+    };
+  }, [initializeOriginalData]);
+
   useEffect(() => {
     if (query && query !== searchQuery) {
       setSearchQuery(query);
       const results = searchProducts(query);
       setSearchResults(results);
     }
-  }, [query, searchQuery, setSearchQuery, setSearchResults]);
+  }, [query, searchQuery, setSearchQuery, setSearchResults, searchProducts]);
 
   return (
     <>

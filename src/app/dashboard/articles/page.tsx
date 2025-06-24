@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import {
   Plus,
   Search,
@@ -12,16 +13,28 @@ import {
   MoreHorizontal,
 } from "lucide-react";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
-import { blogPosts } from "@/lib/blog";
+import { useHydratedStore } from "@/lib/store";
+import { toast } from "sonner";
 
 export default function DashboardArticlesPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
   const [showFilters, setShowFilters] = useState(false);
+  const [isDeleting, setIsDeleting] = useState<number | null>(null);
+
+  const { getAllArticles, initializeOriginalData, deleteArticle } =
+    useHydratedStore();
+
+  // Initialize data on mount
+  useEffect(() => {
+    initializeOriginalData();
+  }, [initializeOriginalData]);
+
+  const articles = getAllArticles();
 
   // Filter articles
-  const filteredArticles = blogPosts.filter((article) => {
+  const filteredArticles = articles.filter((article: any) => {
     const matchesSearch =
       article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       article.excerpt.toLowerCase().includes(searchQuery.toLowerCase());
@@ -36,8 +49,28 @@ export default function DashboardArticlesPage() {
   // Get unique categories
   const categories = [
     "all",
-    ...new Set(blogPosts.map((article) => article.category)),
+    ...new Set(articles.map((article: any) => article.category)),
   ];
+
+  const handleDelete = async (articleId: number, articleTitle: string) => {
+    if (!confirm(`Are you sure you want to delete "${articleTitle}"?`)) {
+      return;
+    }
+
+    setIsDeleting(articleId);
+    try {
+      const result = await deleteArticle(articleId);
+      if (result.success) {
+        toast.success(result.message);
+      } else {
+        toast.error(result.message);
+      }
+    } catch (error) {
+      toast.error("Failed to delete article. Please try again.");
+    } finally {
+      setIsDeleting(null);
+    }
+  };
 
   return (
     <DashboardLayout>
@@ -47,10 +80,13 @@ export default function DashboardArticlesPage() {
             <h1 className="text-2xl font-bold text-gray-900">Articles</h1>
             <p className="text-gray-600 mt-1">Manage blog posts and content</p>
           </div>
-          <button className="mt-4 md:mt-0 bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors flex items-center gap-2">
+          <Link
+            href="/dashboard/articles/create"
+            className="mt-4 md:mt-0 bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors flex items-center gap-2"
+          >
             <Plus size={20} />
             New Article
-          </button>
+          </Link>
         </div>
 
         {/* Search and Filters */}
@@ -155,8 +191,15 @@ export default function DashboardArticlesPage() {
                           />
                         </div>
                         <div className="ml-4">
-                          <div className="text-sm font-medium text-gray-900 line-clamp-2 max-w-xs">
-                            {article.title}
+                          <div className="flex items-center gap-2">
+                            <div className="text-sm font-medium text-gray-900 line-clamp-2 max-w-xs">
+                              {article.title}
+                            </div>
+                            {article.createdBy === "original" && (
+                              <span className="px-2 py-1 text-xs font-bold bg-blue-100 text-blue-800 rounded-full">
+                                Original
+                              </span>
+                            )}
                           </div>
                           <div className="text-sm text-gray-500 line-clamp-1 max-w-xs">
                             {article.excerpt}
@@ -186,16 +229,56 @@ export default function DashboardArticlesPage() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <div className="flex items-center gap-2">
-                        <button className="text-gray-600 hover:text-primary p-1 transition-colors">
+                        <Link
+                          href={`/dashboard/articles/${article.id}`}
+                          className="text-gray-600 hover:text-primary p-2 hover:bg-gray-100 rounded-lg transition-all duration-300 hover:scale-110"
+                          title="View Article Details"
+                        >
                           <Eye size={16} />
-                        </button>
-                        <button className="text-gray-600 hover:text-primary p-1 transition-colors">
-                          <Edit size={16} />
-                        </button>
-                        <button className="text-gray-600 hover:text-primary p-1 transition-colors">
-                          <Trash2 size={16} />
-                        </button>
-                        <button className="text-gray-600 hover:text-primary p-1 transition-colors">
+                        </Link>
+                        {article.isEditable !== false &&
+                        article.createdBy !== "original" ? (
+                          <>
+                            <button
+                              className="text-gray-600 hover:text-primary p-2 hover:bg-gray-100 rounded-lg transition-all duration-300 hover:scale-110"
+                              title="Edit Article"
+                            >
+                              <Edit size={16} />
+                            </button>
+                            <button
+                              className={`p-2 rounded-lg transition-all duration-300 hover:scale-110 ${
+                                isDeleting === article.id
+                                  ? "text-gray-400 cursor-not-allowed"
+                                  : "text-gray-600 hover:text-red-600 hover:bg-red-50"
+                              }`}
+                              title="Delete Article"
+                              disabled={isDeleting === article.id}
+                              onClick={() =>
+                                handleDelete(article.id, article.title)
+                              }
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          </>
+                        ) : (
+                          <>
+                            <button
+                              className="text-gray-300 bg-gray-100 p-2 cursor-not-allowed rounded-lg opacity-50"
+                              title="Original articles cannot be edited"
+                              disabled
+                            >
+                              <Edit size={16} />
+                            </button>
+                            <button
+                              className="text-gray-300 bg-gray-100 p-2 cursor-not-allowed rounded-lg opacity-50"
+                              title="Original articles cannot be deleted"
+                              disabled
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          </>
+                        )}
+                        <button className="text-gray-600 hover:text-primary p-2 hover:bg-gray-100 rounded-lg transition-all duration-300 hover:scale-110">
                           <MoreHorizontal size={16} />
                         </button>
                       </div>

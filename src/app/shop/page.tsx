@@ -7,15 +7,18 @@ import { Filter, Grid, List, ChevronDown } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
-import { products, getCategories } from "@/lib/products";
+import { getCategories } from "@/lib/products";
 import type { Product } from "@/lib/store";
+import { useHydratedStore } from "@/lib/store";
 
 export default function ShopPage() {
   const searchParams = useSearchParams();
   const categoryParam = searchParams.get("category");
 
-  const [allProducts, setAllProducts] = useState<Product[]>(products);
-  const [filteredProducts, setFilteredProducts] = useState<Product[]>(products);
+  const { getAllProducts, initializeOriginalData } = useHydratedStore();
+
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [selectedCategory, setSelectedCategory] = useState(
     categoryParam || "all"
   );
@@ -24,7 +27,44 @@ export default function ShopPage() {
   const [showFilters, setShowFilters] = useState(false);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
-  const categories = getCategories();
+  // Initialize data and load products
+  useEffect(() => {
+    const loadProducts = () => {
+      initializeOriginalData();
+      const products = getAllProducts();
+      setAllProducts(products);
+      setFilteredProducts(products);
+    };
+
+    loadProducts();
+
+    // Listen for product updates
+    const handleProductUpdate = () => {
+      setTimeout(loadProducts, 100);
+    };
+
+    window.addEventListener("productCreated", handleProductUpdate);
+    window.addEventListener("productUpdated", handleProductUpdate);
+    window.addEventListener("productDeleted", handleProductUpdate);
+
+    return () => {
+      window.removeEventListener("productCreated", handleProductUpdate);
+      window.removeEventListener("productUpdated", handleProductUpdate);
+      window.removeEventListener("productDeleted", handleProductUpdate);
+    };
+  }, [getAllProducts, initializeOriginalData]);
+
+  // Get categories from loaded products
+  const categories =
+    allProducts.length > 0
+      ? [
+          ...new Set(
+            allProducts
+              .map((product) => product.category)
+              .filter(Boolean) as string[]
+          ),
+        ]
+      : getCategories();
 
   useEffect(() => {
     let filtered = [...allProducts];

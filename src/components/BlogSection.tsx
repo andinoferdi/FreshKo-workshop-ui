@@ -1,10 +1,42 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import BlogCard from "./BlogCard";
-import { blogPosts } from "@/lib/blog";
+import { useHydratedStore } from "@/lib/store";
 
 export default function BlogSection() {
+  const { getAllArticles, initializeOriginalData } = useHydratedStore();
+  const [allArticles, setAllArticles] = useState<any[]>([]);
+
+  // Initialize data and load articles
+  useEffect(() => {
+    const loadArticles = () => {
+      initializeOriginalData();
+      const articles = getAllArticles();
+      setAllArticles(articles);
+    };
+
+    loadArticles();
+
+    // Listen for article updates
+    const handleArticleUpdate = () => {
+      setTimeout(loadArticles, 100);
+    };
+
+    window.addEventListener("articleCreated", handleArticleUpdate);
+    window.addEventListener("articleUpdated", handleArticleUpdate);
+    window.addEventListener("articleDeleted", handleArticleUpdate);
+
+    return () => {
+      window.removeEventListener("articleCreated", handleArticleUpdate);
+      window.removeEventListener("articleUpdated", handleArticleUpdate);
+      window.removeEventListener("articleDeleted", handleArticleUpdate);
+    };
+  }, [getAllArticles, initializeOriginalData]);
+
   // Get first 3 posts for homepage
-  const featuredPosts = blogPosts.slice(0, 3);
+  const featuredPosts = allArticles.slice(0, 3);
 
   return (
     <section className="bg-gray-50 py-12 lg:py-20">

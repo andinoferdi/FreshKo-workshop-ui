@@ -1,18 +1,57 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ChevronDown, Search, Filter, Eye, Download } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { orders } from "@/lib/orders";
+import { useHydratedStore } from "@/lib/store";
+import type { Order } from "@/lib/store";
 
 export default function OrdersPage() {
+  const { getUserOrders, isAuthenticated, user } = useHydratedStore();
+  const [orders, setOrders] = useState<Order[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [dateFilter, setDateFilter] = useState("all");
   const [showFilters, setShowFilters] = useState(false);
+
+  // Load orders on component mount and when events are triggered
+  useEffect(() => {
+    const loadOrders = () => {
+      if (isAuthenticated) {
+        const userOrders = getUserOrders();
+        setOrders(userOrders);
+      }
+    };
+
+    loadOrders();
+
+    // Listen for order events
+    const handleOrderCreated = () => {
+      setTimeout(loadOrders, 100);
+    };
+
+    const handleOrderUpdated = () => {
+      setTimeout(loadOrders, 100);
+    };
+
+    window.addEventListener("orderCreated", handleOrderCreated);
+    window.addEventListener("orderUpdated", handleOrderUpdated);
+
+    return () => {
+      window.removeEventListener("orderCreated", handleOrderCreated);
+      window.removeEventListener("orderUpdated", handleOrderUpdated);
+    };
+  }, [getUserOrders, isAuthenticated]);
+
+  // Redirect if not authenticated
+  useEffect(() => {
+    if (!isAuthenticated) {
+      window.location.href = "/account/login";
+    }
+  }, [isAuthenticated]);
 
   // Filter orders
   const filteredOrders = orders.filter((order) => {
@@ -60,6 +99,10 @@ export default function OrdersPage() {
         return "bg-gray-100 text-gray-600 border border-gray-200";
     }
   };
+
+  if (!isAuthenticated) {
+    return null; // Prevent flash before redirect
+  }
 
   return (
     <>
@@ -200,105 +243,102 @@ export default function OrdersPage() {
                         </span>
                       </div>
                     </div>
+
                     <div className="flex items-center gap-2">
                       <Link
                         href={`/account/orders/${order.id}`}
-                        className="flex items-center gap-1 px-4 py-2 bg-primary text-white rounded-lg 
-                                 hover:bg-primary/90 hover:scale-105 text-sm font-medium 
-                                 transition-all duration-300 shadow-lg hover:shadow-xl"
+                        className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg 
+                                 hover:bg-primary/90 transition-colors text-sm font-medium"
                       >
                         <Eye size={16} />
                         View Details
                       </Link>
                       <button
-                        className="flex items-center gap-1 px-4 py-2 bg-gray-50 border border-gray-200 
-                                       rounded-lg hover:bg-gray-100 hover:border-primary/20 text-sm font-medium 
-                                       transition-all duration-300"
+                        className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg 
+                                       hover:bg-gray-200 transition-colors text-sm font-medium"
                       >
                         <Download size={16} />
-                        Invoice
+                        Receipt
                       </button>
                     </div>
                   </div>
 
                   {/* Order Items */}
                   <div className="p-6">
-                    <div className="space-y-4">
-                      {order.items.slice(0, 3).map((item, index) => (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {order.items.map((item) => (
                         <div
-                          key={index}
-                          className="flex items-center gap-4 group/item"
+                          key={`${order.id}-${item.id}`}
+                          className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg"
                         >
-                          <div className="flex-shrink-0 w-16 h-16 relative overflow-hidden rounded-lg">
-                            <Image
-                              src={item.image || "/placeholder.svg"}
-                              alt={item.name}
-                              fill
-                              className="object-cover group-hover/item:scale-110 transition-transform duration-300"
-                            />
-                          </div>
-                          <div className="flex-1">
-                            <h4 className="font-semibold text-gray-900 group-hover/item:text-primary transition-colors">
+                          <Image
+                            src={item.image || "/placeholder.svg"}
+                            alt={item.name}
+                            width={50}
+                            height={50}
+                            className="rounded-lg"
+                          />
+                          <div className="flex-1 min-w-0">
+                            <h4 className="font-semibold text-sm truncate">
                               {item.name}
                             </h4>
-                            <div className="text-sm text-gray-600">
-                              <span>Qty: {item.quantity}</span>
-                              <span className="mx-2">•</span>
-                              <span>${item.price.toFixed(2)} each</span>
-                            </div>
+                            <p className="text-xs text-gray-600">
+                              Qty: {item.quantity} × ${item.price.toFixed(2)}
+                            </p>
                           </div>
-                          <div className="text-right">
-                            <span className="font-bold text-primary">
-                              ${(item.price * item.quantity).toFixed(2)}
-                            </span>
+                          <div className="text-sm font-bold text-primary">
+                            ${(item.price * item.quantity).toFixed(2)}
                           </div>
                         </div>
                       ))}
+                    </div>
 
-                      {order.items.length > 3 && (
-                        <div className="text-sm text-gray-600 text-center pt-4 border-t border-gray-100">
-                          <span className="bg-gray-50 px-3 py-1 rounded-full">
-                            + {order.items.length - 3} more items
-                          </span>
+                    {/* Order Summary */}
+                    <div className="mt-6 pt-4 border-t border-gray-100 grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div>
+                        <h4 className="font-semibold text-gray-900 mb-2">
+                          Shipping Address
+                        </h4>
+                        <p className="text-sm text-gray-600">
+                          {order.shippingAddress}
+                        </p>
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-gray-900 mb-2">
+                          Payment & Delivery
+                        </h4>
+                        <div className="text-sm text-gray-600 space-y-1">
+                          <p>Payment: {order.paymentMethod}</p>
+                          <p>Estimated Delivery: {order.estimatedDelivery}</p>
                         </div>
-                      )}
+                      </div>
                     </div>
                   </div>
                 </div>
               ))}
             </div>
           ) : (
-            <div className="bg-white rounded-xl border border-gray-100 p-12 text-center">
-              <div className="text-gray-400 mb-4">
-                <Search size={48} className="mx-auto" />
+            /* Empty State */
+            <div className="text-center py-16">
+              <div className="bg-gray-50 rounded-full w-32 h-32 mx-auto flex items-center justify-center mb-6">
+                <Search size={80} className="text-gray-300" />
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">
-                No orders found
-              </h3>
-              <p className="text-lg text-gray-600 mb-6">
-                Try adjusting your search criteria
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                {orders.length === 0 ? "No Orders Yet" : "No Orders Found"}
+              </h2>
+              <p className="text-lg text-gray-600 mb-8">
+                {orders.length === 0
+                  ? "You haven't placed any orders yet. Start shopping to see your orders here!"
+                  : "Try adjusting your search criteria or filters."}
               </p>
-              <div className="space-x-4">
-                <button
-                  onClick={() => {
-                    setSearchQuery("");
-                    setStatusFilter("all");
-                    setDateFilter("all");
-                  }}
-                  className="bg-primary text-white px-6 py-3 rounded-lg font-semibold
-                           hover:bg-primary/90 hover:scale-105 transition-all duration-300 shadow-lg"
-                >
-                  Clear Filters
-                </button>
+              {orders.length === 0 && (
                 <Link
                   href="/shop"
-                  className="bg-gray-50 text-gray-700 px-6 py-3 rounded-lg border border-gray-200
-                           hover:bg-gray-100 hover:border-primary/20 inline-block font-semibold 
-                           transition-all duration-300"
+                  className="inline-flex items-center gap-2 bg-primary text-white px-8 py-3 rounded-lg font-semibold hover:bg-primary/90 hover:scale-105 hover:shadow-lg transition-all duration-300"
                 >
-                  Continue Shopping
+                  Start Shopping
                 </Link>
-              </div>
+              )}
             </div>
           )}
         </div>

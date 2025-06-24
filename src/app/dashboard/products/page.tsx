@@ -1,30 +1,79 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Image from "next/image"
-import { Plus, Search, Filter, Edit, Trash2, Eye, MoreHorizontal } from "lucide-react"
-import DashboardLayout from "@/components/dashboard/DashboardLayout"
-import { products } from "@/lib/products"
+import { useState, useEffect } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import {
+  Plus,
+  Search,
+  Filter,
+  Edit,
+  Trash2,
+  Eye,
+  MoreHorizontal,
+} from "lucide-react";
+import DashboardLayout from "@/components/dashboard/DashboardLayout";
+import { useHydratedStore } from "@/lib/store";
+import { toast } from "sonner";
 
 export default function DashboardProductsPage() {
-  const [searchQuery, setSearchQuery] = useState("")
-  const [categoryFilter, setCategoryFilter] = useState("all")
-  const [statusFilter, setStatusFilter] = useState("all")
-  const [showFilters, setShowFilters] = useState(false)
+  const [searchQuery, setSearchQuery] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [showFilters, setShowFilters] = useState(false);
+  const [isDeleting, setIsDeleting] = useState<number | null>(null);
+
+  const { getAllProducts, initializeOriginalData, deleteProduct } =
+    useHydratedStore();
+
+  // Initialize data on mount
+  useEffect(() => {
+    initializeOriginalData();
+  }, [initializeOriginalData]);
+
+  const products = getAllProducts();
 
   // Filter products
-  const filteredProducts = products.filter((product) => {
-    const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase())
-    const matchesCategory = categoryFilter === "all" || product.category === categoryFilter
+  const filteredProducts = products.filter((product: any) => {
+    const matchesSearch = product.name
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase());
+    const matchesCategory =
+      categoryFilter === "all" || product.category === categoryFilter;
     const matchesStatus =
       statusFilter === "all" ||
       (statusFilter === "in-stock" && product.inStock) ||
-      (statusFilter === "out-of-stock" && !product.inStock)
-    return matchesSearch && matchesCategory && matchesStatus
-  })
+      (statusFilter === "out-of-stock" && !product.inStock);
+    return matchesSearch && matchesCategory && matchesStatus;
+  });
 
   // Get unique categories
-  const categories = ["all", ...new Set(products.map((product) => product.category).filter(Boolean))]
+  const categories = [
+    "all",
+    ...new Set(
+      products.map((product: any) => product.category).filter(Boolean)
+    ),
+  ];
+
+  const handleDelete = async (productId: number, productName: string) => {
+    if (!confirm(`Are you sure you want to delete "${productName}"?`)) {
+      return;
+    }
+
+    setIsDeleting(productId);
+    try {
+      const result = await deleteProduct(productId);
+      if (result.success) {
+        toast.success(result.message);
+      } else {
+        toast.error(result.message);
+      }
+    } catch (error) {
+      toast.error("Failed to delete product. Please try again.");
+    } finally {
+      setIsDeleting(null);
+    }
+  };
 
   return (
     <DashboardLayout>
@@ -32,19 +81,27 @@ export default function DashboardProductsPage() {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
           <div>
             <h1 className="text-3xl font-bold gradient-text mb-2">Products</h1>
-            <p className="text-gray-600 font-medium">Manage your product inventory</p>
+            <p className="text-gray-600 font-medium">
+              Manage your product inventory
+            </p>
           </div>
-          <button className="mt-4 md:mt-0 btn-primary flex items-center gap-2 hover:scale-105 transition-all duration-300">
+          <Link
+            href="/dashboard/products/create"
+            className="mt-4 md:mt-0 btn-primary flex items-center gap-2 hover:scale-105 transition-all duration-300"
+          >
             <Plus size={20} />
             Add Product
-          </button>
+          </Link>
         </div>
 
         {/* Search and Filters */}
         <div className="modern-card p-6 mb-6 hover:shadow-lg transition-all duration-300">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1 relative">
-              <Search size={20} className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              <Search
+                size={20}
+                className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"
+              />
               <input
                 type="text"
                 value={searchQuery}
@@ -62,7 +119,11 @@ export default function DashboardProductsPage() {
               Filters
             </button>
 
-            <div className={`flex flex-col md:flex-row gap-4 ${showFilters ? "block" : "hidden md:flex"}`}>
+            <div
+              className={`flex flex-col md:flex-row gap-4 ${
+                showFilters ? "block" : "hidden md:flex"
+              }`}
+            >
               <select
                 value={categoryFilter}
                 onChange={(e) => setCategoryFilter(e.target.value)}
@@ -73,8 +134,8 @@ export default function DashboardProductsPage() {
                     {category === "all"
                       ? "All Categories"
                       : category
-                        ? category.charAt(0).toUpperCase() + category.slice(1)
-                        : "Unknown"}
+                      ? category.charAt(0).toUpperCase() + category.slice(1)
+                      : "Unknown"}
                   </option>
                 ))}
               </select>
@@ -120,7 +181,10 @@ export default function DashboardProductsPage() {
               </thead>
               <tbody className="bg-white divide-y divide-gray-100">
                 {filteredProducts.map((product) => (
-                  <tr key={product.id} className="hover:bg-gray-50/50 transition-all duration-300 group">
+                  <tr
+                    key={product.id}
+                    className="hover:bg-gray-50/50 transition-all duration-300 group"
+                  >
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <div className="flex-shrink-0 h-12 w-12">
@@ -133,8 +197,19 @@ export default function DashboardProductsPage() {
                           />
                         </div>
                         <div className="ml-4">
-                          <div className="text-sm font-bold text-gray-900">{product.name}</div>
-                          <div className="text-sm text-gray-500 font-medium">{product.unit}</div>
+                          <div className="flex items-center gap-2">
+                            <div className="text-sm font-bold text-gray-900">
+                              {product.name}
+                            </div>
+                            {product.createdBy === "original" && (
+                              <span className="px-2 py-1 text-xs font-bold bg-blue-100 text-blue-800 rounded-full">
+                                Original
+                              </span>
+                            )}
+                          </div>
+                          <div className="text-sm text-gray-500 font-medium">
+                            {product.unit}
+                          </div>
                         </div>
                       </div>
                     </td>
@@ -147,7 +222,9 @@ export default function DashboardProductsPage() {
                       <div className="text-sm font-bold text-gray-900">
                         ${product.price.toFixed(2)}
                         {product.discount && (
-                          <span className="ml-2 text-xs text-primary font-bold">-{product.discount}%</span>
+                          <span className="ml-2 text-xs text-primary font-bold">
+                            -{product.discount}%
+                          </span>
                         )}
                       </div>
                     </td>
@@ -168,7 +245,11 @@ export default function DashboardProductsPage() {
                           {[...Array(5)].map((_, i) => (
                             <svg
                               key={i}
-                              className={`w-4 h-4 ${i < Math.floor(product.rating) ? "text-primary" : "text-gray-300"}`}
+                              className={`w-4 h-4 ${
+                                i < Math.floor(product.rating)
+                                  ? "text-primary"
+                                  : "text-gray-300"
+                              }`}
                               fill="currentColor"
                               viewBox="0 0 20 20"
                             >
@@ -176,20 +257,63 @@ export default function DashboardProductsPage() {
                             </svg>
                           ))}
                         </div>
-                        <span className="ml-1 text-sm text-gray-500 font-semibold">({product.rating})</span>
+                        <span className="ml-1 text-sm text-gray-500 font-semibold">
+                          ({product.rating})
+                        </span>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <div className="flex items-center gap-2">
-                        <button className="text-gray-600 hover:text-primary p-2 hover:bg-gray-100 rounded-lg transition-all duration-300 hover:scale-110">
+                        <Link
+                          href={`/dashboard/products/${product.id}`}
+                          className="text-gray-600 hover:text-primary p-2 hover:bg-gray-100 rounded-lg transition-all duration-300 hover:scale-110"
+                          title="View Product Details"
+                        >
                           <Eye size={16} />
-                        </button>
-                        <button className="text-gray-600 hover:text-primary p-2 hover:bg-gray-100 rounded-lg transition-all duration-300 hover:scale-110">
-                          <Edit size={16} />
-                        </button>
-                        <button className="text-gray-600 hover:text-red-600 p-2 hover:bg-red-50 rounded-lg transition-all duration-300 hover:scale-110">
-                          <Trash2 size={16} />
-                        </button>
+                        </Link>
+                        {product.isEditable !== false &&
+                        product.createdBy !== "original" ? (
+                          <>
+                            <Link
+                              href={`/dashboard/products/edit/${product.id}`}
+                              className="text-gray-600 hover:text-primary p-2 hover:bg-gray-100 rounded-lg transition-all duration-300 hover:scale-110"
+                              title="Edit Product"
+                            >
+                              <Edit size={16} />
+                            </Link>
+                            <button
+                              className={`p-2 rounded-lg transition-all duration-300 hover:scale-110 ${
+                                isDeleting === product.id
+                                  ? "text-gray-400 cursor-not-allowed"
+                                  : "text-gray-600 hover:text-red-600 hover:bg-red-50"
+                              }`}
+                              title="Delete Product"
+                              disabled={isDeleting === product.id}
+                              onClick={() =>
+                                handleDelete(product.id, product.name)
+                              }
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          </>
+                        ) : (
+                          <>
+                            <button
+                              className="text-gray-300 bg-gray-100 p-2 cursor-not-allowed rounded-lg opacity-50"
+                              title="Original products cannot be edited"
+                              disabled
+                            >
+                              <Edit size={16} />
+                            </button>
+                            <button
+                              className="text-gray-300 bg-gray-100 p-2 cursor-not-allowed rounded-lg opacity-50"
+                              title="Original products cannot be deleted"
+                              disabled
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          </>
+                        )}
                         <button className="text-gray-600 hover:text-primary p-2 hover:bg-gray-100 rounded-lg transition-all duration-300 hover:scale-110">
                           <MoreHorizontal size={16} />
                         </button>
@@ -206,8 +330,12 @@ export default function DashboardProductsPage() {
               <div className="text-gray-400 mb-4">
                 <Search size={48} className="mx-auto" />
               </div>
-              <h3 className="text-lg font-bold text-gray-900 mb-2">No products found</h3>
-              <p className="text-gray-500 font-medium">Try adjusting your search criteria</p>
+              <h3 className="text-lg font-bold text-gray-900 mb-2">
+                No products found
+              </h3>
+              <p className="text-gray-500 font-medium">
+                Try adjusting your search criteria
+              </p>
             </div>
           )}
         </div>
@@ -217,14 +345,19 @@ export default function DashboardProductsPage() {
           <div className="flex items-center justify-between mt-6">
             <div className="text-sm text-gray-700 font-medium">
               Showing <span className="font-bold">1</span> to{" "}
-              <span className="font-bold">{Math.min(10, filteredProducts.length)}</span> of{" "}
-              <span className="font-bold">{filteredProducts.length}</span> results
+              <span className="font-bold">
+                {Math.min(10, filteredProducts.length)}
+              </span>{" "}
+              of <span className="font-bold">{filteredProducts.length}</span>{" "}
+              results
             </div>
             <div className="flex gap-2">
               <button className="px-4 py-2 text-sm glass-effect rounded-lg hover:bg-white/20 transition-all duration-300 font-semibold">
                 Previous
               </button>
-              <button className="px-4 py-2 text-sm bg-gradient-primary text-white rounded-lg font-semibold">1</button>
+              <button className="px-4 py-2 text-sm bg-gradient-primary text-white rounded-lg font-semibold">
+                1
+              </button>
               <button className="px-4 py-2 text-sm glass-effect rounded-lg hover:bg-white/20 transition-all duration-300 font-semibold">
                 Next
               </button>
@@ -233,5 +366,5 @@ export default function DashboardProductsPage() {
         )}
       </div>
     </DashboardLayout>
-  )
+  );
 }

@@ -7,7 +7,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ShoppingCart, Search, User, Heart, Menu, X } from "lucide-react";
 import { useHydratedStore, type CartItem } from "../lib/store";
-import { searchProducts } from "../lib/products";
+// Dynamic search function will be defined locally
 import { useRouter } from "next/navigation";
 import { useVisibilityFix } from "@/hooks/useVisibilityFix";
 
@@ -33,12 +33,22 @@ export default function Header() {
     setSearchQuery: setStoreSearchQuery,
     setSearchResults,
     logout,
+    getAllProducts,
+    initializeOriginalData,
+    searchProducts: storeSearchProducts,
   } = useHydratedStore();
   const router = useRouter();
 
   const cartTotal = getCartTotal();
   const cartItemsCount = getCartItemsCount();
   const wishlistCount = getWishlistCount();
+
+  // Use search function from store
+
+  // Initialize data on mount
+  useEffect(() => {
+    initializeOriginalData();
+  }, [initializeOriginalData]);
 
   // Handle scroll effect
   useEffect(() => {
@@ -60,7 +70,7 @@ export default function Header() {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      const results = searchProducts(searchQuery);
+      const results = storeSearchProducts(searchQuery);
       setStoreSearchQuery(searchQuery);
       setSearchResults(results);
       router.push("/search");
@@ -70,7 +80,7 @@ export default function Header() {
 
   const handleQuickSearch = (query: string) => {
     setSearchQuery(query);
-    const results = searchProducts(query);
+    const results = storeSearchProducts(query);
     setStoreSearchQuery(query);
     setSearchResults(results);
     router.push("/search");
@@ -489,7 +499,7 @@ export default function Header() {
                 </div>
 
                 <button
-                  className="relative p-3 glass-effect rounded-xl hover:bg-white/20 transition-all duration-300 hover:scale-110 transform group"
+                  className="relative p-3 bg-white rounded-xl hover:bg-white/20 transition-all duration-300 hover:scale-110 transform group"
                   onClick={handleWishlistClick}
                   title="Wishlist"
                 >

@@ -190,11 +190,14 @@ function LoginForm() {
               </div>
             </div>
             <div className="border-t pt-3">
-              <p className="font-medium text-gray-800 mb-1">Users:</p>
-              <p className="text-gray-600 pl-3">
-                Please register for a new account first. Only registered users
-                can login.
-              </p>
+              <p className="font-medium text-gray-800 mb-1">Customer Access:</p>
+              <div className="text-gray-600 pl-3 space-y-1">
+                <p>• Register for a new account yourself</p>
+                <p>• Or login with customers created by admin</p>
+                <p className="text-xs text-primary font-medium">
+                  (Admin can create customers from dashboard)
+                </p>
+              </div>
             </div>
           </div>
         </div>

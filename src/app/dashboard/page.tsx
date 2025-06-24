@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import {
   BarChart3,
@@ -11,6 +11,13 @@ import {
   TrendingDown,
   Package,
   Clock,
+  Eye,
+  Edit,
+  Trash2,
+  ArrowUpRight,
+  ArrowDownRight,
+  MoreVertical,
+  Star,
 } from "lucide-react";
 import {
   LineChart,
@@ -30,8 +37,8 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
-import { orders } from "@/lib/orders";
-import { products } from "@/lib/products";
+import { useHydratedStore } from "@/lib/store";
+import type { Order } from "@/lib/store";
 
 // Sample data for charts
 const salesData = [
@@ -79,20 +86,65 @@ const getStatusStyle = (status: string) => {
 
 export default function DashboardPage() {
   const [timeRange, setTimeRange] = useState("week");
+  const { getAllProducts, getAllOrders, initializeOriginalData } =
+    useHydratedStore();
+  const [orders, setOrders] = useState<Order[]>([]);
+
+  // Initialize data on mount
+  useEffect(() => {
+    const loadData = () => {
+      initializeOriginalData();
+      const allOrders = getAllOrders();
+      setOrders(allOrders);
+    };
+
+    loadData();
+
+    // Listen for data updates
+    const handleDataUpdate = () => {
+      setTimeout(loadData, 100);
+    };
+
+    window.addEventListener("productCreated", handleDataUpdate);
+    window.addEventListener("productUpdated", handleDataUpdate);
+    window.addEventListener("productDeleted", handleDataUpdate);
+    window.addEventListener("orderCreated", handleDataUpdate);
+    window.addEventListener("orderUpdated", handleDataUpdate);
+
+    return () => {
+      window.removeEventListener("productCreated", handleDataUpdate);
+      window.removeEventListener("productUpdated", handleDataUpdate);
+      window.removeEventListener("productDeleted", handleDataUpdate);
+      window.removeEventListener("orderCreated", handleDataUpdate);
+      window.removeEventListener("orderUpdated", handleDataUpdate);
+    };
+  }, [initializeOriginalData, getAllOrders]);
+
+  const allProducts = getAllProducts();
 
   // Calculate statistics
-  const totalSales = orders.reduce((sum, order) => sum + order.total, 0);
+  const totalSales = orders.reduce(
+    (sum: number, order: Order) => sum + order.total,
+    0
+  );
   const totalOrders = orders.length;
-  const totalProducts = products.length;
+  const totalProducts = allProducts.length;
   const totalCustomers = 120; // Example value
 
   // Recent orders
-  const recentOrders = [...orders]
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-    .slice(0, 5);
+  const recentOrders =
+    orders.length > 0
+      ? [...orders]
+          .sort(
+            (a, b) =>
+              new Date(b.createdAt || b.date).getTime() -
+              new Date(a.createdAt || a.date).getTime()
+          )
+          .slice(0, 5)
+      : [];
 
   // Popular products
-  const popularProducts = [...products]
+  const popularProducts = [...allProducts]
     .sort((a, b) => b.rating - a.rating)
     .slice(0, 5);
 
@@ -202,15 +254,15 @@ export default function DashboardPage() {
                   {totalCustomers}
                 </h3>
                 <div className="flex items-center mt-3 text-sm">
-                  <TrendingDown className="text-gray-500 mr-1" size={16} />
-                  <span className="text-gray-500 font-semibold">-2.4%</span>
+                  <TrendingUp className="text-green-500 mr-1" size={16} />
+                  <span className="text-green-500 font-semibold">+15.1%</span>
                   <span className="text-gray-500 ml-1">
                     from last {timeRange}
                   </span>
                 </div>
               </div>
-              <div className="p-3 bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl group-hover:scale-110 transition-all duration-300">
-                <Users className="text-gray-600" size={24} />
+              <div className="p-3 bg-gradient-to-br from-green-100 to-green-200 rounded-xl group-hover:scale-110 transition-all duration-300">
+                <Users className="text-green-600" size={24} />
               </div>
             </div>
           </div>
@@ -398,7 +450,7 @@ export default function DashboardPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {recentOrders.map((order) => (
+                  {recentOrders.map((order: Order) => (
                     <tr
                       key={order.id}
                       className="border-b border-gray-50 last:border-0 hover:bg-gray-50/50 transition-colors duration-300"
@@ -521,7 +573,7 @@ export default function DashboardPage() {
                 <p className="font-semibold text-sm">
                   New order{" "}
                   <span className="font-bold text-primary">
-                    #{orders[0].id}
+                    #{orders[0]?.id || "123"}
                   </span>{" "}
                   was placed
                 </p>
@@ -542,7 +594,7 @@ export default function DashboardPage() {
                 <p className="font-semibold text-sm">
                   Product{" "}
                   <span className="font-bold text-primary">
-                    {products[0].name}
+                    {allProducts[0]?.name || "Sample Product"}
                   </span>{" "}
                   is low in stock
                 </p>

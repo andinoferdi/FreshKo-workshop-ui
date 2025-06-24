@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import {
   Search,
   Filter,
@@ -65,10 +66,13 @@ export default function DashboardCustomersPage() {
               Manage user accounts and information
             </p>
           </div>
-          <button className="mt-4 md:mt-0 bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors flex items-center gap-2">
+          <Link
+            href="/dashboard/customers/create"
+            className="mt-4 md:mt-0 bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors flex items-center gap-2"
+          >
             <UserPlus size={20} />
             Add User
-          </button>
+          </Link>
         </div>
 
         {/* Search and Filters */}
@@ -172,9 +176,12 @@ export default function DashboardCustomersPage() {
                         <button className="text-gray-600 hover:text-primary p-1 transition-colors">
                           <Eye size={16} />
                         </button>
-                        <button className="text-gray-600 hover:text-primary p-1 transition-colors">
+                        <Link
+                          href={`/dashboard/customers/edit/${customer.id}`}
+                          className="text-gray-600 hover:text-primary p-1 transition-colors"
+                        >
                           <Edit size={16} />
-                        </button>
+                        </Link>
                         <button className="text-gray-600 hover:text-primary p-1 transition-colors">
                           <MoreHorizontal size={16} />
                         </button>

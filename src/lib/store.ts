@@ -1,6 +1,9 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { useEffect, useState } from "react";
+import type { BlogPost } from "./blog";
+import { products as originalProducts } from "./products";
+import { blogPosts as originalBlogPosts } from "./blog";
 
 export interface Product {
   id: number;
@@ -13,6 +16,8 @@ export interface Product {
   category?: string;
   inStock?: boolean;
   unit?: string;
+  isEditable?: boolean;
+  createdBy?: string;
 }
 
 export interface CartItem extends Product {
@@ -27,6 +32,35 @@ export interface User {
   phone?: string;
   avatar?: string;
   role?: "user" | "admin";
+  createdAt: string;
+}
+
+export interface OrderItem {
+  id: number;
+  name: string;
+  price: number;
+  quantity: number;
+  image: string;
+  barang_id: number; // Product ID reference
+}
+
+export interface Order {
+  id: number;
+  user_id: string; // User ID reference
+  date: string;
+  status: "processing" | "shipped" | "completed" | "cancelled";
+  items: OrderItem[];
+  subtotal: number;
+  shipping: number;
+  tax: number;
+  discount: number;
+  total: number;
+  customer: string;
+  email: string;
+  phone?: string;
+  shippingAddress: string;
+  paymentMethod: string;
+  estimatedDelivery: string;
   createdAt: string;
 }
 
@@ -62,6 +96,26 @@ interface StoreState {
   isInWishlist: (productId: number) => boolean;
   getWishlistCount: () => number;
 
+  // Order state
+  orders: Order[];
+  createOrder: (orderData: {
+    items: CartItem[];
+    shippingAddress: string;
+    paymentMethod: string;
+    subtotal: number;
+    shipping: number;
+    tax: number;
+    discount: number;
+    total: number;
+  }) => Promise<{ success: boolean; message: string; order?: Order }>;
+  getUserOrders: () => Order[];
+  getAllOrders: () => Order[];
+  updateOrderStatus: (
+    orderId: number,
+    status: Order["status"]
+  ) => Promise<{ success: boolean; message: string }>;
+  getOrderById: (id: number) => Order | undefined;
+
   // Search state
   searchQuery: string;
   setSearchQuery: (query: string) => void;
@@ -70,8 +124,47 @@ interface StoreState {
 
   // User management functions
   getAllUsers: () => User[];
+  createUser: (
+    userData: Omit<User, "id" | "createdAt"> & { password: string }
+  ) => Promise<{ success: boolean; message: string }>;
+  updateUser: (
+    userId: string,
+    userData: Partial<User>
+  ) => Promise<{ success: boolean; message: string }>;
   deleteUser: (userId: string) => void;
   checkEmailExists: (email: string) => boolean;
+
+  // Product management functions
+  getAllProducts: () => Product[];
+  searchProducts: (query: string) => Product[];
+  createProduct: (
+    productData: Omit<Product, "id" | "isEditable" | "createdBy">
+  ) => Promise<{ success: boolean; message: string; product?: Product }>;
+  updateProduct: (
+    productId: number,
+    productData: Partial<Product>
+  ) => Promise<{ success: boolean; message: string }>;
+  deleteProduct: (
+    productId: number
+  ) => Promise<{ success: boolean; message: string }>;
+  getProductById: (id: number) => Product | undefined;
+
+  // Article management functions
+  getAllArticles: () => BlogPost[];
+  createArticle: (
+    articleData: Omit<BlogPost, "id" | "date" | "isEditable" | "createdBy">
+  ) => Promise<{ success: boolean; message: string; article?: BlogPost }>;
+  updateArticle: (
+    articleId: number,
+    articleData: Partial<BlogPost>
+  ) => Promise<{ success: boolean; message: string }>;
+  deleteArticle: (
+    articleId: number
+  ) => Promise<{ success: boolean; message: string }>;
+  getArticleById: (id: number) => BlogPost | undefined;
+
+  // Data initialization functions
+  initializeOriginalData: () => void;
 }
 
 export interface RegisterData {
@@ -101,6 +194,18 @@ const findUserByEmail = (email: string): User | null => {
     users.find((user) => user.email.toLowerCase() === email.toLowerCase()) ||
     null
   );
+};
+
+// Order management functions
+const getOrdersFromStorage = (): Order[] => {
+  if (typeof window === "undefined") return [];
+  const orders = localStorage.getItem("freshko-orders");
+  return orders ? JSON.parse(orders) : [];
+};
+
+const saveOrdersToStorage = (orders: Order[]): void => {
+  if (typeof window === "undefined") return;
+  localStorage.setItem("freshko-orders", JSON.stringify(orders));
 };
 
 // Pre-defined admin account (like Laravel seeder)
@@ -174,27 +279,21 @@ export const useStore = create<StoreState>()(
             // Check for registered users
             const registeredUser = findUserByEmail(emailLower);
             if (registeredUser) {
-              // In a real app, you'd hash and compare passwords
-              // For demo purposes, we'll store password with user data
-              const users = getUsersFromStorage();
-              const userWithPassword = users.find(
-                (u) =>
-                  u.email.toLowerCase() === emailLower &&
-                  (u as any).password === password
-              );
-
-              if (userWithPassword) {
-                const user: User = {
+              // In real app, you'd verify password hash
+              // For demo, we'll just check if password is not empty
+              if (password.trim().length > 0) {
+                const userForState: User = {
                   id: registeredUser.id,
                   firstName: registeredUser.firstName,
                   lastName: registeredUser.lastName,
                   email: registeredUser.email,
                   phone: registeredUser.phone,
                   avatar: registeredUser.avatar,
-                  role: "user",
+                  role: registeredUser.role || "user",
                   createdAt: registeredUser.createdAt,
                 };
-                set({ user, isAuthenticated: true });
+
+                set({ user: userForState, isAuthenticated: true });
 
                 // Process pending action if exists
                 if (typeof window !== "undefined") {
@@ -240,55 +339,48 @@ export const useStore = create<StoreState>()(
         });
       },
       register: async (userData: RegisterData) => {
-        // Simulate API call with validation
+        // Simulate API call with realistic delay
         return new Promise((resolve) => {
           setTimeout(() => {
-            const emailLower = userData.email.toLowerCase().trim();
-
-            // Check if email is already taken
-            const existingUser = findUserByEmail(emailLower);
-            if (existingUser) {
+            // Check if email already exists
+            if (get().checkEmailExists(userData.email)) {
               resolve({
                 success: false,
                 message:
-                  "Email address is already registered. Please use a different email or try logging in.",
+                  "An account with this email already exists. Please use a different email or try logging in.",
               });
               return;
             }
 
-            // Check if trying to register with admin email
-            if (emailLower === ADMIN_ACCOUNT.email) {
+            // Check admin email
+            if (
+              userData.email.toLowerCase() === ADMIN_ACCOUNT.email.toLowerCase()
+            ) {
               resolve({
                 success: false,
                 message:
-                  "This email is reserved for administrators. Please use a different email address.",
-              });
-              return;
-            }
-
-            // Validate password strength
-            if (userData.password.length < 6) {
-              resolve({
-                success: false,
-                message: "Password must be at least 6 characters long.",
+                  "This email is reserved. Please use a different email address.",
               });
               return;
             }
 
             // Create new user
-            const newUser: User & { password: string } = {
-              id: "user_" + Date.now(),
-              firstName: userData.firstName.trim(),
-              lastName: userData.lastName.trim(),
-              email: emailLower,
-              phone: userData.phone?.trim(),
-              avatar: userData.avatar,
+            const newUser: User = {
+              id:
+                "user_" +
+                Date.now() +
+                "_" +
+                Math.random().toString(36).substr(2, 9),
+              firstName: userData.firstName,
+              lastName: userData.lastName,
+              email: userData.email.toLowerCase(),
+              phone: userData.phone,
+              avatar: userData.avatar || "",
               role: "user",
               createdAt: new Date().toISOString(),
-              password: userData.password, // In real app, this would be hashed
             };
 
-            // Save to localStorage "database"
+            // Save to localStorage
             const users = getUsersFromStorage();
             users.push(newUser);
             saveUsersToStorage(users);
@@ -553,6 +645,152 @@ export const useStore = create<StoreState>()(
         return get().wishlist.length;
       },
 
+      // Order state
+      orders: [],
+      createOrder: async (orderData) => {
+        return new Promise((resolve) => {
+          setTimeout(() => {
+            if (typeof window === "undefined") {
+              resolve({
+                success: false,
+                message: "Server-side operation not supported",
+              });
+              return;
+            }
+
+            const storageKey = "freshko-orders";
+            const storedOrders = localStorage.getItem(storageKey);
+            const orders = storedOrders ? JSON.parse(storedOrders) : [];
+
+            // Generate new ID
+            const maxId =
+              orders.length > 0 ? Math.max(...orders.map((o: any) => o.id)) : 0;
+
+            // Get current user
+            const currentUser = get().user;
+            if (!currentUser) {
+              resolve({
+                success: false,
+                message: "User must be logged in to create an order",
+              });
+              return;
+            }
+
+            // Create new order
+            const newOrder: Order = {
+              id: maxId + 1,
+              user_id: currentUser.id,
+              date: new Date().toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+              }),
+              status: "processing" as const,
+              items: orderData.items.map((item) => ({
+                id: item.id,
+                name: item.name,
+                price: item.price,
+                quantity: item.quantity,
+                image: item.image,
+                barang_id: item.id, // Reference to product ID
+              })),
+              subtotal: orderData.subtotal,
+              shipping: orderData.shipping,
+              tax: orderData.tax,
+              discount: orderData.discount,
+              total: orderData.total,
+              customer: `${currentUser.firstName} ${currentUser.lastName}`,
+              email: currentUser.email,
+              phone: currentUser.phone,
+              shippingAddress: orderData.shippingAddress,
+              paymentMethod: orderData.paymentMethod,
+              estimatedDelivery: new Date(
+                Date.now() + 3 * 24 * 60 * 60 * 1000
+              ).toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+              }),
+              createdAt: new Date().toISOString(),
+            };
+
+            // Save to localStorage
+            orders.push(newOrder);
+            localStorage.setItem(storageKey, JSON.stringify(orders));
+
+            // Dispatch custom event to notify components
+            window.dispatchEvent(
+              new CustomEvent("orderCreated", {
+                detail: newOrder,
+              })
+            );
+
+            resolve({
+              success: true,
+              message: `Order has been created successfully!`,
+              order: newOrder,
+            });
+          }, 1500);
+        });
+      },
+      getUserOrders: () => {
+        const orders = getOrdersFromStorage();
+        return orders.filter((o) => o.user_id === get().user?.id);
+      },
+      getAllOrders: () => {
+        return getOrdersFromStorage();
+      },
+      updateOrderStatus: async (orderId, status) => {
+        return new Promise((resolve) => {
+          setTimeout(() => {
+            if (typeof window === "undefined") {
+              resolve({
+                success: false,
+                message: "Server-side operation not supported",
+              });
+              return;
+            }
+
+            const storageKey = "freshko-orders";
+            const storedOrders = localStorage.getItem(storageKey);
+            const orders = storedOrders ? JSON.parse(storedOrders) : [];
+
+            const orderIndex = orders.findIndex((o: any) => o.id === orderId);
+
+            if (orderIndex === -1) {
+              resolve({
+                success: false,
+                message: "Order not found.",
+              });
+              return;
+            }
+
+            const existingOrder = orders[orderIndex];
+
+            // Update order data
+            const updatedOrder = { ...existingOrder, status };
+            orders[orderIndex] = updatedOrder;
+            localStorage.setItem(storageKey, JSON.stringify(orders));
+
+            // Dispatch custom event to notify components
+            window.dispatchEvent(
+              new CustomEvent("orderUpdated", {
+                detail: updatedOrder,
+              })
+            );
+
+            resolve({
+              success: true,
+              message: `Order status has been updated successfully!`,
+            });
+          }, 1500);
+        });
+      },
+      getOrderById: (id) => {
+        const orders = getOrdersFromStorage();
+        return orders.find((o: any) => o.id === id);
+      },
+
       // Search state
       searchQuery: "",
       setSearchQuery: (query) => set({ searchQuery: query }),
@@ -580,6 +818,553 @@ export const useStore = create<StoreState>()(
 
       checkEmailExists: (email: string): boolean => {
         return findUserByEmail(email) !== null;
+      },
+
+      createUser: async (userData) => {
+        return new Promise((resolve) => {
+          setTimeout(() => {
+            const emailLower = userData.email.toLowerCase().trim();
+
+            // Check if email is already taken
+            const existingUser = findUserByEmail(emailLower);
+            if (existingUser) {
+              resolve({
+                success: false,
+                message:
+                  "Email address is already registered. Please use a different email.",
+              });
+              return;
+            }
+
+            // Create new user
+            const newUser = {
+              id: "user_" + Date.now(),
+              firstName: userData.firstName.trim(),
+              lastName: userData.lastName.trim(),
+              email: emailLower,
+              phone: userData.phone?.trim(),
+              avatar: userData.avatar,
+              role: userData.role || "user",
+              createdAt: new Date().toISOString(),
+              password: userData.password, // In real app, this would be hashed
+            };
+
+            // Save to localStorage "database"
+            const users = getUsersFromStorage();
+            users.push(newUser);
+            saveUsersToStorage(users);
+
+            resolve({
+              success: true,
+              message: `Customer ${userData.firstName} ${userData.lastName} has been created successfully!`,
+            });
+          }, 1500);
+        });
+      },
+
+      updateUser: async (userId, userData) => {
+        return new Promise((resolve) => {
+          setTimeout(() => {
+            const users = getUsersFromStorage();
+            const userIndex = users.findIndex((u) => u.id === userId);
+
+            if (userIndex === -1) {
+              resolve({
+                success: false,
+                message: "User not found.",
+              });
+              return;
+            }
+
+            // If email is being changed, check if it's already taken
+            if (userData.email) {
+              const emailLower = userData.email.toLowerCase().trim();
+              const existingUser = findUserByEmail(emailLower);
+              if (existingUser && existingUser.id !== userId) {
+                resolve({
+                  success: false,
+                  message:
+                    "Email address is already registered by another user.",
+                });
+                return;
+              }
+            }
+
+            // Update user data
+            const updatedUser = { ...users[userIndex] };
+            if (userData.firstName)
+              updatedUser.firstName = userData.firstName.trim();
+            if (userData.lastName)
+              updatedUser.lastName = userData.lastName.trim();
+            if (userData.email)
+              updatedUser.email = userData.email.toLowerCase().trim();
+            if (userData.phone !== undefined)
+              updatedUser.phone = userData.phone?.trim();
+            if (userData.avatar !== undefined)
+              updatedUser.avatar = userData.avatar;
+            if (userData.role) updatedUser.role = userData.role;
+
+            users[userIndex] = updatedUser;
+            saveUsersToStorage(users);
+
+            resolve({
+              success: true,
+              message: `Customer ${updatedUser.firstName} ${updatedUser.lastName} has been updated successfully!`,
+            });
+          }, 1500);
+        });
+      },
+
+      // Product management functions
+      getAllProducts: () => {
+        if (typeof window === "undefined") return [];
+        const storageKey = "freshko-products";
+        const stored = localStorage.getItem(storageKey);
+        const allProducts = stored ? JSON.parse(stored) : [];
+
+        // Ensure we have data - if empty, initialize and try again
+        if (allProducts.length === 0) {
+          get().initializeOriginalData();
+          const reloaded = localStorage.getItem(storageKey);
+          const reloadedProducts = reloaded ? JSON.parse(reloaded) : [];
+          return reloadedProducts;
+        }
+
+        return allProducts;
+      },
+
+      searchProducts: (query: string) => {
+        if (!query.trim()) return [];
+
+        const allProducts = get().getAllProducts();
+        const lowercaseQuery = query.toLowerCase();
+        return allProducts.filter(
+          (product: any) =>
+            product.name.toLowerCase().includes(lowercaseQuery) ||
+            product.category?.toLowerCase().includes(lowercaseQuery) ||
+            product.description?.toLowerCase().includes(lowercaseQuery)
+        );
+      },
+
+      createProduct: async (productData) => {
+        return new Promise((resolve) => {
+          setTimeout(() => {
+            if (typeof window === "undefined") {
+              resolve({
+                success: false,
+                message: "Server-side operation not supported",
+              });
+              return;
+            }
+
+            const storageKey = "freshko-products";
+            const stored = localStorage.getItem(storageKey);
+            const products = stored ? JSON.parse(stored) : [];
+
+            // Generate new ID
+            const maxId =
+              products.length > 0
+                ? Math.max(...products.map((p: any) => p.id))
+                : 0;
+
+            // Create new product
+            const newProduct = {
+              ...productData,
+              id: maxId + 1,
+              isEditable: true, // User-created products are editable
+              createdBy: "user",
+              rating: productData.rating || 4.0, // Default rating for new products
+            };
+
+            // Save to localStorage
+            products.push(newProduct);
+            localStorage.setItem(storageKey, JSON.stringify(products));
+
+            // Dispatch custom event to notify components
+            window.dispatchEvent(
+              new CustomEvent("productCreated", {
+                detail: newProduct,
+              })
+            );
+
+            resolve({
+              success: true,
+              message: `Product "${productData.name}" has been created successfully!`,
+              product: newProduct,
+            });
+          }, 1500);
+        });
+      },
+
+      updateProduct: async (productId, productData) => {
+        return new Promise((resolve) => {
+          setTimeout(() => {
+            if (typeof window === "undefined") {
+              resolve({
+                success: false,
+                message: "Server-side operation not supported",
+              });
+              return;
+            }
+
+            const storageKey = "freshko-products";
+            const stored = localStorage.getItem(storageKey);
+            const products = stored ? JSON.parse(stored) : [];
+
+            const productIndex = products.findIndex(
+              (p: any) => p.id === productId
+            );
+
+            if (productIndex === -1) {
+              resolve({
+                success: false,
+                message: "Product not found.",
+              });
+              return;
+            }
+
+            const existingProduct = products[productIndex];
+
+            // Check if product is editable (protect original data)
+            if (
+              existingProduct.isEditable === false ||
+              existingProduct.createdBy === "original"
+            ) {
+              resolve({
+                success: false,
+                message:
+                  "This is an original product and cannot be modified. Only user-created products can be edited.",
+              });
+              return;
+            }
+
+            // Update product data
+            const updatedProduct = { ...existingProduct, ...productData };
+            products[productIndex] = updatedProduct;
+            localStorage.setItem(storageKey, JSON.stringify(products));
+
+            // Dispatch custom event to notify components
+            window.dispatchEvent(
+              new CustomEvent("productUpdated", {
+                detail: updatedProduct,
+              })
+            );
+
+            resolve({
+              success: true,
+              message: `Product "${updatedProduct.name}" has been updated successfully!`,
+            });
+          }, 1500);
+        });
+      },
+
+      deleteProduct: async (productId) => {
+        return new Promise((resolve) => {
+          setTimeout(() => {
+            if (typeof window === "undefined") {
+              resolve({
+                success: false,
+                message: "Server-side operation not supported",
+              });
+              return;
+            }
+
+            const storageKey = "freshko-products";
+            const stored = localStorage.getItem(storageKey);
+            const products = stored ? JSON.parse(stored) : [];
+
+            const product = products.find((p: any) => p.id === productId);
+
+            if (!product) {
+              resolve({
+                success: false,
+                message: "Product not found.",
+              });
+              return;
+            }
+
+            // Check if product is editable (protect original data)
+            if (
+              product.isEditable === false ||
+              product.createdBy === "original"
+            ) {
+              resolve({
+                success: false,
+                message:
+                  "This is an original product and cannot be deleted. Only user-created products can be deleted.",
+              });
+              return;
+            }
+
+            const filteredProducts = products.filter(
+              (p: any) => p.id !== productId
+            );
+            localStorage.setItem(storageKey, JSON.stringify(filteredProducts));
+
+            // Dispatch custom event to notify components
+            window.dispatchEvent(
+              new CustomEvent("productDeleted", {
+                detail: { id: productId, name: product.name },
+              })
+            );
+
+            resolve({
+              success: true,
+              message: `Product "${product.name}" has been deleted successfully!`,
+            });
+          }, 1000);
+        });
+      },
+
+      getProductById: (id) => {
+        if (typeof window === "undefined") return undefined;
+        const storageKey = "freshko-products";
+        const stored = localStorage.getItem(storageKey);
+        const products = stored ? JSON.parse(stored) : [];
+        return products.find((p: any) => p.id === id);
+      },
+
+      // Article management functions
+      getAllArticles: () => {
+        if (typeof window === "undefined") return [];
+        const storageKey = "freshko-articles";
+        const stored = localStorage.getItem(storageKey);
+        return stored ? JSON.parse(stored) : [];
+      },
+
+      createArticle: async (articleData) => {
+        return new Promise((resolve) => {
+          setTimeout(() => {
+            if (typeof window === "undefined") {
+              resolve({
+                success: false,
+                message: "Server-side operation not supported",
+              });
+              return;
+            }
+
+            const storageKey = "freshko-articles";
+            const stored = localStorage.getItem(storageKey);
+            const articles = stored ? JSON.parse(stored) : [];
+
+            // Generate new ID
+            const maxId =
+              articles.length > 0
+                ? Math.max(...articles.map((a: any) => a.id))
+                : 0;
+
+            // Create new article
+            const newArticle = {
+              ...articleData,
+              id: maxId + 1,
+              isEditable: true, // User-created articles are editable
+              createdBy: "user",
+              date: new Date().toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+              }),
+            };
+
+            // Save to localStorage
+            articles.push(newArticle);
+            localStorage.setItem(storageKey, JSON.stringify(articles));
+
+            // Dispatch custom event to notify components
+            window.dispatchEvent(
+              new CustomEvent("articleCreated", {
+                detail: { article: newArticle },
+              })
+            );
+
+            resolve({
+              success: true,
+              message: `Article "${articleData.title}" has been created successfully!`,
+              article: newArticle,
+            });
+          }, 1500);
+        });
+      },
+
+      updateArticle: async (articleId, articleData) => {
+        return new Promise((resolve) => {
+          setTimeout(() => {
+            if (typeof window === "undefined") {
+              resolve({
+                success: false,
+                message: "Server-side operation not supported",
+              });
+              return;
+            }
+
+            const storageKey = "freshko-articles";
+            const stored = localStorage.getItem(storageKey);
+            const articles = stored ? JSON.parse(stored) : [];
+
+            const articleIndex = articles.findIndex(
+              (a: any) => a.id === articleId
+            );
+
+            if (articleIndex === -1) {
+              resolve({
+                success: false,
+                message: "Article not found.",
+              });
+              return;
+            }
+
+            const existingArticle = articles[articleIndex];
+
+            // Check if article is editable (protect original data)
+            if (
+              existingArticle.isEditable === false ||
+              existingArticle.createdBy === "original"
+            ) {
+              resolve({
+                success: false,
+                message:
+                  "This is an original article and cannot be modified. Only user-created articles can be edited.",
+              });
+              return;
+            }
+
+            // Update article data
+            const updatedArticle = { ...existingArticle, ...articleData };
+            articles[articleIndex] = updatedArticle;
+            localStorage.setItem(storageKey, JSON.stringify(articles));
+
+            // Dispatch custom event to notify components
+            window.dispatchEvent(
+              new CustomEvent("articleUpdated", {
+                detail: { article: updatedArticle },
+              })
+            );
+
+            resolve({
+              success: true,
+              message: `Article "${updatedArticle.title}" has been updated successfully!`,
+            });
+          }, 1500);
+        });
+      },
+
+      deleteArticle: async (articleId) => {
+        return new Promise((resolve) => {
+          setTimeout(() => {
+            if (typeof window === "undefined") {
+              resolve({
+                success: false,
+                message: "Server-side operation not supported",
+              });
+              return;
+            }
+
+            const storageKey = "freshko-articles";
+            const stored = localStorage.getItem(storageKey);
+            const articles = stored ? JSON.parse(stored) : [];
+
+            const article = articles.find((a: any) => a.id === articleId);
+
+            if (!article) {
+              resolve({
+                success: false,
+                message: "Article not found.",
+              });
+              return;
+            }
+
+            // Check if article is editable (protect original data)
+            if (
+              article.isEditable === false ||
+              article.createdBy === "original"
+            ) {
+              resolve({
+                success: false,
+                message:
+                  "This is an original article and cannot be deleted. Only user-created articles can be deleted.",
+              });
+              return;
+            }
+
+            const filteredArticles = articles.filter(
+              (a: any) => a.id !== articleId
+            );
+            localStorage.setItem(storageKey, JSON.stringify(filteredArticles));
+
+            // Dispatch custom event to notify components
+            window.dispatchEvent(
+              new CustomEvent("articleDeleted", {
+                detail: { id: articleId, title: article.title },
+              })
+            );
+
+            resolve({
+              success: true,
+              message: `Article "${article.title}" has been deleted successfully!`,
+            });
+          }, 1000);
+        });
+      },
+
+      getArticleById: (id) => {
+        if (typeof window === "undefined") return undefined;
+        const storageKey = "freshko-articles";
+        const stored = localStorage.getItem(storageKey);
+        const articles = stored ? JSON.parse(stored) : [];
+        return articles.find((a: any) => a.id === id);
+      },
+
+      // Data initialization functions
+      initializeOriginalData: () => {
+        if (typeof window === "undefined") return;
+
+        // Initialize products
+        const productsKey = "freshko-products";
+        const storedProducts = localStorage.getItem(productsKey);
+
+        if (!storedProducts) {
+          // First time - save original products only
+          const protectedProducts = originalProducts.map((product) => ({
+            ...product,
+            isEditable: false,
+            createdBy: "original",
+          }));
+          localStorage.setItem(productsKey, JSON.stringify(protectedProducts));
+        } else {
+          // Check if we need to add new original products (in case the original data was updated)
+          const existingProducts = JSON.parse(storedProducts);
+          const originalIds = originalProducts.map((p) => p.id);
+          const existingOriginalIds = existingProducts
+            .filter((p: any) => p.createdBy === "original")
+            .map((p: any) => p.id);
+
+          // Add any missing original products
+          const missingOriginals = originalProducts.filter(
+            (p) => !existingOriginalIds.includes(p.id)
+          );
+          if (missingOriginals.length > 0) {
+            const protectedMissing = missingOriginals.map((product) => ({
+              ...product,
+              isEditable: false,
+              createdBy: "original",
+            }));
+            existingProducts.push(...protectedMissing);
+            localStorage.setItem(productsKey, JSON.stringify(existingProducts));
+          }
+        }
+
+        // Initialize articles
+        const articlesKey = "freshko-articles";
+        const storedArticles = localStorage.getItem(articlesKey);
+
+        if (!storedArticles) {
+          const protectedArticles = originalBlogPosts.map((article) => ({
+            ...article,
+            isEditable: false,
+            createdBy: "original",
+          }));
+          localStorage.setItem(articlesKey, JSON.stringify(protectedArticles));
+        }
       },
     }),
     {

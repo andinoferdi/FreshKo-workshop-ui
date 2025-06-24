@@ -1,25 +1,15 @@
-import { notFound } from "next/navigation"
-import { getProductById, products } from "@/lib/products"
-import ProductDetail from "@/components/ProductDetail"
+"use client";
+
+import ProductDetail from "@/components/ProductDetail";
+import { use } from "react";
 
 interface ProductPageProps {
-  params: {
-    id: string
-  }
-}
-
-export async function generateStaticParams() {
-  return products.map((product) => ({
-    id: product.id.toString(),
-  }))
+  params: Promise<{
+    id: string;
+  }>;
 }
 
 export default function ProductPage({ params }: ProductPageProps) {
-  const product = getProductById(Number.parseInt(params.id))
-
-  if (!product) {
-    notFound()
-  }
-
-  return <ProductDetail product={product} />
+  const resolvedParams = use(params);
+  return <ProductDetail productId={resolvedParams.id} />;
 }
