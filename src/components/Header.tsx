@@ -313,7 +313,7 @@ export default function Header() {
                   />
                   <button
                     type="submit"
-                    className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-primary text-white p-2 rounded-lg hover:bg-primary/90 transition-colors duration-200"
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-primary text-white p-2 rounded-full hover:bg-primary/90 transition-colors duration-200"
                   >
                     <Search size={16} />
                   </button>
@@ -381,7 +381,7 @@ export default function Header() {
                 </div>
                 <button
                   type="submit"
-                  className="px-8 py-4 bg-gradient-primary text-white hover:shadow-lg transition-all duration-300 hover:scale-105 transform font-medium"
+                  className="px-8 py-4 bg-gradient-primary text-white hover:shadow-lg transition-all duration-300 hover:scale-105 transform font-medium rounded-full"
                 >
                   <Search size={20} />
                 </button>
