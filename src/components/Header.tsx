@@ -25,6 +25,7 @@ export default function Header() {
   // NextAuth session
   const { data: session, status } = useSession();
 
+  const store = useHydratedStore();
   const {
     cart,
     wishlist,
@@ -40,7 +41,7 @@ export default function Header() {
     getAllProducts,
     initializeOriginalData,
     searchProducts: storeSearchProducts,
-  } = useHydratedStore();
+  } = store;
   const router = useRouter();
 
   const cartTotal = getCartTotal();
@@ -54,17 +55,66 @@ export default function Header() {
     initializeOriginalData();
   }, [initializeOriginalData]);
 
-  // Sync NextAuth session with FreshKo store
+  // Listen for Google profile updates
   useEffect(() => {
+    const handleGoogleProfileUpdate = () => {
+      console.log("🎯 Header received Google profile update event");
+      // Force component re-render by updating a state
+      setIsUserMenuOpen(false);
+    };
+
+    window.addEventListener(
+      "google-profile-updated",
+      handleGoogleProfileUpdate
+    );
+    window.addEventListener("google-user-login", handleGoogleProfileUpdate);
+
+    return () => {
+      window.removeEventListener(
+        "google-profile-updated",
+        handleGoogleProfileUpdate
+      );
+      window.removeEventListener(
+        "google-user-login",
+        handleGoogleProfileUpdate
+      );
+    };
+  }, []);
+
+  // Enhanced sync between NextAuth session and FreshKo store
+  useEffect(() => {
+    // Debug Header state
+    console.log("🎯 Header Auth State:", {
+      status,
+      sessionEmail: session?.user?.email,
+      isAuthenticated,
+      userExists: !!user,
+      userEmail: user?.email,
+      userName: user?.firstName,
+      userAvatar: user?.avatar,
+    });
+
     if (status === "unauthenticated" && isAuthenticated && user) {
       // NextAuth logged out but FreshKo store still thinks user is logged in
       // Check if user has avatar (Google users typically have profile photos)
-      // This is a simple heuristic to identify Google OAuth users
       if (user.avatar && user.avatar.includes("googleusercontent.com")) {
+        console.log("🔄 Syncing Google logout with FreshKo store");
         logout();
       }
     }
-  }, [status, isAuthenticated, user, logout]);
+
+    // Auto-sync Google users when NextAuth session exists but FreshKo doesn't
+    if (
+      status === "authenticated" &&
+      session?.user?.email &&
+      !isAuthenticated
+    ) {
+      console.log(
+        "🔄 NextAuth authenticated but FreshKo not - triggering sync"
+      );
+      // The GoogleUserSync component will handle this automatically
+    }
+  }, [status, isAuthenticated, user, logout, session?.user?.email]);
 
   // Handle scroll effect
   useEffect(() => {
@@ -356,35 +406,23 @@ export default function Header() {
                 <div className="relative">
                   <button
                     onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                    className="relative group"
+                    className="relative group p-3 glass-effect rounded-xl hover:bg-white/20 transition-all duration-300 hover:scale-110 transform flex items-center justify-center"
                     title="My Account"
                   >
                     {isAuthenticated && user ? (
-                      user.avatar ? (
-                        <div className="relative">
-                          <img
-                            src={user.avatar}
-                            alt={`${user.firstName} ${user.lastName}`}
-                            className="w-10 h-10 rounded-full object-cover border-2 border-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 ring-2 ring-primary/20 hover:ring-primary/40"
-                          />
-                          <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></div>
-                        </div>
-                      ) : (
-                        <div className="relative">
-                          <div className="w-10 h-10 bg-gradient-primary rounded-full flex items-center justify-center text-white text-sm font-bold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 ring-2 ring-primary/20 hover:ring-primary/40">
-                            {user.firstName[0]}
-                            {user.lastName[0]}
-                          </div>
-                          <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></div>
-                        </div>
-                      )
-                    ) : (
-                      <div className="p-3 glass-effect rounded-xl hover:bg-white/20 transition-all duration-300 hover:scale-110 transform">
-                        <User
-                          size={20}
-                          className="text-gray-600 group-hover:text-primary transition-colors duration-200"
+                      <div className="relative">
+                        <img
+                          src={user.avatar || "/images/guest.png"}
+                          alt={`${user.firstName} ${user.lastName}`}
+                          className="w-6 h-6 rounded-full object-cover border border-gray-200"
                         />
+                        <div className="absolute -bottom-0.5 -right-0.5 w-2 h-2 bg-green-500 border border-white rounded-full"></div>
                       </div>
+                    ) : (
+                      <User
+                        size={20}
+                        className="text-gray-600 group-hover:text-primary transition-colors duration-200"
+                      />
                     )}
                   </button>
 
@@ -407,24 +445,14 @@ export default function Header() {
                             <>
                               <div className="px-6 py-4 border-b border-gray-100/50 bg-gradient-to-r from-primary/5 to-primary/10 rounded-t-xl">
                                 <div className="flex items-center space-x-4">
-                                  {user.avatar ? (
-                                    <div className="relative">
-                                      <img
-                                        src={user.avatar}
-                                        alt={`${user.firstName} ${user.lastName}`}
-                                        className="w-12 h-12 rounded-full object-cover border-2 border-white shadow-lg ring-2 ring-primary/20"
-                                      />
-                                      <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-white rounded-full"></div>
-                                    </div>
-                                  ) : (
-                                    <div className="relative">
-                                      <div className="w-12 h-12 bg-gradient-primary rounded-full flex items-center justify-center text-white text-base font-bold shadow-lg ring-2 ring-primary/20">
-                                        {user.firstName[0]}
-                                        {user.lastName[0]}
-                                      </div>
-                                      <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-white rounded-full"></div>
-                                    </div>
-                                  )}
+                                  <div className="relative">
+                                    <img
+                                      src={user.avatar || "/images/guest.png"}
+                                      alt={`${user.firstName} ${user.lastName}`}
+                                      className="w-12 h-12 rounded-full object-cover border-2 border-white shadow-lg ring-2 ring-primary/20"
+                                    />
+                                    <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-white rounded-full"></div>
+                                  </div>
                                   <div className="flex-1 min-w-0">
                                     <p className="text-sm font-semibold text-gray-800 truncate">
                                       Welcome back, {user.firstName}!
@@ -525,7 +553,7 @@ export default function Header() {
                 </div>
 
                 <button
-                  className="relative p-3 bg-white rounded-xl hover:bg-white/20 transition-all duration-300 hover:scale-110 transform group"
+                  className="relative p-3 glass-effect rounded-xl hover:bg-white/20 transition-all duration-300 hover:scale-110 transform group"
                   onClick={handleWishlistClick}
                   title="Wishlist"
                 >

@@ -1537,22 +1537,72 @@ export const useStore = create<StoreState>()(
         user: state.user,
         isAuthenticated: state.isAuthenticated,
       }),
-      skipHydration: true, // Prevent hydration issues
+      skipHydration: false, // Enable hydration for better Google OAuth sync
     }
   )
 );
 
-// Improved hydration-safe hook
+// Enhanced hydration-safe hook with Google OAuth support
 export const useHydratedStore = () => {
   const store = useStore();
   const [isHydrated, setIsHydrated] = useState(false);
 
   useEffect(() => {
-    // Immediately mark as hydrated and rehydrate
+    // Mark as hydrated and rehydrate
     setIsHydrated(true);
     useStore.persist.rehydrate();
+
+    // Add Google OAuth event listener for fallback authentication
+    const handleGoogleLogin = (event: CustomEvent) => {
+      console.log("🎉 Handling Google user login event:", event.detail);
+
+      const userData = event.detail;
+
+      // Update store state directly
+      useStore.setState({
+        user: userData,
+        isAuthenticated: true,
+      });
+
+      console.log("✅ Google user authenticated via event listener");
+    };
+
+    // Add Google profile update event listener
+    const handleGoogleProfileUpdate = (event: CustomEvent) => {
+      console.log("🔄 Handling Google profile update:", event.detail);
+
+      const updatedUser = event.detail;
+
+      // Update store state with refreshed profile
+      useStore.setState({
+        user: updatedUser,
+      });
+
+      console.log("✅ Google profile updated in store");
+    };
+
+    // Listen for Google login and profile update events
+    window.addEventListener(
+      "google-user-login",
+      handleGoogleLogin as EventListener
+    );
+    window.addEventListener(
+      "google-profile-updated",
+      handleGoogleProfileUpdate as EventListener
+    );
+
+    // Cleanup
+    return () => {
+      window.removeEventListener(
+        "google-user-login",
+        handleGoogleLogin as EventListener
+      );
+      window.removeEventListener(
+        "google-profile-updated",
+        handleGoogleProfileUpdate as EventListener
+      );
+    };
   }, []);
 
-  // Always return the current store state to prevent blinking
   return store;
 };

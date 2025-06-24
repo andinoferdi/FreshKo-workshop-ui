@@ -206,10 +206,11 @@ function AccountDashboard() {
           <div className="modern-card p-6 text-center animate-slideInLeft">
             {/* Avatar */}
             <div className="relative inline-block mb-6">
-              <div className="w-20 h-20 bg-gradient-primary rounded-full flex items-center justify-center text-white text-xl font-bold animate-pulse-slow">
-                {user.firstName[0]}
-                {user.lastName[0]}
-              </div>
+              <img
+                src={user.avatar || "/guest.png"}
+                alt={`${user.firstName} ${user.lastName}`}
+                className="w-20 h-20 rounded-full object-cover border-4 border-white shadow-lg"
+              />
             </div>
 
             {/* User Info */}

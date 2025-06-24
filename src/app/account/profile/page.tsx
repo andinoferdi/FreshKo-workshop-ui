@@ -290,25 +290,18 @@ function ProfileContent() {
           <div className="modern-card p-8 text-center animate-slideInLeft h-fit">
             {/* Avatar */}
             <div className="relative inline-block mb-8">
-              {avatarPreview || user.avatar ? (
-                <div className="relative">
-                  <img
-                    src={avatarPreview || user.avatar}
-                    alt={`${user.firstName} ${user.lastName}`}
-                    className="w-32 h-32 rounded-full object-cover border-4 border-white shadow-2xl ring-4 ring-primary/20"
-                  />
-                  {isUploadingAvatar && (
-                    <div className="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center backdrop-blur-sm">
-                      <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <div className="w-32 h-32 bg-gradient-primary rounded-full flex items-center justify-center text-white text-4xl font-bold shadow-2xl ring-4 ring-primary/20">
-                  {user.firstName[0]}
-                  {user.lastName[0]}
-                </div>
-              )}
+              <div className="relative">
+                <img
+                  src={avatarPreview || user.avatar || "/images/guest.png"}
+                  alt={`${user.firstName} ${user.lastName}`}
+                  className="w-32 h-32 rounded-full object-cover border-4 border-white shadow-2xl ring-4 ring-primary/20"
+                />
+                {isUploadingAvatar && (
+                  <div className="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center backdrop-blur-sm">
+                    <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  </div>
+                )}
+              </div>
 
               {/* Upload Button */}
               <button
@@ -320,8 +313,9 @@ function ProfileContent() {
                 <Camera size={18} />
               </button>
 
-              {/* Remove Button (show only if has avatar) */}
-              {(user.avatar || avatarPreview) && (
+              {/* Remove Button (show only if has custom avatar) */}
+              {((user.avatar && user.avatar !== "/guest.png") ||
+                avatarPreview) && (
                 <button
                   onClick={removeAvatar}
                   disabled={isUploadingAvatar}

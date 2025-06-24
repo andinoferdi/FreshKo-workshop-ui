@@ -1,163 +1,285 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { useHydratedStore } from "@/lib/store";
+import { debugAuthFlow } from "@/lib/auth-debug";
+import { autoRefreshGoogleProfile } from "@/lib/google-profile-refresh";
 
 export default function GoogleUserSync() {
   const { data: session, status } = useSession();
-  const { isAuthenticated, user, initializeOriginalData } = useHydratedStore();
-  const store = useHydratedStore();
-
-  // Enhanced debug logging
-  console.log(
-    "GoogleUserSync - Status:",
-    status,
-    "Session:",
-    session
-      ? {
-          email: session.user?.email,
-          name: session.user?.name,
-          image: session.user?.image,
-          hasSession: true,
-        }
-      : "No session",
-    "IsAuth:",
-    isAuthenticated,
-    "User:",
-    user?.email
-  );
+  const { isAuthenticated, user, login } = useHydratedStore();
+  const syncInProgress = useRef(false);
+  const lastProcessedUser = useRef<string | null>(null);
 
   useEffect(() => {
-    console.log("GoogleUserSync useEffect triggered:", {
+    // Helper function to check if sync is needed
+    const needsSync = () => {
+      return (
+        status === "authenticated" &&
+        session?.user?.email &&
+        !isAuthenticated &&
+        !syncInProgress.current &&
+        lastProcessedUser.current !== session.user.email
+      );
+    };
+
+    // Helper function to check if user already synced but state not updated
+    const needsStateUpdate = () => {
+      return (
+        status === "authenticated" &&
+        session?.user?.email &&
+        !isAuthenticated &&
+        lastProcessedUser.current === session.user.email
+      );
+    };
+
+    // Debug logging
+    debugAuthFlow.nextAuthSession(status, session);
+    debugAuthFlow.freshkoStore(isAuthenticated, user);
+
+    console.log("🔄 GoogleUserSync Check:", {
       status,
-      userEmail: session?.user?.email,
+      sessionEmail: session?.user?.email,
       isAuthenticated,
-      sessionExists: !!session,
-      userExists: !!session?.user,
+      syncInProgress: syncInProgress.current,
+      lastProcessedUser: lastProcessedUser.current,
+      needsSync: needsSync(),
+      needsStateUpdate: needsStateUpdate(),
     });
 
-    // Only proceed if we have an authenticated session with user data
-    if (
-      status === "authenticated" &&
-      session?.user?.email &&
-      !isAuthenticated
-    ) {
-      // Google user is authenticated but not in FreshKo store
-      console.log("🚀 Starting Google user sync for:", session.user.email);
-
-      // Add a flag to prevent multiple syncs
-      const userEmail = session.user.email;
-      const syncKey = `freshko-sync-${userEmail}`;
-
-      if (!sessionStorage.getItem(syncKey)) {
-        console.log("✨ No sync flag found, proceeding with sync...");
-        sessionStorage.setItem(syncKey, "true");
-        syncGoogleUserToStore(session.user);
-      } else {
-        console.log("✅ Sync already performed for this user");
-      }
+    if (needsSync()) {
+      performGoogleUserSync();
+    } else if (needsStateUpdate()) {
+      // Force re-login to update state
+      retryLogin();
     } else if (
       status === "authenticated" &&
       session?.user?.email &&
-      isAuthenticated
+      isAuthenticated &&
+      user
     ) {
-      console.log(
-        "✅ User already authenticated in both systems:",
-        session.user.email
-      );
-    } else if (status === "loading") {
-      console.log("⏳ Session still loading...");
-    } else if (status === "unauthenticated") {
-      console.log("❌ No authentication session found");
+      // Auto-refresh Google profile for existing authenticated users
+      autoRefreshGoogleProfile(user, session);
     }
-  }, [status, session?.user?.email, isAuthenticated]); // Use email as dependency
+  }, [status, session?.user?.email, isAuthenticated]);
 
-  const syncGoogleUserToStore = async (googleUser: any) => {
+  const performGoogleUserSync = async () => {
+    if (!session?.user?.email || syncInProgress.current) return;
+
+    syncInProgress.current = true;
+    const userEmail = session.user.email;
+
+    debugAuthFlow.googleSync("Starting Sync", { userEmail }, true);
+    console.log("🚀 Starting Google user sync for:", userEmail);
+
     try {
-      console.log("🔄 Starting sync process for Google user:", googleUser);
+      // Try to get enhanced profile data from sessionStorage first
+      let enhancedProfile = null;
+      try {
+        const storedProfile = sessionStorage.getItem("freshko-google-signin");
+        if (storedProfile) {
+          enhancedProfile = JSON.parse(storedProfile);
+          // Clean up temporary storage
+          sessionStorage.removeItem("freshko-google-signin");
+        }
+      } catch (error) {
+        console.warn("Could not parse stored Google profile:", error);
+      }
 
-      // Create user data in FreshKo format - MATCH EXACTLY with store User interface
+      // Enhanced Google profile data extraction with fallbacks
+      const profileData = enhancedProfile || {};
+      const firstName =
+        profileData.firstName ||
+        session.user.name?.split(" ")[0] ||
+        userEmail.split("@")[0] ||
+        "Google User";
+      const lastName =
+        profileData.lastName ||
+        session.user.name?.split(" ").slice(1).join(" ") ||
+        "";
+      const avatar = profileData.image || session.user.image || "";
+
+      // Create user data with enhanced Google profile information
       const userData = {
         id: `google_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-        firstName: googleUser.name?.split(" ")[0] || "",
-        lastName: googleUser.name?.split(" ").slice(1).join(" ") || "",
-        email: googleUser.email || "",
+        firstName: firstName,
+        lastName: lastName,
+        email: userEmail,
         phone: "",
-        role: "user", // Use "user" role, not "customer" to match store
+        role: "user" as const,
         createdAt: new Date().toISOString(),
-        avatar: googleUser.image || "", // Google profile image
+        avatar: avatar,
       };
 
+      // Enhanced debug logging with Google profile details
+      debugAuthFlow.googleSync(
+        "Google Profile Extracted",
+        {
+          enhancedProfile,
+          sessionUserName: session.user.name,
+          sessionUserImage: session.user.image,
+          extractedFirstName: firstName,
+          extractedLastName: lastName,
+          extractedAvatar: avatar,
+          email: userEmail,
+        },
+        true
+      );
+
+      debugAuthFlow.googleSync("User Data Created", userData, true);
+      console.log("📝 Google Profile Processing:", {
+        enhancedProfile,
+        sessionUser: {
+          name: session.user.name,
+          image: session.user.image,
+          email: session.user.email,
+        },
+        extracted: {
+          firstName,
+          lastName,
+          avatar,
+        },
+      });
       console.log("📝 Created user data:", userData);
 
-      // Get existing users from localStorage
+      // Save to localStorage using direct access (bypass store functions)
+      await saveGoogleUserToStorage(userData);
+
+      // Mark as processed
+      lastProcessedUser.current = userEmail;
+
+      // Attempt auto-login with retry mechanism
+      await attemptAutoLogin(userEmail);
+    } catch (error) {
+      debugAuthFlow.error("Google Sync", error);
+      console.error("❌ Error in Google user sync:", error);
+    } finally {
+      syncInProgress.current = false;
+    }
+  };
+
+  const saveGoogleUserToStorage = async (userData: any) => {
+    try {
       let users = [];
-      try {
-        const existingUsers = localStorage.getItem("freshko-users");
-        users = existingUsers ? JSON.parse(existingUsers) : [];
-        console.log("📚 Found existing users:", users.length);
-      } catch (error) {
-        console.error("❌ Error parsing existing users:", error);
-        users = [];
+      const existingUsers = localStorage.getItem("freshko-users");
+
+      if (existingUsers) {
+        users = JSON.parse(existingUsers);
       }
 
       // Check if user already exists
       const existingUserIndex = users.findIndex(
-        (u: any) => u.email === userData.email
+        (u: any) => u.email.toLowerCase() === userData.email.toLowerCase()
       );
 
       if (existingUserIndex === -1) {
-        // Add new Google user
+        // Add new user
         users.push(userData);
-        localStorage.setItem("freshko-users", JSON.stringify(users));
-        console.log(
-          "✅ New Google user added to FreshKo store:",
-          userData.email
-        );
+        debugAuthFlow.storageOperation("Add New Google User", userData, true);
+        console.log("✅ Adding new Google user to storage");
       } else {
-        // Update existing user with Google data
-        users[existingUserIndex] = { ...users[existingUserIndex], ...userData };
-        localStorage.setItem("freshko-users", JSON.stringify(users));
-        console.log(
-          "🔄 Existing user updated with Google data:",
-          userData.email
+        // Update existing user with Google data, prioritizing Google profile info
+        const updatedUser = {
+          ...users[existingUserIndex],
+          ...userData,
+          // Preserve original ID if it exists
+          id: users[existingUserIndex].id || userData.id,
+          // Always update with latest Google profile data
+          firstName: userData.firstName,
+          lastName: userData.lastName,
+          avatar: userData.avatar || users[existingUserIndex].avatar,
+        };
+        users[existingUserIndex] = updatedUser;
+        debugAuthFlow.storageOperation(
+          "Update Existing User with Google Profile",
+          updatedUser,
+          true
         );
+        console.log("🔄 Updating existing user with Google data");
       }
 
-      // AUTO-LOGIN: Simulate the same login process as regular users
-      // Use store's login method with a dummy password for Google users
-      const { login } = store;
-
-      try {
-        // Save Google user in a way that the login method can find them
-        const result = await login(userData.email, "google-oauth-login");
-
-        if (!result.success) {
-          // If login fails, try to set user state directly
-          // This is a fallback for Google users
-          console.log("🔄 Regular login failed, setting Google user directly");
-
-          // Force state update by dispatching custom event
-          window.dispatchEvent(
-            new CustomEvent("google-user-login", {
-              detail: userData,
-            })
-          );
-        }
-
-        console.log("🎉 Google user successfully logged in to FreshKo store!");
-      } catch (error) {
-        console.error("❌ Failed to auto-login Google user:", error);
-      }
-
-      // Remove sync flag after successful sync
-      sessionStorage.removeItem(`freshko-sync-${userData.email}`);
+      localStorage.setItem("freshko-users", JSON.stringify(users));
+      console.log("💾 User data saved to localStorage");
     } catch (error) {
-      console.error("❌ Error syncing Google user to FreshKo store:", error);
+      console.error("❌ Error saving user to storage:", error);
+      throw error;
     }
   };
 
-  // This component doesn't render anything
+  const attemptAutoLogin = async (email: string, retries = 3) => {
+    for (let attempt = 1; attempt <= retries; attempt++) {
+      console.log(`🔐 Auto-login attempt ${attempt}/${retries} for:`, email);
+
+      try {
+        const result = await login(email, "google-oauth-login");
+
+        if (result.success) {
+          console.log("🎉 Google user successfully logged in!");
+          return;
+        } else {
+          console.warn(`❌ Login attempt ${attempt} failed:`, result.message);
+
+          if (attempt === retries) {
+            // Final attempt - force state update
+            console.log("🔄 Final attempt failed, forcing state update...");
+            await forceStateUpdate(email);
+          } else {
+            // Wait before retry
+            await new Promise((resolve) => setTimeout(resolve, 500 * attempt));
+          }
+        }
+      } catch (error) {
+        console.error(`❌ Login attempt ${attempt} error:`, error);
+
+        if (attempt === retries) {
+          await forceStateUpdate(email);
+        }
+      }
+    }
+  };
+
+  const retryLogin = async () => {
+    if (!session?.user?.email) return;
+
+    console.log(
+      "🔄 Retrying login for already processed user:",
+      session.user.email
+    );
+    await attemptAutoLogin(session.user.email, 2);
+  };
+
+  const forceStateUpdate = async (email: string) => {
+    console.log("⚡ Force updating store state for:", email);
+
+    try {
+      // Get user from storage
+      const users = JSON.parse(localStorage.getItem("freshko-users") || "[]");
+      const user = users.find(
+        (u: any) => u.email.toLowerCase() === email.toLowerCase()
+      );
+
+      if (user) {
+        // Dispatch custom event for fallback authentication
+        window.dispatchEvent(
+          new CustomEvent("google-user-login", {
+            detail: user,
+          })
+        );
+
+        console.log("✅ Store state force updated via event");
+      }
+    } catch (error) {
+      console.error("❌ Error force updating state:", error);
+    }
+  };
+
+  // Cleanup effect
+  useEffect(() => {
+    return () => {
+      syncInProgress.current = false;
+    };
+  }, []);
+
   return null;
 }

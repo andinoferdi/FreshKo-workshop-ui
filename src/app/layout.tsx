@@ -9,6 +9,7 @@ import { HydrationFix } from "@/components/HydrationFix";
 import { Toaster } from "sonner";
 import NextAuthSessionProvider from "@/components/providers/SessionProvider";
 import GoogleUserSync from "@/components/GoogleUserSync";
+import DebugHelper from "@/components/DebugHelper";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -50,6 +51,7 @@ export default function RootLayout({
       >
         <NextAuthSessionProvider>
           <GoogleUserSync />
+          <DebugHelper />
           <HydrationFix />
           <AOSProvider>
             <NavigationHandler />

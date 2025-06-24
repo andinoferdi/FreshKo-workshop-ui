@@ -153,7 +153,7 @@ export default function DashboardCustomerDetailPage() {
               <div className="text-center mb-6">
                 <div className="relative w-24 h-24 mx-auto mb-4">
                   <Image
-                    src="/placeholder-user.jpg"
+                    src="/guest.png"
                     alt={customer.name}
                     fill
                     className="rounded-full object-cover"
